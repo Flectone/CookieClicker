@@ -79,7 +79,6 @@ public class BlockBreakListener implements Listener {
         ItemStack amethyst = ItemManager.get("AMETHYST");
         amethyst.setAmount(randomCount);
 
-
         Location gemstoneALocation = event.getBlock().getLocation();
         block.getWorld().dropItemNaturally(block.getLocation(), amethyst);
         event.setDropItems(false);
