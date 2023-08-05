@@ -1,0 +1,11 @@
+name: CookieClicker
+version: '${project.version}'
+main: net.flectone.cookieclicker.CookieClicker
+api-version: '1.20'
+commands:
+  giveitem:
+    usage: /giveitem
+    permission: cookieclicker.giveitem
+permissions:
+  cookieclicker.giveitem:
+    default: op
