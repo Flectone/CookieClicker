@@ -92,5 +92,44 @@ public class BlockBreakListener implements Listener {
         }, 200L);
     }
 
+    @EventHandler
+    public void breakTopazBlock (BlockBreakEvent event) {
+        Block block = event.getBlock();
+        if (!block.getType().equals(Material.YELLOW_STAINED_GLASS)) return;
+        ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
+        if (!item.getType().equals(Material.DIAMOND_PICKAXE)) return;
+
+        Inventory inventory = event.getPlayer().getInventory();
+        for (int i = 36; i < 40; i++) {
+            if (inventory.getItem(i) == null) {
+                event.setCancelled(true);
+                return;
+            }
+            NBTItem armorNBT = new NBTItem(inventory.getItem(i));
+            if (!armorNBT.hasTag("rubyTest")) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        Random random = new Random();
+        int topazAmount = random.nextInt(1, 3);
+
+        ItemStack topaz = ItemManager.get("TOPAZ");
+        topaz.setAmount(topazAmount);
+        block.getWorld().dropItemNaturally(block.getLocation(),topaz);
+        Location gemstoneLocation = event.getBlock().getLocation();
+        Bukkit.getScheduler().runTaskLater(CookieClicker.getPlugin(), new Runnable() {
+            @Override
+            public void run() {
+                Block topazGem = gemstoneLocation.getBlock();
+                topazGem.setType(Material.YELLOW_STAINED_GLASS);
+
+            }
+        }, 200L);
+
+
+    }
+
 
 }

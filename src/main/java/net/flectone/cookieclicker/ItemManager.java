@@ -87,7 +87,7 @@ public class ItemManager {
         diamondPick.setUnbreakable(true);
         diamondPick.addItemFlags(ItemFlag.HIDE_DESTROYS);
         rubyPickaxe.setItemMeta(diamondPick);
-        rubyPickaxe = ItemUtils.forgeCanDestroyItem(rubyPickaxe,"minecraft:red_stained_glass","minecraft:amethyst_block");
+        rubyPickaxe = ItemUtils.forgeCanDestroyItem(rubyPickaxe,"minecraft:red_stained_glass","minecraft:amethyst_block","minecraft:yellow_stained_glass");
         itemStackHashMap.put("RUBY_PICKAXE", rubyPickaxe);
 
         ItemStack cake = new ItemStack(Material.CAKE);
@@ -120,6 +120,20 @@ public class ItemManager {
 
         ItemStack perfectAmethyst = ItemUtils.createDefaultMeta(ChatColor.LIGHT_PURPLE + "Идеальный аметист", Material.BUDDING_AMETHYST);
         itemStackHashMap.put("PERFECT_AMETHYST", perfectAmethyst);
+
+        ItemStack topaz = ItemUtils.createDefaultMeta(ChatColor.YELLOW + "Грубый топаз", Material.YELLOW_DYE);
+        itemStackHashMap.put("TOPAZ", topaz);
+
+        ItemStack fineTopaz = ItemUtils.createEnchantedMeta(ChatColor.YELLOW + "Прекрасный топаз", Material.YELLOW_DYE, Enchantment.MENDING);
+        itemStackHashMap.put("FINE_TOPAZ", fineTopaz);
+
+        ItemStack gemsMixture = ItemUtils.createEnchantedMeta(ChatColor.GOLD + "Смесь драгоценных камней", Material.GRAY_DYE, Enchantment.MENDING);
+        ItemMeta gemsMixtureMeta = gemsMixture.getItemMeta();
+        ArrayList<String> gMList = new ArrayList<>();
+        gMList.add(ChatColor.GOLD + "" + ChatColor.ITALIC + " Добавляет вторую звезду к броне фермера");
+        gemsMixtureMeta.setLore(gMList);
+        gemsMixture.setItemMeta(gemsMixtureMeta);
+        itemStackHashMap.put("GEMSTONE_MIXTURE",gemsMixture);
     }
     public static ItemStack get(String string) {
         return itemStackHashMap.get(string);

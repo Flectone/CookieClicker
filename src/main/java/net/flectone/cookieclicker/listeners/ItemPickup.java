@@ -34,6 +34,7 @@ public class ItemPickup implements Listener {
                         mergeItem(player, ItemManager.get("ENCH_COCOA_BEANS"), event.getItem().getItemStack());
                         mergeItem(player, ItemManager.get("FINE_AMETHYST"), event.getItem().getItemStack());
                         mergeItem(player, ItemManager.get("PERFECT_AMETHYST"), event.getItem().getItemStack(), Material.AMETHYST_SHARD, false);
+                        mergeItem(player, ItemManager.get("FINE_TOPAZ"), event.getItem().getItemStack());
                     }
                 });
 
