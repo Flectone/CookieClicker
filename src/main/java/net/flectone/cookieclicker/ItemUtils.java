@@ -41,7 +41,8 @@ public class ItemUtils {
             return false;
         }
     }
-    public static Integer addFortune(Inventory inventory, String tag, Integer multiplier) {
+
+    public static int addFortune(Inventory inventory, String tag, Integer multiplier) {
         ArrayList <ItemStack> list = new ArrayList<>();
         int addChance = 0;
 
@@ -52,11 +53,10 @@ public class ItemUtils {
         for (ItemStack armor : list) {
             if (armor == null) continue;
             NBTItem nbtItem = new NBTItem(armor);
-            if (nbtItem.hasTag(tag)) {
-                addChance += multiplier;
-            }
+            int fortuneLvl = nbtItem.getInteger(tag);
+            addChance += fortuneLvl * multiplier;
         }
-    return addChance;
+        return addChance;
     }
 
     public static ItemStack createDefaultMeta(String displayName, Material material) {

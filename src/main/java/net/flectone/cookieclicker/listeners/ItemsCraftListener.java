@@ -108,5 +108,70 @@ public class ItemsCraftListener implements Listener {
     private boolean equalsItem(ItemStack item, Material material) {
         return equalsItem(item, material, 1);
     }
+
+    @EventHandler
+    public void gemMixtureClick(InventoryClickEvent event) {
+        if (!(event.getInventory() instanceof SmithingInventory)) return;
+        if (event.getInventory().getItem(3) == null) return;
+        if (event.getSlot() != 3) return;
+        if (event.getCurrentItem() == null || !event.getCurrentItem().getType().equals(Material.GRAY_DYE)) return;
+        event.setCurrentItem(ItemManager.get("GEMSTONE_MIXTURE"));
+    }
+
+    @EventHandler
+    public  void armorStarUpgrade (PrepareAnvilEvent event) {
+        Inventory inventory = event.getInventory();
+        ArrayList<Material> items = new ArrayList<>();
+        items.add(Material.CAKE);
+        items.add(Material.GRAY_DYE);
+        items.add(Material.ENDER_EYE);
+        items.add(Material.ECHO_SHARD);
+        items.add(Material.COOKIE);
+        if (inventory.getItem(1) == null || inventory.getItem(0) == null || !items.contains(inventory.getItem(1).getType())) return;
+        NBTItem nbtItem = new NBTItem(inventory.getItem(0));
+        int farmFortuneLvl = nbtItem.getInteger("ff");
+        if (farmFortuneLvl == 6 || !inventory.getItem(1).getType().equals(items.get(farmFortuneLvl - 1))) return;
+        //ну типо редкость брони
+        ArrayList<String> materials = new ArrayList<>();
+        materials.add("minecraft:iron");
+        materials.add("minecraft:emerald");
+        materials.add("minecraft:diamond");
+        materials.add("minecraft:amethyst");
+        materials.add("minecraft:gold");
+        //Римские цифры
+        String[] romeNumbers = new String[]{"I", "II", "III", "IV", "V", "VI"};
+        ItemStack upgradedItem = new ItemStack(inventory.getItem(0).getType());
+        ItemMeta meta = inventory.getItem(0).getItemMeta();
+        if (farmFortuneLvl == 1) {
+            meta.setDisplayName(inventory.getItem(0).getItemMeta().getDisplayName() + ChatColor.GOLD + " ★");
+            meta.addItemFlags(ItemFlag.HIDE_DYE);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+            meta.addItemFlags(ItemFlag.HIDE_ARMOR_TRIM);
+        }
+        if (farmFortuneLvl > 1) meta.setDisplayName(inventory.getItem(0).getItemMeta().getDisplayName() + ChatColor.GOLD + "★");
+        List<String> list = new ArrayList<>();
+        list.add(ChatColor.GRAY + "Farming fortune " + romeNumbers[farmFortuneLvl]);
+        meta.setLore(list);
+        upgradedItem.setItemMeta(meta);
+        NBTItem upgradedItemNBT = new NBTItem(upgradedItem);
+        if (farmFortuneLvl == 1) {
+            NBTCompound trim = upgradedItemNBT.addCompound("Trim");
+            trim.setString("pattern", "minecraft:sentry");
+            NBTCompound display = upgradedItemNBT.addCompound("display");
+            display.setInteger("color", 13921578);
+        }
+
+        NBTCompound trim = upgradedItemNBT.getCompound("Trim");
+        trim.setString("material", materials.get(farmFortuneLvl - 1));
+
+        upgradedItemNBT.setInteger("ff", farmFortuneLvl + 1);
+        upgradedItem = upgradedItemNBT.getItem();
+        upgradedItem.addUnsafeEnchantment(Enchantment.MENDING, 1);
+        event.setResult(upgradedItem);
+        event.getInventory().setRepairCost(5);
+        List<HumanEntity> viewers = event.getViewers();
+        viewers.forEach(humanEntity -> ((Player)humanEntity).updateInventory());
+    }
 }
 

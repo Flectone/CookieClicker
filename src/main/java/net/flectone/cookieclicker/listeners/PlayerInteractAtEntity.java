@@ -45,8 +45,7 @@ public class PlayerInteractAtEntity implements Listener {
         // Тута кароче проверка на броню эта с лилгрином
         Inventory inventory = event.getPlayer().getInventory();
         maxCookie += ItemUtils.addFortune(inventory, "ff", 1);
-        maxCookie += ItemUtils.addFortune(inventory, "farmfortune2", 2);
-        melonChance += ItemUtils.addFortune(inventory, "farmfortune2", 2);
+        melonChance += ItemUtils.addFortune(inventory, "ff", 1);
 
         Location location = event.getRightClicked().getLocation();
         location.setY(location.getY() + 1);
