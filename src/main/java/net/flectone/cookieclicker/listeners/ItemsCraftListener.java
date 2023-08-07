@@ -55,42 +55,6 @@ public class ItemsCraftListener implements Listener {
 
     }
     @EventHandler
-    public void onSmithingCraft (PrepareAnvilEvent event) {
-        Inventory inventory = event.getInventory();
-        if (inventory.getItem(1) == null || inventory.getItem(0) == null || !inventory.getItem(1).getType().equals(Material.CAKE)) return;
-        ArrayList<Material> armor = new ArrayList<>();
-        armor.add(Material.LEATHER_HELMET);
-        armor.add(Material.LEATHER_CHESTPLATE);
-        armor.add(Material.LEATHER_LEGGINGS);
-        armor.add(Material.LEATHER_BOOTS);
-        NBTItem nbtItem = new NBTItem(inventory.getItem(0));
-        if (!armor.contains(inventory.getItem(0).getType()) || !nbtItem.hasTag("ff")) return;
-
-        ItemStack secondArmor = new ItemStack(inventory.getItem(0).getType()); //бля может просто 4 ифа написать и нормально будет
-        ItemMeta sArmorMeta = secondArmor.getItemMeta();
-        List<String> list = new ArrayList<>();
-        list.add(ChatColor.GRAY + "Farming fortune II");
-        sArmorMeta.setDisplayName(inventory.getItem(0).getItemMeta().getDisplayName() + ChatColor.GOLD + " ★");
-        sArmorMeta.setLore(list);
-        sArmorMeta.addItemFlags(ItemFlag.HIDE_DYE);
-        sArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        sArmorMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-        sArmorMeta.setUnbreakable(true);
-        secondArmor.setItemMeta(sArmorMeta);
-        NBTItem sArmornbt = new NBTItem(secondArmor);
-        sArmornbt.setInteger("farmfortune2", 1);
-        NBTCompound display = sArmornbt.addCompound("display");
-        display.setInteger("color", 13921578);
-        secondArmor = sArmornbt.getItem();
-        secondArmor.addUnsafeEnchantment(Enchantment.MENDING, 1);
-
-
-        event.setResult(secondArmor);
-        event.getInventory().setRepairCost(10);
-        List<HumanEntity> viewers = event.getViewers();
-        viewers.forEach(humanEntity -> ((Player)humanEntity).updateInventory());
-    }
-    @EventHandler
     public void cakeCraftEvent (InventoryClickEvent event) {
         if (!(event.getInventory() instanceof CraftingInventory)) return;
         if (!equalsItem(event.getCurrentItem(), Material.CAKE)) return;
