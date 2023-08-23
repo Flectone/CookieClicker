@@ -26,6 +26,11 @@ public final class CookieClicker extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ItemsCraftListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractAtEntity(), this);
         Bukkit.getPluginManager().registerEvents(new HayBlockCraftCancel(), this);
+        Bukkit.getPluginManager().registerEvents(new TeleportRod(), this);
+        Bukkit.getPluginManager().registerEvents(new TeleportToIsland(), this);
+
+        Bukkit.getPluginManager().registerEvents(new OpenChest(), this);
+
         getCommand("giveitem").setExecutor(new CommandGiveitem());
         getCommand("giveitem").setTabCompleter(new CommandGiveitem());
         plugin = this;
