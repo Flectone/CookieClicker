@@ -4,39 +4,27 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
-import io.papermc.paper.registry.TypedKey;
 import net.flectone.cookieclicker.utility.CCobjects.ClickerItems;
 import net.flectone.cookieclicker.utility.CCobjects.EquipmentItem;
 import net.flectone.cookieclicker.utility.CCobjects.HoeItem;
 import net.flectone.cookieclicker.utility.CCobjects.NormalItem;
-
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-
-import net.minecraft.advancements.critereon.ItemEnchantmentsPredicate;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
-import net.minecraft.world.item.component.TooltipProvider;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.item.equipment.EquipmentAssets;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Registry;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.meta.*;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
@@ -45,17 +33,16 @@ import java.util.*;
 public class ItemManager {
     //LinkedHashMap использую, потому что тут предметы добавляются в мапу в таком же порядке,
     //в каком они написаны в коде, в игре проще понять, где какой предмет
-    public final LinkedHashMap<String, ItemStack> items = new LinkedHashMap<>();
+    private final LinkedHashMap<String, ItemStack> items = new LinkedHashMap<>();
     //public final HashMap<String, ItemStack> items = new HashMap<>();
 
-    final MiniMessage miniMessage = MiniMessage.miniMessage();
-    final Registry<Enchantment> enchantmentRegistry = RegistryAccess
+    private final MiniMessage miniMessage = MiniMessage.miniMessage();
+    private final Registry<Enchantment> enchantmentRegistry = RegistryAccess
             .registryAccess()
             .getRegistry(RegistryKey.ENCHANTMENT);
 
     @Inject
     public ItemManager() {
-
     }
 
     public void load() {
@@ -65,6 +52,7 @@ public class ItemManager {
                 "<gradient:#ff8009:#ffdd09><italic:false>Печенье",
                 "cookie",
                 99);
+
         items.put("cookie", basicCookie.toItemStack());
 
         // Compressed Cookie
@@ -289,7 +277,7 @@ public class ItemManager {
                 EquipmentAssets.LEATHER,
                 "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Шляпа фермера",
                 "fHelmet");
-        fhelmet.farmingFortune(100);
+        fhelmet.setFarmingFortune(100);
         fhelmet.addLore("это просто победа", "поздравляю всех.",
                 "С новым годом!");
         fhelmet.setDyedColor(16493613);

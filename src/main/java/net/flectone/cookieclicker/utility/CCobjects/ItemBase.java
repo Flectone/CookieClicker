@@ -18,23 +18,29 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
-public class ItemBase implements ClickerItems{
-    ItemMeta firstMeta;
-    String displayName, itemTag, equipType;
-    Material itemType;
-    List<Component> fullLore = new ArrayList<>(), preStatsLore = new ArrayList<>();
-    HashMap<NamespacedKey, Integer> stats = new HashMap<>();
-    String ability = "none";
-    MiniMessage miniMessage = MiniMessage.miniMessage();
+public abstract class ItemBase implements ClickerItems{
+    protected final String displayName;
+    protected final String itemTag;
+    protected final String equipType;
+    protected Material itemType;
+    protected final List<Component> fullLore = new ArrayList<>(), preStatsLore = new ArrayList<>();
+    protected final HashMap<NamespacedKey, Integer> stats = new HashMap<>();
+    protected String ability = "none";
+    protected final MiniMessage miniMessage = MiniMessage.miniMessage();
 
 
     // на этом держатся все предметы этого плагина
-    List<DataComponentPatch> components = new ArrayList<>();
+    protected final List<DataComponentPatch> components = new ArrayList<>();
+
+    protected ItemBase(String displayName, String itemTag, String equipType, Material itemType) {
+        this.displayName = displayName;
+        this.itemTag = itemTag;
+        this.equipType = equipType;
+        this.itemType = itemType;
+    }
 
     //конвертация компонентов
     public static net.minecraft.network.chat.Component convertToNMSComponent(net.kyori.adventure.text.Component comp) {
@@ -52,6 +58,7 @@ public class ItemBase implements ClickerItems{
         if (!(this.itemType.equals(Material.LEATHER_HORSE_ARMOR)))
             this.setColorable();
     }
+
     @Deprecated
     public void setColorable() {
         DataComponentPatch itemModelComponent = DataComponentPatch.builder()
@@ -62,6 +69,7 @@ public class ItemBase implements ClickerItems{
         itemType = Material.LEATHER_HORSE_ARMOR;
 
     }
+
     public void addLore(String... lores) {
         Arrays.stream(lores).forEach(b -> {
             fullLore.add(miniMessage.deserialize(b));
@@ -79,73 +87,74 @@ public class ItemBase implements ClickerItems{
 
     public net.minecraft.world.item.ItemStack toItemStack() {
         ItemStack createdItem = new ItemStack(itemType);
+        net.minecraft.world.item.ItemStack createdItemNMS = CraftItemStack.asNMSCopy(createdItem);
 
         //в начале пишется тег предмета
         fullLore.addFirst(miniMessage.deserialize("<dark_gray> #" + itemTag));
 
         //фулл лор собирается тут и создаётся компонент
-        ItemLore lore = new ItemLore(combineLore(fullLore, stats, preStatsLore));
+        ItemLore finallore = new ItemLore(combineLore(fullLore, stats, preStatsLore));
         DataComponentPatch loreComponent = DataComponentPatch.builder()
-                .set(DataComponents.LORE, lore)
+                .set(DataComponents.LORE, finallore)
+                .build();
+        DataComponentPatch nameComponent = DataComponentPatch.builder()
+                .set(DataComponents.CUSTOM_NAME, convertToNMSComponent(miniMessage.deserialize(displayName)))
                 .build();
 
-        net.minecraft.world.item.ItemStack createdItemNMS = CraftItemStack.asNMSCopy(createdItem);
         //добавление всех компонентов, которые были
-        for (DataComponentPatch b : components) {
-            createdItemNMS.applyComponents(b);
+        for (DataComponentPatch dataComponentPatch : components) {
+            createdItemNMS.applyComponents(dataComponentPatch);
         }
         createdItemNMS.remove(DataComponents.ATTRIBUTE_MODIFIERS);
 
-        DataComponentPatch name = DataComponentPatch.builder()
-                .set(DataComponents.CUSTOM_NAME, convertToNMSComponent(miniMessage.deserialize(displayName)))
-                .build();
         createdItemNMS.applyComponents(loreComponent);
-        createdItemNMS.applyComponents(name);
+        createdItemNMS.applyComponents(nameComponent);
         createdItemNMS.applyComponents(combineCustomData());
         return createdItemNMS;
     }
     //объединение всего лора в один
     protected List<net.minecraft.network.chat.Component> combineLore(List<Component> fullLore, HashMap<NamespacedKey, Integer> stats, List<Component> preStatsLore) {
         List<net.minecraft.network.chat.Component> itemLore = new ArrayList<>();
-        for (Component a : fullLore)
-            itemLore.add(convertToNMSComponent(a));
+
+        for (Component fullLoreComponent : fullLore)
+            itemLore.add(convertToNMSComponent(fullLoreComponent));
+
         //itemLore.addFirst(miniMessage.deserialize("<dark_gray> #cookieclicker"));
         if (stats.isEmpty() && preStatsLore.isEmpty()) return itemLore;
         itemLore.add(net.minecraft.network.chat.Component.empty());
-        for (Component b : preStatsLore)
-            itemLore.add(convertToNMSComponent(b));
 
+        for (Component component : preStatsLore) {
+            itemLore.add(convertToNMSComponent(component));
+        }
+        //если есть статы в предмете, то добавление их в лор, чтобы были видны
         for (Map.Entry<NamespacedKey, Integer> a : stats.entrySet()) {
-            StringBuilder stat = new StringBuilder("<blue><italic:false>+");
-            double value = (double) a.getValue();
-            stat.append(value == Math.floor(value) ? String.format("%d", (int) value) : value);
+            StringBuilder statforLore = new StringBuilder("<blue><italic:false>+");
+            double statValue = (double) a.getValue();
+            statforLore.append(statValue == Math.floor(statValue) ? String.format("%d", (int) statValue) : statValue);
             switch (a.getKey().getKey()) {
-                case "ff":
-                    stat.append(" Удача фермера");
-                    break;
-                case "dmg":
-                    stat.append(" Урон");
-                    break;
-                case "mf":
-                    stat.append(" Удача шахтёра");
-                    break;
+                case "ff" -> statforLore.append(" Удача фермера");
+                case "dmg" -> statforLore.append(" Урон");
+                case "mf" -> statforLore.append(" Удача шахтёра");
             }
-            itemLore.add(convertToNMSComponent(miniMessage.deserialize(stat.toString())));
+            itemLore.add(convertToNMSComponent(miniMessage.deserialize(statforLore.toString())));
         }
         return itemLore;
     }
+
     private DataComponentPatch combineCustomData() {
         CompoundTag compoundTag = new CompoundTag();
         compoundTag.putString("item_tag", itemTag);
-        if (!ability.equals("none")) compoundTag.putString("ability", ability);
-        for (Map.Entry<NamespacedKey, Integer> a : stats.entrySet()) {
-            compoundTag.putInt(a.getKey().getKey(), a.getValue());
-
+        if (!ability.equals("none")) {
+            compoundTag.putString("ability", ability);
         }
 
-        CompoundTag finalTag = new CompoundTag();
-        finalTag.put("cookies", compoundTag);
-        CustomData cd = CustomData.of(finalTag);
-        return DataComponentPatch.builder().set(DataComponents.CUSTOM_DATA, cd).build();
+        for (Map.Entry<NamespacedKey, Integer> a : stats.entrySet()) {
+            compoundTag.putInt(a.getKey().getKey(), a.getValue());
+        }
+
+        CompoundTag finaCompoundTag = new CompoundTag();
+        finaCompoundTag.put("cookies", compoundTag);
+        CustomData customData = CustomData.of(finaCompoundTag);
+        return DataComponentPatch.builder().set(DataComponents.CUSTOM_DATA, customData).build();
     }
 }
