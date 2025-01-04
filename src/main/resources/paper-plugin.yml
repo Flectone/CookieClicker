@@ -1,0 +1,14 @@
+name: CookieClicker
+version: 'experimental'
+main: net.flectone.cookieclicker.CookieClicker
+api-version: '1.21'
+load: STARTUP
+bootstrapper: net.flectone.cookieclicker.Enchantments
+dependencies:
+  server:
+    FlectonePulse:
+      load: AFTER
+      required: false
+    LuckPerms:
+      load: AFTER
+      required: false

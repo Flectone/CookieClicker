@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id("io.github.goooler.shadow") version "8.1.8"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.10"
+}
+group = 'net.flectone'
+version = 'experimental'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "papermc-repo"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/groups/public/"
+    }
+    maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
+
+    maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
+}
+
+dependencies {
+    pluginRemapper("net.fabricmc:tiny-remapper:0.10.4:fat")
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
+    implementation "com.github.retrooper:packetevents-spigot:2.7.0"
+    //compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    //compileOnly("de.tr7zw:item-nbt-api-plugin:2.14.0")
+    implementation "com.google.inject:guice:7.0.0"
+}
+
+
+java {
+    sourceCompatibility = "21"
+    targetCompatibility = "21"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('paper-plugin.yml') {
+        expand props
+    }
+}
+shadowJar {}
