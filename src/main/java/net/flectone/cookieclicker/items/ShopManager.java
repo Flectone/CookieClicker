@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Singleton
 public class ShopManager {
-    public final HashMap<ItemStack, ItemStack> sellingItems = new HashMap<>();
+    private final HashMap<ItemStack, ItemStack> sellingItems = new HashMap<>();
     private final ItemManager manager;
     private final UtilsCookie utilsCookie;
 

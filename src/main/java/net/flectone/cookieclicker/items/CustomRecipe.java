@@ -1,19 +1,18 @@
 package net.flectone.cookieclicker.items;
 
-import io.papermc.paper.configuration.type.fallback.FallbackValue;
+import com.google.inject.Singleton;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Singleton
 public class CustomRecipe {
-    public
-    ItemStack result;
-    List<ItemStack> ingredients = new ArrayList<>(9);
+    private final ItemStack result;
+    private final List<ItemStack> ingredients = new ArrayList<>(9);
 
     public CustomRecipe(ItemStack resultItem) {
-        this.result = resultItem;
+        result = resultItem;
         for (int i = 0; i < 9; i++)
             ingredients.add(new ItemStack(Material.AIR));
     }

@@ -45,6 +45,17 @@ public class ItemTagsUtility {
         return getCookiesTags(itemNMS).getString("ability");
     }
 
+    public void setAbility(net.minecraft.world.item.ItemStack itemNMS, String ability) {
+        CompoundTag cookiesTag = getCookiesTags(itemNMS);
+        cookiesTag.putString("ability", ability);
+        CompoundTag baseTag = new CompoundTag();
+        baseTag.put("cookies", cookiesTag);
+        itemNMS.applyComponents(DataComponentPatch.builder()
+                .set(DataComponents.CUSTOM_DATA, CustomData.of(baseTag))
+                .build()
+        );
+    }
+
     public String getItemTag(ItemStack itemNotNMS) {
         return getCookiesTags(itemNotNMS).getString("item_tag");
     }
@@ -56,7 +67,8 @@ public class ItemTagsUtility {
         baseTag.put("cookies", cookiesTag);
         itemNMS.applyComponents(DataComponentPatch.builder()
                         .set(DataComponents.CUSTOM_DATA, CustomData.of(baseTag))
-                .build());
+                .build()
+        );
 
     }
 }

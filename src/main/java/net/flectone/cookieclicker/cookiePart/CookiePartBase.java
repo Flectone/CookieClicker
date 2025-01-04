@@ -1,6 +1,5 @@
 package net.flectone.cookieclicker.cookiePart;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.color.Color;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleTrailData;
@@ -8,12 +7,10 @@ import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.PacketUtils;
 import net.flectone.cookieclicker.items.ItemManager;
-import net.flectone.cookieclicker.utility.CCobjects.ItemBase;
 import net.flectone.cookieclicker.utility.ItemTagsUtility;
 import net.flectone.cookieclicker.utility.UtilsCookie;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -21,8 +18,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.phys.EntityHitResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,26 +30,22 @@ public class CookiePartBase {
     private final PacketUtils packetUtils;
     private final UtilsCookie utilsCookie;
     private final EpicHoeUtils epicHoeUtils;
+    private final BagHoeUpgrade bagHoeUpgrade;
 
     @Inject
     public CookiePartBase (ItemTagsUtility itemTagsUtility, ItemManager manager, UtilsCookie utilsCookie,
-                           PacketUtils packetUtils, EpicHoeUtils epicHoeUtils) {
+                           PacketUtils packetUtils, EpicHoeUtils epicHoeUtils, BagHoeUpgrade bagHoeUpgrade) {
         this.manager = manager;
         this.itemTagsUtility = itemTagsUtility;
         this.packetUtils = packetUtils;
         this.utilsCookie = utilsCookie;
         this.epicHoeUtils = epicHoeUtils;
-
+        this.bagHoeUpgrade = bagHoeUpgrade;
     }
 
-    public void cookieClickPacketEvent(User user, WrapperPlayClientInteractEntity interaction) {
+    public void cookieClickPacketEvent(User user, ItemFrame itemFrame) {
         Player player = packetUtils.userToNMS(user);
 
-        if (interaction.getAction() != WrapperPlayClientInteractEntity.InteractAction.INTERACT) return;
-        EntityHitResult res = player.getTargetEntity(5);
-
-        if (res == null || !(res.getEntity() instanceof ItemFrame itemFrame)) return;
-        if (!itemFrame.getItem().getItem().equals(Items.COOKIE)) return;
         //
         int maxAmount = 1;
         Random rnd = new Random();
@@ -80,9 +71,16 @@ public class CookiePartBase {
         }
 
         // Показ статистики
-        player.displayClientMessage(ItemBase.convertToNMSComponent(MiniMessage.miniMessage().deserialize("<#eb6514>" + maxAmount + "⯫ "
+        player.displayClientMessage(utilsCookie.convertToNMSComponent(MiniMessage.miniMessage().deserialize("<#eb6514>" + maxAmount + "⯫ "
                 + "<#e4a814>" + droppedAmount +"★ "
                 + "<#b014eb>[" + epicHoeUtils.getCharge(player) + "% " +  epicHoeUtils.getTier(player) + "☄]")), true);
+
+        Vector3d itemFrameVector3d = new Vector3d(itemFrame.getX(), itemFrame.getY(), itemFrame.getZ());
+
+        if (bagHoeUpgrade.updateHoe(user)) {
+            packetUtils.spawnParticle(user, new Particle<>(ParticleTypes.TRIAL_SPAWNER_DETECTION_OMINOUS), 1,
+                    itemFrameVector3d, 0.2f);
+        }
 
         calculateItemDrops(user,
                 droppedAmount,
@@ -92,7 +90,7 @@ public class CookiePartBase {
         packetUtils.spawnParticle(user,
                 new Particle<>(ParticleTypes.TRIAL_SPAWNER_DETECTION),
                 2,
-                new Vector3d(itemFrame.getX(), itemFrame.getY(), itemFrame.getZ()),
+                itemFrameVector3d,
                 0.2f);
         packetUtils.playSound(user, 575, 1f, 1f);
     }

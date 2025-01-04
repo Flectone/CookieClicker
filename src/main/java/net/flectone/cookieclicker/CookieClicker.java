@@ -6,6 +6,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import net.flectone.cookieclicker.cookiePart.InteractEvent;
 import net.flectone.cookieclicker.crafting.CraftingEvent;
 import net.flectone.cookieclicker.crafting.Recipes;
 import net.flectone.cookieclicker.events.*;
@@ -31,7 +32,7 @@ public final class CookieClicker extends JavaPlugin {
         Injector injector = Guice.createInjector(new CookieClickerInject(this));
 
         //slozhno.generateText();
-        //Bukkit.getPluginManager().registerEvents(injector.getInstance(InteractEvent.class), this);
+        Bukkit.getPluginManager().registerEvents(injector.getInstance(InteractEvent.class), this);
         Bukkit.getPluginManager().registerEvents(injector.getInstance(PickupEvent.class), this);
         Bukkit.getPluginManager().registerEvents(injector.getInstance(EatingEvent.class), this);
         //Bukkit.getPluginManager().registerEvents(injector.getInstance(BlockInteractEvent.class), this);

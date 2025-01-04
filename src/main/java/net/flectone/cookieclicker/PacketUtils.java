@@ -90,6 +90,7 @@ public class PacketUtils {
     }
 
     public net.minecraft.world.entity.player.Player userToNMS (User user) {
+        //короче, тут я беру всех игроков на сервере и с помощью UUID нахожу нужного
         net.minecraft.world.entity.player.Player player = null;
         for (net.minecraft.world.entity.player.Player i : MinecraftServer.getServer().getPlayerList().players) {
             if (i.getUUID().equals(user.getUUID()))

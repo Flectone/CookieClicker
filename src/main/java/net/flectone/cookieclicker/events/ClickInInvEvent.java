@@ -6,6 +6,7 @@ import net.flectone.cookieclicker.CookieClicker;
 import net.flectone.cookieclicker.utility.UtilsCookie;
 import net.flectone.cookieclicker.items.ShopManager;
 import net.kyori.adventure.text.Component;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -43,11 +44,18 @@ public class ClickInInvEvent implements Listener {
             //compactItems.compact(he.getInventory(), new ItemStack(priceItem), shopManager.getItem(slot - 9), priceItem.getAmount(), 1);
         }
     }
+    //Когда-нибудь я перепишу тут всё
     @EventHandler
     public void clickInAnvil(InventoryClickEvent event) {
         if (!(event.getClickedInventory() instanceof AnvilInventory) || event.getCurrentItem() == null) return;
         if (event.getSlot() != 2) return;
-        utilsCookie.updateStats(event.getCurrentItem());
+
+        //всё переписываю и всё ломается
+        net.minecraft.world.item.ItemStack currentItem = CraftItemStack.asNMSCopy(event.getCurrentItem());
+        utilsCookie.updateStats(currentItem);
+        event.setCurrentItem(CraftItemStack.asBukkitCopy(currentItem));
+
+        //utilsCookie.updateStats(event.getCurrentItem());
     }
 
     @EventHandler

@@ -5,7 +5,6 @@ import io.papermc.paper.adventure.WrapperAwareSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -20,7 +19,6 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
-
 public abstract class ItemBase implements ClickerItems{
     protected final String displayName;
     protected final String itemTag;
@@ -43,12 +41,12 @@ public abstract class ItemBase implements ClickerItems{
     }
 
     //конвертация компонентов
-    public static net.minecraft.network.chat.Component convertToNMSComponent(net.kyori.adventure.text.Component comp) {
-        GsonComponentSerializer ser = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson();
+    public net.minecraft.network.chat.Component convertToNMSComponent(net.kyori.adventure.text.Component comp) {
         ComponentSerializer<Component, Component, net.minecraft.network.chat.Component> sss;
         sss = new WrapperAwareSerializer(() -> MinecraftServer.getServer().registryAccess().createSerializationContext(JavaOps.INSTANCE));
         return sss.serialize(comp);
     }
+
     @Deprecated
     public void setColor(Integer color) {
         DataComponentPatch dyedColor = DataComponentPatch.builder()
