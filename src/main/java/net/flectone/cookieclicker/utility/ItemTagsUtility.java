@@ -23,6 +23,7 @@ public class ItemTagsUtility {
         if (itemNotNMS == null) return new CompoundTag();
         return getCookiesTags(CraftItemStack.asNMSCopy(itemNotNMS));
     }
+
     public Integer getStat(ItemStack itemNotNMS, String statName) {
         return getCookiesTags(itemNotNMS).getInt(statName);
     }
@@ -33,9 +34,13 @@ public class ItemTagsUtility {
 
 
     //Получить фарминг фортуну только с данных, чары не учитываются
-    public Integer getBaseFortune(ItemStack item) {return getStat(item, ClickerItems.fortuneTag);}
+    public Integer getBaseFortune(ItemStack item) {
+        return getStat(item, ClickerItems.fortuneTag);
+    }
     //nms version
-    public Integer getBaseFortune(net.minecraft.world.item.ItemStack item) {return getStat(item, ClickerItems.fortuneTag);}
+    public Integer getBaseFortune(net.minecraft.world.item.ItemStack item) {
+        return getStat(item, ClickerItems.fortuneTag);
+    }
 
     public String getAbility(ItemStack itemNotNMS) {
         return getCookiesTags(itemNotNMS).getString("ability");
@@ -59,7 +64,9 @@ public class ItemTagsUtility {
     public String getItemTag(ItemStack itemNotNMS) {
         return getCookiesTags(itemNotNMS).getString("item_tag");
     }
-    public String getItemTag(net.minecraft.world.item.ItemStack itemNMS) {return getCookiesTags(itemNMS).getString("item_tag");}
+    public String getItemTag(net.minecraft.world.item.ItemStack itemNMS) {
+        return getCookiesTags(itemNMS).getString("item_tag");
+    }
     public void setStat(net.minecraft.world.item.ItemStack itemNMS, String statName, Integer value) {
         CompoundTag cookiesTag = getCookiesTags(itemNMS);
         cookiesTag.putInt(statName, value);

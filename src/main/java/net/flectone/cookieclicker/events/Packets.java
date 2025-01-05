@@ -8,8 +8,10 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.cookieclicker.ClickerContainer;
 import net.flectone.cookieclicker.CompactItems;
 import net.flectone.cookieclicker.PacketUtils;
 import net.flectone.cookieclicker.cookiePart.BagHoeUpgrade;
@@ -71,6 +73,10 @@ public class Packets implements PacketListener {
         if (player.getItemInHand(InteractionHand.OFF_HAND).getItem().equals(Items.RED_DYE)) {
             event.getUser().sendMessage(String.valueOf(event.getPacketType()) + " " + String.valueOf(event.getPacketId()));
         }
+
+//        if (event.getPacketType() == PacketType.Play.Client.CLICK_WINDOW) {
+//            WrapperPlayClientClickWindow clickWindowPacket = new WrapperPlayClientClickWindow(event);
+//        }
 
         if (event.getPacketType() == PacketType.Play.Client.ANIMATION) {
             WrapperPlayClientAnimation animationPacket = new WrapperPlayClientAnimation(event);
@@ -150,6 +156,13 @@ public class Packets implements PacketListener {
         if (event.getPacketType() == PacketType.Play.Server.ENTITY_VELOCITY) return;
         if (event.getPacketType() == PacketType.Play.Server.ENTITY_HEAD_LOOK) return;
         if (event.getPacketType() == PacketType.Play.Server.ENTITY_RELATIVE_MOVE_AND_ROTATION) return;
+        if (event.getPacketType() == PacketType.Play.Server.ENTITY_METADATA) return;
+        if (event.getPacketType() == PacketType.Play.Server.OPEN_WINDOW) {
+            WrapperPlayServerOpenWindow openContainerPacket = new WrapperPlayServerOpenWindow(event);
+            ClickerContainer container = new ClickerContainer(openContainerPacket.getContainerId(), openContainerPacket.getType(), "default");
+
+        }
+
         if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
             compact.compact(player.getInventory(), manager.getNMS("cookie"), manager.getNMS("ench_cookie"), 160);
             compact.compact(player.getInventory(), manager.getNMS("cocoa_beans"), manager.getNMS("ench_cocoa"), 320);

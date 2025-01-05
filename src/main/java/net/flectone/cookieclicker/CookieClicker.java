@@ -33,7 +33,6 @@ public final class CookieClicker extends JavaPlugin {
 
         //slozhno.generateText();
         Bukkit.getPluginManager().registerEvents(injector.getInstance(InteractEvent.class), this);
-        Bukkit.getPluginManager().registerEvents(injector.getInstance(PickupEvent.class), this);
         Bukkit.getPluginManager().registerEvents(injector.getInstance(EatingEvent.class), this);
         //Bukkit.getPluginManager().registerEvents(injector.getInstance(BlockInteractEvent.class), this);
         Bukkit.getPluginManager().registerEvents(injector.getInstance(ClickInInvEvent.class), this);

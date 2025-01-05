@@ -21,6 +21,7 @@ public class Recipes {
     private final ItemManager manager;
     private final UtilsCookie utilsCookie;
     Map<List<ItemStack>, CustomRecipe> recipesToCheck = new HashMap<>();
+
     @Inject
     public Recipes (ItemManager manager, UtilsCookie utilsCookie) {
         this.utilsCookie = utilsCookie;

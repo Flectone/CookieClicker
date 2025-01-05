@@ -20,6 +20,7 @@ import java.util.Map;
 public class CraftingEvent implements Listener {
     private final Recipes recipes;
     private final UtilsCookie utilsCookie;
+
     @Inject
     public CraftingEvent(Recipes recipes, UtilsCookie utilsCookie) {
         this.recipes = recipes;
@@ -27,7 +28,7 @@ public class CraftingEvent implements Listener {
     }
 
     @EventHandler
-    public void prepareCraft (PrepareItemCraftEvent event) {
+    public void prepareCraft(PrepareItemCraftEvent event) {
         List<ItemStack> listIS = createList(event.getInventory());
 //        event.getViewers().forEach(b -> {
 //            b.sendMessage(Component.text(String.valueOf(recipes.listWithItemStacks(listIS))));
@@ -42,7 +43,7 @@ public class CraftingEvent implements Listener {
     }
 
     @EventHandler
-    public void onCraft (InventoryClickEvent event) {
+    public void onCraft(InventoryClickEvent event) {
         if (!(event.getClickedInventory() instanceof CraftingInventory inv)) return;
         if (event.getSlot() != 0 || inv.getItem(0) == null) return;
         List<ItemStack> listIS = createList(inv);

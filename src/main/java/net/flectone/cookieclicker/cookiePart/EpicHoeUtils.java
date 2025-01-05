@@ -11,24 +11,24 @@ import java.util.UUID;
 @Singleton
 public class EpicHoeUtils {
     public HashMap<UUID, Integer> charge = new HashMap<>();
-    public void addCharge(Player pl, Integer percentage) {
-        UUID plId = pl.getUUID();
+    public void addCharge(Player player, Integer percentage) {
+        UUID plId = player.getUUID();
         charge.put(plId, charge.isEmpty() || !(charge.containsKey(plId)) ? percentage : charge.get(plId) + percentage);
-        Bukkit.getScheduler().runTaskLater(CookieClicker.getPlugin(CookieClicker.class), b -> {
+        Bukkit.getScheduler().runTaskLater(CookieClicker.getPlugin(CookieClicker.class), () -> {
             charge.put(plId, charge.get(plId) - percentage);
 
         }, 400L);
     }
 
-    public Integer getCharge (Player pl) {
-        UUID uuid = pl.getUUID();
+    public Integer getCharge (Player player) {
+        UUID uuid = player.getUUID();
         if (charge.isEmpty() || !(charge.containsKey(uuid)))
             return 0;
         return charge.get(uuid);
     }
 
-    public Integer getTier (Player pl) {
-        int value = getCharge(pl);
+    public Integer getTier (Player player) {
+        int value = getCharge(player);
         if (value <= 0)
             return 0;
         return Math.round((float) value / 33f);

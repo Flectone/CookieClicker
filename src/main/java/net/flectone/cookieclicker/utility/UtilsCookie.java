@@ -14,7 +14,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
@@ -32,8 +31,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,19 +48,10 @@ public class UtilsCookie {
     }
 
     //конвертация компонентов
-    public net.minecraft.network.chat.Component convertToNMSComponent(net.kyori.adventure.text.Component comp) {
-        GsonComponentSerializer ser = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson();
-        ComponentSerializer<Component, Component, net.minecraft.network.chat.Component> sss;
-        sss = new WrapperAwareSerializer(() -> MinecraftServer.getServer().registryAccess().createSerializationContext(JavaOps.INSTANCE));
-        return sss.serialize(comp);
-    }
-
-    @Deprecated
-    public Object getPDCValue (ItemStack item, NamespacedKey key, PersistentDataType<?, ?> dtp) {
-        if (item.getItemMeta() == null) return null;
-        PersistentDataContainer container = item.getItemMeta().getPersistentDataContainer();
-        if (!(container.has(key, dtp))) return null;
-        return container.get(key, dtp);
+    public net.minecraft.network.chat.Component convertToNMSComponent(net.kyori.adventure.text.Component component) {
+        ComponentSerializer<Component, Component, net.minecraft.network.chat.Component> componentSerializer;
+        componentSerializer = new WrapperAwareSerializer(() -> MinecraftServer.getServer().registryAccess().createSerializationContext(JavaOps.INSTANCE));
+        return componentSerializer.serialize(component);
     }
 
     public boolean compare(ItemStack item, ItemStack checkItem) {

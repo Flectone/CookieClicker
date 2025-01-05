@@ -41,10 +41,10 @@ public abstract class ItemBase implements ClickerItems{
     }
 
     //конвертация компонентов
-    public net.minecraft.network.chat.Component convertToNMSComponent(net.kyori.adventure.text.Component comp) {
-        ComponentSerializer<Component, Component, net.minecraft.network.chat.Component> sss;
-        sss = new WrapperAwareSerializer(() -> MinecraftServer.getServer().registryAccess().createSerializationContext(JavaOps.INSTANCE));
-        return sss.serialize(comp);
+    public net.minecraft.network.chat.Component convertToNMSComponent(net.kyori.adventure.text.Component component) {
+        ComponentSerializer<Component, Component, net.minecraft.network.chat.Component> componentSerializer;
+        componentSerializer = new WrapperAwareSerializer(() -> MinecraftServer.getServer().registryAccess().createSerializationContext(JavaOps.INSTANCE));
+        return componentSerializer.serialize(component);
     }
 
     @Deprecated

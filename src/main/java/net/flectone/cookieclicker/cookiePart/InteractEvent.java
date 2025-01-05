@@ -29,21 +29,13 @@ import java.util.Map;
 
 @Singleton
 public class InteractEvent implements Listener {
-    private final ItemManager manager;
     private final ShopManager shopManager;
-    private final UtilsCookie utilsCookie;
-    private final BagHoeUpgrade bagHoe;
-    private final EpicHoeUtils epicHoeUtils;
-    final NamespacedKey key = new NamespacedKey("cc2", "custom");
+    private final NamespacedKey key = new NamespacedKey("cc2", "custom");
 
     @Inject
     public InteractEvent(ItemManager manager, ShopManager shopManager, UtilsCookie utilsCookie,
                          BagHoeUpgrade bagHoeUpgrade, EpicHoeUtils epicHoeUtils) {
-        this.manager = manager;
         this.shopManager = shopManager;
-        this.utilsCookie = utilsCookie;
-        this.bagHoe = bagHoeUpgrade;
-        this.epicHoeUtils = epicHoeUtils;
     }
 
     @EventHandler

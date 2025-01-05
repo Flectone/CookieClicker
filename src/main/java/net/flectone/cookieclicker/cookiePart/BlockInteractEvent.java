@@ -15,11 +15,13 @@ import org.bukkit.inventory.ItemStack;
 public class BlockInteractEvent implements Listener {
     private final ItemManager manager;
     private final UtilsCookie utilsCookie;
+
     @Inject
     public BlockInteractEvent(ItemManager manager, UtilsCookie utilsCookie) {
         this.manager = manager;
         this.utilsCookie = utilsCookie;
     }
+
     @EventHandler
     public void clickOnBookshelf(PlayerInteractEvent event) {
         if (event.getClickedBlock() == null || !(event.getClickedBlock().getState() instanceof ChiseledBookshelf bookshelf)) return;

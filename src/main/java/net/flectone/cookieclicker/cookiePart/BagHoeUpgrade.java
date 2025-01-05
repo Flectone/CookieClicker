@@ -82,9 +82,11 @@ public class BagHoeUpgrade {
         HitResult hitResult = player.getRayTrace(7, ClipContext.Fluid.NONE);
         if (!hitResult.getType().equals(HitResult.Type.MISS)) return;
 
+        //предмет в руке
         ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
         if (!(itemTagsUtility.getItemTag(itemInHand).equals("leg_hoe"))) return;
 
+        //компонент item_model не берёт просто Item, ему надо ResourceLocation, поэтому вот
         ResourceLocation resourceLocation = itemInHand.getComponents().get(DataComponents.ITEM_MODEL);
         if (resourceLocation == null) return;
 
@@ -93,6 +95,7 @@ public class BagHoeUpgrade {
                 .set(DataComponents.ITEM_MODEL, ResourceLocation.tryBuild(ResourceLocation.DEFAULT_NAMESPACE, newCurrentItemType))
                 .build();
 
+        //частицы красивые
         ParticleDustColorTransitionData particleDustColorTransitionData = new ParticleDustColorTransitionData(1f,
                 new Color(14606046), new Color(16758272));
         Particle<?> particle = new Particle<>(ParticleTypes.DUST_COLOR_TRANSITION, particleDustColorTransitionData);
