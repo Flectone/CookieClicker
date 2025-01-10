@@ -1,17 +1,12 @@
-package net.flectone.cookieclicker.crafting;
+package net.flectone.cookieclicker.items;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.items.CustomRecipe;
-import net.flectone.cookieclicker.items.ItemManager;
+import net.flectone.cookieclicker.inventories.crafting.CustomRecipe;
 import net.flectone.cookieclicker.utility.UtilsCookie;
-import org.bukkit.Bukkit;
 
-import org.bukkit.Keyed;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.*;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 

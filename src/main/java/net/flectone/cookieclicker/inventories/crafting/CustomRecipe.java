@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.items;
+package net.flectone.cookieclicker.inventories.crafting;
 
 import com.google.inject.Singleton;
 import org.bukkit.Material;

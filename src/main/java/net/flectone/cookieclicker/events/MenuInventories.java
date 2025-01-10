@@ -3,10 +3,11 @@ package net.flectone.cookieclicker.events;
 import com.google.inject.Inject;
 import net.flectone.cookieclicker.CompactItems;
 import net.flectone.cookieclicker.CookieClicker;
-import net.flectone.cookieclicker.items.CustomRecipe;
+import net.flectone.cookieclicker.items.Recipes;
+import net.flectone.cookieclicker.inventories.crafting.CustomRecipe;
 import net.flectone.cookieclicker.items.ItemManager;
-import net.flectone.cookieclicker.crafting.Recipes;
 import net.flectone.cookieclicker.items.ShopManager;
+import net.flectone.cookieclicker.utility.ItemTagsUtility;
 import net.flectone.cookieclicker.utility.UtilsCookie;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -30,13 +31,16 @@ public class MenuInventories implements Listener {
     private final CompactItems compactItems;
     private final UtilsCookie utilsCookie;
     private final Recipes recipes;
+    private final ItemTagsUtility itemTagsUtility;
     @Inject
-    public MenuInventories(Recipes recipes, ShopManager shopManager, CompactItems compactItems, UtilsCookie utilsCookie, ItemManager manager) {
+    public MenuInventories(Recipes recipes, ShopManager shopManager, CompactItems compactItems,
+                           UtilsCookie utilsCookie, ItemManager manager, ItemTagsUtility itemTagsUtility) {
         this.shopManager = shopManager;
         this.compactItems = compactItems;
         this.utilsCookie = utilsCookie;
         this.manager = manager;
         this.recipes = recipes;
+        this.itemTagsUtility = itemTagsUtility;
     }
 
 
@@ -55,11 +59,11 @@ public class MenuInventories implements Listener {
         he.openInventory(recipesInv);
         he.setMetadata("inv", new FixedMetadataValue(CookieClicker.getPlugin(CookieClicker.class), "menu_recipes"));
     }
-    public void openRecipe(HumanEntity he, CustomRecipe se) {
-        Inventory recipe = Bukkit.createInventory(he, 9 * 3, Component.text("рецепт"));
-        he.openInventory(recipe);
+    public void openRecipe(HumanEntity humanEntity, CustomRecipe se) {
+        Inventory recipe = Bukkit.createInventory(humanEntity, 9 * 3, Component.text("рецепт"));
+        humanEntity.openInventory(recipe);
 
-        he.setMetadata("inv", new FixedMetadataValue(CookieClicker.getPlugin(CookieClicker.class), "recipe"));
+        humanEntity.setMetadata("inv", new FixedMetadataValue(CookieClicker.getPlugin(CookieClicker.class), "recipe"));
         int slot = 0;
         for (ItemStack itm : se.getAllIngredients()) {
             recipe.setItem(slot, itm);
@@ -75,24 +79,24 @@ public class MenuInventories implements Listener {
 
     @EventHandler
     public void invSelectorClick (InventoryClickEvent event) {
-        HumanEntity he = event.getWhoClicked();
+        HumanEntity humanEntity = event.getWhoClicked();
         if (event.getClickedInventory() == null || event.getClickedInventory().isEmpty()) return;
-        if (!(checkIfInv(he, "menu_selector"))) return;
+        if (!(checkIfInv(humanEntity, "menu_selector"))) return;
         event.setCancelled(true);
         switch (event.getSlot()) {
             case 12:
-                he.closeInventory();
-                Inventory allItems = Bukkit.createInventory(he, 9 * 4, Component.text("халява"));
-                he.openInventory(allItems);
+                humanEntity.closeInventory();
+                Inventory allItems = Bukkit.createInventory(humanEntity, 9 * 4, Component.text("халява"));
+                humanEntity.openInventory(allItems);
                 int slot = 0;
                 for (Map.Entry<String, net.minecraft.world.item.ItemStack> entry : manager.allItems()) {
-                    allItems.setItem(slot, CraftItemStack.asBukkitCopy(entry.getValue()));
+                    allItems.setItem(slot, new ItemStack(CraftItemStack.asBukkitCopy(entry.getValue())));
                     slot++;
                 }
                 break;
             case 14:
-                he.closeInventory();
-                openAllRecipes(he);
+                humanEntity.closeInventory();
+                openAllRecipes(humanEntity);
                 break;
         }
 
@@ -121,17 +125,17 @@ public class MenuInventories implements Listener {
 
     @EventHandler
     public void closeInvEvent (InventoryCloseEvent event) {
-        HumanEntity pl = event.getPlayer();
+        HumanEntity humanEntity = event.getPlayer();
         String name = null;
-        if (checkIfInv(pl, "menu_selector"))
+        if (checkIfInv(humanEntity, "menu_selector"))
             name = "menu_selector";
-        if (checkIfInv(pl, "menu_recipes"))
+        if (checkIfInv(humanEntity, "menu_recipes"))
             name = "menu_recipes";
-        if (checkIfInv(pl, "recipe"))
+        if (checkIfInv(humanEntity, "recipe"))
             name = "recipe";
-        if (name != null) pl.sendMessage(Component.text("closed! " + name));
+        if (name != null) humanEntity.sendMessage(Component.text("closed! " + name));
 
         if (name != null)
-            pl.removeMetadata("inv", CookieClicker.getPlugin(CookieClicker.class));
+            humanEntity.removeMetadata("inv", CookieClicker.getPlugin(CookieClicker.class));
     }
 }

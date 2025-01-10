@@ -300,26 +300,15 @@ public class ItemManager {
         // Pickaxe
         items.put("miningPart_pickaxe", placeholder("[mining] Кирка", "miningPart_pickaxe"));
 
-        // Ruby
-//        ItemStack rubyItem = new ItemStack(Material.AMETHYST_SHARD);
-//        ItemMeta rubyMeta = rubyItem.getItemMeta();
-//        rubyMeta.displayName(miniMessage.deserialize("<red> Рубин <white>[<gray>t1</gray>]</white>"));
-//        rubyItem.setItemMeta(rubyMeta);
-//        rubyItem = nbtUtils.makeColorable(rubyItem);
-//        nbtUtils.setColor(rubyItem, 16722731);
-//        items.put("ruby1", rubyItem);
-
-        // (epic) glow berries
-
 
 
     }
     @Deprecated
     public org.bukkit.inventory.ItemStack get(String str) {
-        return CraftItemStack.asBukkitCopy(items.get(str));
+        return CraftItemStack.asBukkitCopy(items.get(str).copy());
     }
     public ItemStack getNMS(String str) {
-        return items.get(str);
+        return items.get(str).copy();
     }
     public Set<Map.Entry<String, ItemStack>> allItems() { return items.entrySet();}
 

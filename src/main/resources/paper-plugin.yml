@@ -1,5 +1,5 @@
 name: CookieClicker
-version: 'experimental'
+version: '2.0.0-beta'
 main: net.flectone.cookieclicker.CookieClicker
 api-version: '1.21'
 load: STARTUP

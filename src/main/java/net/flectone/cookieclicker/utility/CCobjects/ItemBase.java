@@ -88,7 +88,9 @@ public abstract class ItemBase implements ClickerItems{
         net.minecraft.world.item.ItemStack createdItemNMS = CraftItemStack.asNMSCopy(createdItem);
 
         //в начале пишется тег предмета
-        fullLore.addFirst(miniMessage.deserialize("<dark_gray> #" + itemTag));
+        if (!itemTag.equals("none")) {
+            fullLore.addFirst(miniMessage.deserialize("<dark_gray> #" + itemTag));
+        }
 
         //фулл лор собирается тут и создаётся компонент
         ItemLore finallore = new ItemLore(combineLore(fullLore, stats, preStatsLore));

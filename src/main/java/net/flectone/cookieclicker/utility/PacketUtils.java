@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker;
+package net.flectone.cookieclicker.utility;
 
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -6,14 +6,16 @@ import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
-import net.minecraft.server.MinecraftServer;
+import net.flectone.cookieclicker.CookieClicker;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -22,6 +24,13 @@ import java.util.UUID;
 
 @Singleton
 public class PacketUtils {
+    private final CCConversionUtils converter;
+
+    @Inject
+    public PacketUtils(CCConversionUtils CCConverter) {
+        this.converter = CCConverter;
+    }
+
     public void spawnItem(User user, com.github.retrooper.packetevents.protocol.world.Location location, net.minecraft.world.item.ItemStack item) {
         //тут наверное есть вероятность, что uuid будет уже существующего моба, но хз чё сделать
         UUID newEntitiUUID = UUID.randomUUID();
@@ -46,7 +55,7 @@ public class PacketUtils {
 
         user.sendPacket(spawnPacket);
         user.sendPacket(metadataPacket);
-        net.minecraft.world.entity.player.Player player = userToNMS(user);
+        net.minecraft.world.entity.player.Player player = converter.userToNMS(user);
         //вот тут реализовано подбирание предмета
         new BukkitRunnable() {
 
@@ -70,12 +79,16 @@ public class PacketUtils {
         }.runTaskTimer(CookieClicker.getPlugin(CookieClicker.class), 0L, 2L);
     }
 
-    public void playSound(User user, Integer soundId, Float volume, Float pitch) {
-        net.minecraft.world.entity.player.Player player = userToNMS(user);
-        WrapperPlayServerSoundEffect soundPacket = new WrapperPlayServerSoundEffect(soundId,
+    public void playSound(User user, Sound sound, Float volume, Float pitch) {
+        net.minecraft.world.entity.player.Player player = converter.userToNMS(user);
+        Vector3i position = new Vector3i((int) player.getX(), (int) player.getY(), (int) player.getZ());
+
+        WrapperPlayServerSoundEffect soundPacket = new WrapperPlayServerSoundEffect(sound,
                 SoundCategory.MASTER,
-                new Vector3i((int) player.getX(), (int) player.getY(), (int) player.getZ()),
+                position.multiply(8), // надо умножать координаты на 8
                 volume, pitch);
+
+
         user.sendPacket(soundPacket);
     }
 
@@ -87,15 +100,5 @@ public class PacketUtils {
                 0f,
                 particleCount);
         user.sendPacket(particlePacket);
-    }
-
-    public net.minecraft.world.entity.player.Player userToNMS (User user) {
-        //короче, тут я беру всех игроков на сервере и с помощью UUID нахожу нужного
-        net.minecraft.world.entity.player.Player player = null;
-        for (net.minecraft.world.entity.player.Player i : MinecraftServer.getServer().getPlayerList().players) {
-            if (i.getUUID().equals(user.getUUID()))
-                player = i;
-        }
-        return player;
     }
 }

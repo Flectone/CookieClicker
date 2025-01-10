@@ -6,10 +6,12 @@ import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleDustColorTransitionData;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.PacketUtils;
+import net.flectone.cookieclicker.utility.PacketUtils;
+import net.flectone.cookieclicker.utility.CCConversionUtils;
 import net.flectone.cookieclicker.utility.CCobjects.ClickerItems;
 import net.flectone.cookieclicker.utility.ItemTagsUtility;
 import net.flectone.cookieclicker.utility.UtilsCookie;
@@ -28,17 +30,20 @@ public class BagHoeUpgrade {
     private final UtilsCookie utilsCookie;
     private final ItemTagsUtility itemTagsUtility;
     private final PacketUtils packetUtils;
+    private final CCConversionUtils conversionUtils;
 
 
     @Inject
-    public BagHoeUpgrade(UtilsCookie utilsCookie, ItemTagsUtility itemTagsUtility, PacketUtils packetUtils) {
+    public BagHoeUpgrade(UtilsCookie utilsCookie, ItemTagsUtility itemTagsUtility, PacketUtils packetUtils,
+                         CCConversionUtils conversionUtils) {
         this.utilsCookie = utilsCookie;
         this.itemTagsUtility = itemTagsUtility;
         this.packetUtils = packetUtils;
+        this.conversionUtils = conversionUtils;
     }
 
     public boolean updateHoe(User user) {
-        Player player = packetUtils.userToNMS(user);
+        Player player = conversionUtils.userToNMS(user);
         ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
 
         if (itemInHand.getItem().equals(Items.AIR)) return false;
@@ -59,7 +64,7 @@ public class BagHoeUpgrade {
 
             itemTagsUtility.setStat(itemInHand, ClickerItems.fortuneTag, itemTagsUtility.getBaseFortune(itemInHand) + 1);
         }
-        packetUtils.playSound(user, 971, 1f, 1.8f);
+        packetUtils.playSound(user, Sounds.BLOCK_NETHERITE_BLOCK_BREAK, 1f, 1.8f);
 
         //кринж штука, чисто для теста
         player.setItemInHand(InteractionHand.MAIN_HAND, itemInHand);
@@ -76,7 +81,7 @@ public class BagHoeUpgrade {
     }
 
     public void LegHoeChange (User user) {
-        Player player = packetUtils.userToNMS(user);
+        Player player = conversionUtils.userToNMS(user);
 
         //проверка, клик в воздух или нет
         HitResult hitResult = player.getRayTrace(7, ClipContext.Fluid.NONE);
@@ -103,6 +108,6 @@ public class BagHoeUpgrade {
         packetUtils.spawnParticle(user, particle, 50, new Vector3d(player.getX(), player.getY() + 1, player.getZ()), 0.5f);
         player.getItemInHand(InteractionHand.MAIN_HAND).applyComponents(itemModelComponent);
         itemTagsUtility.setAbility(itemInHand, resourceLocation.toString().equals("minecraft:golden_hoe") ? "transform" : "infinity");
-//        player.playSound(player, Sound.ENTITY_ENDER_EYE_DEATH, 1f, 0.2f);
+        packetUtils.playSound(user, Sounds.ENTITY_ENDER_EYE_DEATH, 1f, 0.8f);
     }
 }

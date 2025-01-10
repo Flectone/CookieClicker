@@ -1,7 +1,7 @@
-package net.flectone.cookieclicker.crafting;
+package net.flectone.cookieclicker.inventories.crafting;
 
 import com.google.inject.Inject;
-import net.flectone.cookieclicker.items.CustomRecipe;
+import net.flectone.cookieclicker.items.Recipes;
 import net.flectone.cookieclicker.utility.UtilsCookie;
 
 import org.bukkit.Material;

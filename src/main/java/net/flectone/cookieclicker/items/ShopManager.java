@@ -3,7 +3,7 @@ package net.flectone.cookieclicker.items;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.utility.UtilsCookie;
-import org.bukkit.inventory.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,10 +22,10 @@ public class ShopManager {
     }
 
     public void loadSellingItems() {
-        sellingItems.put(manager.get("destroyer"), utilsCookie.createItemAmount(manager.get("ench_cookie"), 100));
-        sellingItems.put(manager.get("wood_hoe"), utilsCookie.createItemAmount(manager.get("ench_cookie"), 10));
-        sellingItems.put(manager.get("stone_hoe"), utilsCookie.createItemAmount(manager.get("ench_cookie"), 30));
-        sellingItems.put(manager.get("rose_bush"), utilsCookie.createItemAmount(manager.get("baguette"), 60));
+        sellingItems.put(manager.getNMS("destroyer"), utilsCookie.createItemAmountNMS(manager.getNMS("ench_cookie"), 100));
+        sellingItems.put(manager.getNMS("wood_hoe"), utilsCookie.createItemAmountNMS(manager.getNMS("ench_cookie"), 10));
+        sellingItems.put(manager.getNMS("stone_hoe"), utilsCookie.createItemAmountNMS(manager.getNMS("ench_cookie"), 30));
+        sellingItems.put(manager.getNMS("rose_bush"), utilsCookie.createItemAmountNMS(manager.getNMS("baguette"), 60));
     }
     public Integer itemsLength() {
         return sellingItems.size();
