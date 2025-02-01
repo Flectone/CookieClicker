@@ -9,6 +9,7 @@ import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 @Getter
 public class ClickerContainer {
@@ -26,6 +27,7 @@ public class ClickerContainer {
         int listSize;
         if (!customData.equals("default")) {
             switch (windowType) {
+                // 9 * x инвентари
                 case 0, 1, 2, 3, 4, 5 -> listSize = 9 * (windowType + 1);
                 case 6 ->  listSize = 9;
                 default -> listSize = 0;
@@ -39,6 +41,12 @@ public class ClickerContainer {
 
         title = packet.getTitle().toString();
         customData = "fromPacket";
+    }
+
+    //о нееет, это статика
+    public static Integer generateId() {
+        Random random = new Random();
+        return random.nextInt(99, 1000);
     }
 
     public void setItem(Integer index, ItemStack itemNMS) {

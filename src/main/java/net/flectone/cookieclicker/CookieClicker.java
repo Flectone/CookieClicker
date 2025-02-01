@@ -6,12 +6,21 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.flectone.cookieclicker.inventories.crafting.CraftingEvent;
 import net.flectone.cookieclicker.items.Recipes;
 import net.flectone.cookieclicker.events.*;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.ShopManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.event.HoverEventSource;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 @Singleton
@@ -29,21 +38,18 @@ public final class CookieClicker extends JavaPlugin {
         PacketEvents.getAPI().init();
         this.plugin = getPlugin(CookieClicker.class);
         Injector injector = Guice.createInjector(new CookieClickerInject(this));
-
         //slozhno.generateText();
         //Bukkit.getPluginManager().registerEvents(injector.getInstance(InteractEvent.class), this);
         Bukkit.getPluginManager().registerEvents(injector.getInstance(EatingEvent.class), this);
         //Bukkit.getPluginManager().registerEvents(injector.getInstance(BlockInteractEvent.class), this);
         //Bukkit.getPluginManager().registerEvents(injector.getInstance(ClickInInvEvent.class), this);
-        Bukkit.getPluginManager().registerEvents(injector.getInstance(openAllItems.class), this);
-        Bukkit.getPluginManager().registerEvents(injector.getInstance(MenuInventories.class), this);
+        //Bukkit.getPluginManager().registerEvents(injector.getInstance(openAllItems.class), this);
+        //Bukkit.getPluginManager().registerEvents(injector.getInstance(MenuInventories.class), this);
         Bukkit.getPluginManager().registerEvents(injector.getInstance(CraftingEvent.class), this);
         PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(Packets.class), PacketListenerPriority.HIGHEST);
         injector.getInstance(ItemManager.class).load();
         injector.getInstance(ShopManager.class).loadSellingItems();
         injector.getInstance(Recipes.class).addRecipes();
-
-        
     }
 
     @Override

@@ -16,10 +16,17 @@ import net.flectone.cookieclicker.utility.ItemTagsUtility;
 import net.flectone.cookieclicker.utility.PacketUtils;
 import net.flectone.cookieclicker.utility.UtilsCookie;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -151,5 +158,50 @@ public class CookiePartBase {
 
     public void changeLegendaryHoeMode(User user) {
         bagHoeUpgrade.LegHoeChange(user);
+    }
+
+    public void bookShelfClick(User user, Player player) {
+        ItemStack enchantedCookiesInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!utilsCookie.compare(enchantedCookiesInHand, manager.getNMS("ench_cookie"))) return;
+        if (enchantedCookiesInHand.getCount() < 15) return;
+
+        HitResult hitResult = player.getRayTrace(5, ClipContext.Fluid.NONE);
+        if (!hitResult.getType().equals(HitResult.Type.BLOCK)) return;
+        BlockHitResult blockHitResult = (BlockHitResult) hitResult;
+        //книжная полка, координаты и blockstate
+        BlockPos shelfPos = blockHitResult.getBlockPos();
+        BlockState bookshelfBlockState = player.level().getBlockState(shelfPos);
+
+        if (!bookshelfBlockState
+                .getBlock().asItem().equals(Items.CHISELED_BOOKSHELF)) return;
+
+        double x = shelfPos.getX() + 0.5;
+        double y = shelfPos.getY() + 0.5;
+        double z = shelfPos.getZ() + 0.5;
+        //facing вроде бы всегда первая в списке
+        EnumProperty<?> facingProperty = (EnumProperty<?>) player.level().getBlockState(shelfPos).getProperties().toArray()[0];
+
+        if (bookshelfBlockState.getOptionalValue(facingProperty).isEmpty()) return;
+        //проверка, куда смотрит блок, чтобы спереди призывать предмет
+        switch (bookshelfBlockState.getOptionalValue(facingProperty).get().toString()) {
+            case "north":
+                z--;
+                break;
+            case "south":
+                z++;
+                break;
+            case "west":
+                x--;
+                break;
+            case "east":
+                x++;
+                break;
+        }
+
+        Location bookLocation = new Location(x, y, z, 1, 1);
+        //spawning item
+        user.sendMessage(MiniMessage.miniMessage().deserialize("<#f4a91c>\uD83C\uDF6A <#f7f4b5>Вы купили книгу!"));
+        packetUtils.spawnItem(user, bookLocation, manager.getNMS("book_boost1"));
+        enchantedCookiesInHand.setCount(enchantedCookiesInHand.getCount() - 15);
     }
 }

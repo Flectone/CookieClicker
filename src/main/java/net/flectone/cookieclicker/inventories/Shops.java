@@ -14,14 +14,12 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 @Singleton
 public class Shops {
@@ -29,8 +27,6 @@ public class Shops {
     private final ShopManager shopManager;
     private final CCConversionUtils converter;
     private final CompactItems compactItems;
-
-    private final Random random = new Random();
 
     @Inject
     public Shops(ContainerManager containerManager, ShopManager shopManager, CCConversionUtils converter,
@@ -43,10 +39,10 @@ public class Shops {
 
     public void openCookiesShop(User user, Player player) {
 
-        ClickerContainer Trading = new ClickerContainer(random.nextInt(99, 1000),
+        ClickerContainer Trading = new ClickerContainer(ClickerContainer.generateId(),
                 3, "trading_farm");
 
-        NormalItem upperItem = new NormalItem(Material.BEDROCK,
+        NormalItem upperItem = new NormalItem(Material.WHITE_STAINED_GLASS_PANE,
                 "<gradient:#ffffff:#cccccc><italic:false>Здесь вы можете купить",
                 "none", 1);
         upperItem.addLore("<gradient:#ffffff:#cccccc><italic:false>различные вещи за печенье");
@@ -88,24 +84,11 @@ public class Shops {
 
     public void buyItemFarmer(User user, Player player, WrapperPlayClientClickWindow packet) {
         int slot = packet.getSlot();
-        user.sendMessage(String.valueOf(slot));
+
         ClickerContainer container = containerManager.getOpenedContainer(user);
         if (container.getContainerItems().size() - 1 < slot) return;
 
-        //отмена клика, самое адекватное, что я смог сделать
-        //короче тут сначала отправляется пакет через nms, потому что у меня используются ItemStack оттуда,
-        //а потом
-        containerManager.setContainerSlot(player, container, slot, container.getContainerItems().get(slot));
-        containerManager.setContainerSlot(player, container, -1, new ItemStack(Items.AIR));
-
-        for (int i = 0; i < 36; i++) {
-            //эта штука сначала пройдётся по хотбару, а потом по инвентарю
-            int actualSlot = i < 9 ? 8 - i : 35 - (i - 9);
-            if (player.getInventory().items.get(actualSlot).getItem().equals(Items.AIR)) {
-                containerManager.setPlayerSlot(player, actualSlot, new ItemStack(Items.AIR));
-                break;
-            }
-        }
+        containerManager.cancelClick(player, container, slot, packet.getWindowClickType());
 
         if (slot >= 9) {
             if (shopManager.itemsLength() <= slot - 9) return;

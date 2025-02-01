@@ -310,7 +310,9 @@ public class ItemManager {
     public ItemStack getNMS(String str) {
         return items.get(str).copy();
     }
-    public Set<Map.Entry<String, ItemStack>> allItems() { return items.entrySet();}
+    public Collection<ItemStack> allItems() {
+        return items.values();
+    }
 
     private ItemStack placeholder(String name, String persistentData) {
         org.bukkit.inventory.ItemStack pholder = new org.bukkit.inventory.ItemStack(Material.BARRIER);
