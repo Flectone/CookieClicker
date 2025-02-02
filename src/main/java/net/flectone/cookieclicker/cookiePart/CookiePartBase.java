@@ -1,6 +1,7 @@
 package net.flectone.cookieclicker.cookiePart;
 
 import com.github.retrooper.packetevents.protocol.color.Color;
+import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleTrailData;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
@@ -12,6 +13,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.utility.CCConversionUtils;
+import net.flectone.cookieclicker.utility.CCobjects.CookieEntity;
+import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
 import net.flectone.cookieclicker.utility.ItemTagsUtility;
 import net.flectone.cookieclicker.utility.PacketUtils;
 import net.flectone.cookieclicker.utility.UtilsCookie;
@@ -43,6 +46,8 @@ public class CookiePartBase {
     private final BagHoeUpgrade bagHoeUpgrade;
     private final CCConversionUtils converter;
 
+    private final List<Integer> bonusEntities = new ArrayList<>();
+
     @Inject
     public CookiePartBase (ItemTagsUtility itemTagsUtility, ItemManager manager, UtilsCookie utilsCookie,
                            PacketUtils packetUtils, EpicHoeUtils epicHoeUtils, BagHoeUpgrade bagHoeUpgrade,
@@ -60,12 +65,10 @@ public class CookiePartBase {
         Player player = converter.userToNMS(user);
 
         //
-        int maxAmount = 1;
-        Random rnd = new Random();
-
+        int maxAmount = 0;
 
         maxAmount += utilsCookie.extractFortune(player);
-        int droppedAmount = rnd.nextInt(maxAmount, maxAmount * 2);
+        int droppedAmount = utilsCookie.convertFortune(maxAmount);
 
         droppedAmount += Math.round(droppedAmount * (0.5f * epicHoeUtils.getTier(player)));
         String pdcValue = itemTagsUtility.getItemTag(player.getItemInHand(InteractionHand.MAIN_HAND));
@@ -154,6 +157,8 @@ public class CookiePartBase {
         //тут спавн предмета идёт уже
         for (net.minecraft.world.item.ItemStack i : dropItems)
             packetUtils.spawnItem(user, loca, i);
+
+        createBonus(user, loca);
     }
 
     public void changeLegendaryHoeMode(User user) {
@@ -203,5 +208,48 @@ public class CookiePartBase {
         user.sendMessage(MiniMessage.miniMessage().deserialize("<#f4a91c>\uD83C\uDF6A <#f7f4b5>Вы купили книгу!"));
         packetUtils.spawnItem(user, bookLocation, manager.getNMS("book_boost1"));
         enchantedCookiesInHand.setCount(enchantedCookiesInHand.getCount() - 15);
+    }
+
+    public void checkForBonus(CookiePlayer cookiePlayer, Integer entityId) {
+        if (bonusEntities.isEmpty() || !bonusEntities.contains(entityId))
+            return;
+        //удаляем существ
+        CookieEntity.removeById(entityId, cookiePlayer.getUser());
+        CookieEntity.removeById(entityId + 10000, cookiePlayer.getUser());
+        bonusEntities.remove(entityId);
+        packetUtils.playSound(cookiePlayer.getUser(), Sounds.ITEM_TRIDENT_RETURN, 1f, 0.7f);
+
+        int amount = utilsCookie.convertFortune(utilsCookie.extractFortune(cookiePlayer.getPlayer())) * 50;
+
+        cookiePlayer.swingArm();
+
+        cookiePlayer.getPlayer().getInventory().add(utilsCookie.createItemAmountNMS(manager.getNMS("cookie"), amount));
+    }
+
+    public void createBonus(User user, Location location) {
+        //random
+        Random random = new Random();
+        int chance = 3;
+        if (random.nextInt(1, 100 + 1) <= (100 - chance))
+            return;
+
+        Location randomLocation = new Location(location.getX() + random.nextInt(-2, 3),
+                location.getY(), location.getZ() + random.nextInt(-2, 3), 0f, 0f);
+
+        CookieEntity interactEntity = new CookieEntity(EntityTypes.INTERACTION);
+        interactEntity.setLocation(randomLocation);
+        interactEntity.spawn(user);
+
+        //200iq, тупо к айдишнику interaction прибавить 10000 и норм
+        CookieEntity textDisplay = new CookieEntity(EntityTypes.TEXT_DISPLAY, interactEntity.getEntityId() + 10000);
+        textDisplay.setText("клик");
+        textDisplay.setLocation(randomLocation.getX(), randomLocation.getY() + 0.5, randomLocation.getZ());
+        textDisplay.spawn(user);
+
+        packetUtils.spawnParticle(user,
+                new Particle<>(ParticleTypes.SONIC_BOOM), 1,
+                new Vector3d(randomLocation.getX(), randomLocation.getY() + 0.5, randomLocation.getZ()), 0f);
+
+        bonusEntities.add(interactEntity.getEntityId());
     }
 }

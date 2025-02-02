@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.utility.CCobjects;
+package net.flectone.cookieclicker.utility.CCobjects.Items;
 
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;

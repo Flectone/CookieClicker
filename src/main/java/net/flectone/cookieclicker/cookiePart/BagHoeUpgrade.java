@@ -12,7 +12,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.utility.PacketUtils;
 import net.flectone.cookieclicker.utility.CCConversionUtils;
-import net.flectone.cookieclicker.utility.CCobjects.ClickerItems;
+import net.flectone.cookieclicker.utility.CCobjects.Items.ClickerItems;
 import net.flectone.cookieclicker.utility.ItemTagsUtility;
 import net.flectone.cookieclicker.utility.UtilsCookie;
 import net.minecraft.core.component.DataComponentPatch;

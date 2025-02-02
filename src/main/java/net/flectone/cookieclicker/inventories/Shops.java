@@ -1,18 +1,17 @@
 package net.flectone.cookieclicker.inventories;
 
-import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.CompactItems;
 import net.flectone.cookieclicker.items.ShopManager;
 import net.flectone.cookieclicker.utility.CCConversionUtils;
-import net.flectone.cookieclicker.utility.CCobjects.NormalItem;
+import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
+import net.flectone.cookieclicker.utility.CCobjects.Items.NormalItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
 import org.bukkit.Material;
@@ -37,7 +36,7 @@ public class Shops {
         this.compactItems = compactItems;
     }
 
-    public void openCookiesShop(User user, Player player) {
+    public void openCookiesShop(CookiePlayer cookiePlayer) {
 
         ClickerContainer Trading = new ClickerContainer(ClickerContainer.generateId(),
                 3, "trading_farm");
@@ -79,22 +78,22 @@ public class Shops {
             Trading.setItem(slot, finalItem);
             slot++;
         }
-        containerManager.openContainer(user, player, Trading);
+        containerManager.openContainer(cookiePlayer, Trading);
     }
 
-    public void buyItemFarmer(User user, Player player, WrapperPlayClientClickWindow packet) {
+    public void buyItemFarmer(CookiePlayer cookiePlayer, WrapperPlayClientClickWindow packet) {
         int slot = packet.getSlot();
 
-        ClickerContainer container = containerManager.getOpenedContainer(user);
+        ClickerContainer container = containerManager.getOpenedContainer(cookiePlayer.getUser());
         if (container.getContainerItems().size() - 1 < slot) return;
 
-        containerManager.cancelClick(player, container, slot, packet.getWindowClickType());
+        containerManager.cancelClick(cookiePlayer.getPlayer(), container, slot, packet.getWindowClickType());
 
         if (slot >= 9) {
             if (shopManager.itemsLength() <= slot - 9) return;
 
             ItemStack priceItem = shopManager.getPrice(slot - 9);
-            compactItems.compact(player.getInventory(), priceItem.copy(), shopManager.getItem(slot - 9), priceItem.getCount(), 1);
+            compactItems.compact(cookiePlayer.getPlayer().getInventory(), priceItem.copy(), shopManager.getItem(slot - 9), priceItem.getCount(), 1);
         }
     }
 

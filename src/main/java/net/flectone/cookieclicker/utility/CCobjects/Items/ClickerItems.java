@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.utility.CCobjects;
+package net.flectone.cookieclicker.utility.CCobjects.Items;
 
 import net.flectone.cookieclicker.CookieClicker;
 import net.minecraft.world.item.ItemStack;

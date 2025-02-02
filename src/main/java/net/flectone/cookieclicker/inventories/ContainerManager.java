@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
 import net.flectone.cookieclicker.utility.UtilsCookie;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.core.NonNullList;
@@ -32,12 +33,12 @@ public class ContainerManager {
         this.utilsCookie = utilsCookie;
     }
 
-    public void setOpenedContainer(User user, ClickerContainer container) {
-        openedContainers.put(user.getUUID(), container);
+    public void setOpenedContainer(UUID uuid, ClickerContainer container) {
+        openedContainers.put(uuid, container);
     }
-    public void setOpenedContainer(User user, WrapperPlayServerOpenWindow packet, String data) {
+    public void setOpenedContainer(UUID uuid, WrapperPlayServerOpenWindow packet, String data) {
         ClickerContainer container = new ClickerContainer(packet.getContainerId(), packet.getType(), data);
-        setOpenedContainer(user, container);
+        setOpenedContainer(uuid, container);
     }
 
     public Integer closeContainer(User user) {
@@ -58,23 +59,27 @@ public class ContainerManager {
         return getOpenedContainer(user.getUUID());
     }
 
+    public ClickerContainer getOpenedContainer(CookiePlayer cookiePlayer) {
+        return getOpenedContainer(cookiePlayer.getUuid());
+    }
+
     public ClickerContainer getOpenedContainer(UUID uuid) {
         if (openedContainers.isEmpty() || !openedContainers.containsKey(uuid))
             return new ClickerContainer(0, 0, "none");
         return openedContainers.get(uuid);
     }
 
-    public void openContainer(User user, Player player, ClickerContainer container) {
+    public void openContainer(CookiePlayer cookiePlayer, ClickerContainer container) {
         WrapperPlayServerOpenWindow openWindowPacket = new WrapperPlayServerOpenWindow(container.getWindowId(),
                 container.getWindowType(),
                 MiniMessage.miniMessage().deserialize(container.getTitle()));
 
-        setOpenedContainer(user, container);
-        user.sendPacketSilently(openWindowPacket);
+        setOpenedContainer(cookiePlayer.getUuid(), container);
+        cookiePlayer.sendPEpacket(openWindowPacket, true);
 
         ClientboundContainerSetContentPacket packet = new ClientboundContainerSetContentPacket(container.getWindowId(),
                 1, container.getContainerItems(), new net.minecraft.world.item.ItemStack(Items.AIR));
-        ((ServerPlayer) player).connection.connection.send(packet);
+        cookiePlayer.sendNMSpacket(packet);
     }
 
     public void anvilClick(Player player, Integer slot) {
@@ -83,7 +88,7 @@ public class ContainerManager {
         utilsCookie.updateStats(player.containerMenu.getSlot(2).getItem());
     }
 
-    public void setSlot(Player player, ClickerContainer container, Integer slot, ItemStack itemStack, boolean isPlayerInventory) {
+    private void setSlot(Player player, ClickerContainer container, Integer slot, ItemStack itemStack, boolean isPlayerInventory) {
         Connection playerConnection = ((ServerPlayer) player).connection.connection;
 
         if (slot == -1) {

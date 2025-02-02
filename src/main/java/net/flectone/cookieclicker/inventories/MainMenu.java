@@ -1,13 +1,13 @@
 package net.flectone.cookieclicker.inventories;
 
-import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.inventories.crafting.CustomRecipe;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.Recipes;
-import net.flectone.cookieclicker.utility.CCobjects.NormalItem;
+import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
+import net.flectone.cookieclicker.utility.CCobjects.Items.NormalItem;
 import net.flectone.cookieclicker.utility.UtilsCookie;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.Unit;
@@ -35,7 +35,7 @@ public class MainMenu {
         this.recipes = recipes;
     }
 
-    public void openMainMenu(User user, Player player) {
+    public void openMainMenu(CookiePlayer cookiePlayer) {
         ClickerContainer menu = new ClickerContainer(ClickerContainer.generateId(), 2,
                 "main_menu");
 
@@ -45,7 +45,8 @@ public class MainMenu {
         NormalItem stats = new NormalItem(Material.WRITABLE_BOOK,
                 "<gradient:#e5fffe:#e7f0ef><italic:false>Статистика игрока",
                 "none", 1);
-        stats.addLore("<#ffc40a><italic:false>Удача фермера: " + utilsCookie.extractFortune(player).toString());
+        stats.addLore("<#ffc40a><italic:false>Удача фермера: " + utilsCookie.extractFortune(cookiePlayer.getPlayer()).toString());
+        stats.addLore("<#ffb652><italic:false>Шанс на бонус: наверное 3%");
         NormalItem allItems = new NormalItem(Material.BOOK,
                 "<gradient:#ffc900:#f3e736:#f7d760:#e1b926:#f3e736:#ffc900><italic:false>Посмотреть все предметы",
                 "none", 1);
@@ -54,10 +55,10 @@ public class MainMenu {
         menu.setItem(13, stats.toItemStack());
         menu.setItem(15, allItems.toItemStack());
 
-        containerManager.openContainer(user, player, menu);
+        containerManager.openContainer(cookiePlayer, menu);
     }
 
-    public void openAllItems(User user, Player player) {
+    public void openAllItems(CookiePlayer cookiePlayer) {
         ClickerContainer allItemsScreen = new ClickerContainer(ClickerContainer.generateId(), 4,
                 "all_items");
 
@@ -67,7 +68,7 @@ public class MainMenu {
             slot++;
         }
 
-        containerManager.openContainer(user, player, allItemsScreen);
+        containerManager.openContainer(cookiePlayer, allItemsScreen);
     }
 
     public void getItemInMenu(Integer slot, Player player, WrapperPlayClientClickWindow.WindowClickType clickType) {
@@ -87,7 +88,7 @@ public class MainMenu {
         player.getInventory().add(itemToAdd);
     }
 
-    public void openAllRecipes(User user, Player player) {
+    public void openAllRecipes(CookiePlayer cookiePlayer) {
         ClickerContainer recipesWindow = new ClickerContainer(ClickerContainer.generateId(), 4,
                 "all_recipes");
 
@@ -97,10 +98,10 @@ public class MainMenu {
             slot++;
         }
 
-        containerManager.openContainer(user, player, recipesWindow);
+        containerManager.openContainer(cookiePlayer, recipesWindow);
     }
 
-    public void openRecipe(User user, Player player, CustomRecipe recipe) {
+    public void openRecipe(CookiePlayer cookiePlayer, CustomRecipe recipe) {
         ClickerContainer singleRecipe = new ClickerContainer(ClickerContainer.generateId(), 2, "recipe");
 
         int slot = 0;
@@ -121,15 +122,15 @@ public class MainMenu {
         singleRecipe.setItem(13, CraftItemStack.asNMSCopy(recipe.getResult()));
         singleRecipe.setItem(8, closeWindowItem);
 
-        containerManager.openContainer(user, player, singleRecipe);
+        containerManager.openContainer(cookiePlayer, singleRecipe);
     }
 
-    public void selectRecipe(User user, Player player, Integer id, WrapperPlayClientClickWindow.WindowClickType clickType) {
-        containerManager.cancelClick(player, containerManager.getOpenedContainer(user), id, clickType);
+    public void selectRecipe(CookiePlayer cookiePlayer, Integer id, WrapperPlayClientClickWindow.WindowClickType clickType) {
+        containerManager.cancelClick(cookiePlayer.getPlayer(), containerManager.getOpenedContainer(cookiePlayer), id, clickType);
 
         Collection<CustomRecipe> allRecipes = recipes.getAllRecipes().values();
-        if (id >= allRecipes.size() || id > containerManager.getOpenedContainer(user).getContainerItems().size())
+        if (id >= allRecipes.size() || id > containerManager.getOpenedContainer(cookiePlayer).getContainerItems().size())
             return;
-        openRecipe(user, player, (CustomRecipe) allRecipes.toArray()[id]);
+        openRecipe(cookiePlayer, (CustomRecipe) allRecipes.toArray()[id]);
     }
 }

@@ -1,7 +1,7 @@
 package net.flectone.cookieclicker.utility;
 
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.utility.CCobjects.ClickerItems;
+import net.flectone.cookieclicker.utility.CCobjects.Items.ClickerItems;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;

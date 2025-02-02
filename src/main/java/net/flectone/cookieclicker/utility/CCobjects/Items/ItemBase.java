@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.utility.CCobjects;
+package net.flectone.cookieclicker.utility.CCobjects.Items;
 
 import com.mojang.serialization.JavaOps;
 import io.papermc.paper.adventure.WrapperAwareSerializer;

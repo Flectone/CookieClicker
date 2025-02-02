@@ -7,7 +7,7 @@ import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.flectone.cookieclicker.items.ItemManager;
-import net.flectone.cookieclicker.utility.CCobjects.ClickerItems;
+import net.flectone.cookieclicker.utility.CCobjects.Items.ClickerItems;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.core.Holder;
@@ -28,6 +28,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Singleton
 public class UtilsCookie {
@@ -100,14 +101,14 @@ public class UtilsCookie {
     }
 
     public Integer extractFortune(net.minecraft.world.entity.player.Player player) {
-        int farminFortune = 0;
+        int farmingFortune = 1;
         Inventory inv = player.getInventory();
         for (int i = 36; i < 40; i++) {
-            if (inv.getItem(i).getItem() != Items.AIR) farminFortune += getFullFortune(inv.getItem(i));
+            if (inv.getItem(i).getItem() != Items.AIR) farmingFortune += getFullFortune(inv.getItem(i));
         }
 
-        farminFortune += getFullFortune(player.getItemInHand(InteractionHand.MAIN_HAND));
-        return farminFortune;
+        farmingFortune += getFullFortune(player.getItemInHand(InteractionHand.MAIN_HAND));
+        return farmingFortune;
     }
 
     public void updateStats(net.minecraft.world.item.ItemStack item) {
@@ -140,5 +141,12 @@ public class UtilsCookie {
                         .set(DataComponents.LORE, new ItemLore(lores))
                         .build()
         );
+    }
+
+    public Integer convertFortune(Integer fortune) {
+        Random random = new Random();
+        Integer baseAmount = fortune <= 1 ? 1 : random.nextInt(Math.max(1, fortune - 3), fortune + 1);
+        Integer additionalAmount = fortune < 10 ? 0 : Math.round((float) random.nextInt(fortune - 10, fortune - 2) / 3);
+        return baseAmount + additionalAmount;
     }
 }
