@@ -5,11 +5,9 @@ import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
-import io.papermc.paper.registry.event.RegistryEvent;
 import io.papermc.paper.registry.event.RegistryEvents;
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.jetbrains.annotations.NotNull;
@@ -26,10 +24,10 @@ public class Enchantments implements PluginBootstrap {
                     b -> b.description(miniMessage.deserialize("<rainbow>Cookie Boost</rainbow>"))
                             .supportedItems(event.getOrCreateTag(ItemTypeTagKeys.HOES))
                             .anvilCost(1)
-                            .maxLevel(3)
+                            .maxLevel(10)
                             .weight(10)
-                            .minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(1, 1))
-                            .maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(3, 1))
+                            .minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(0, 0))
+                            .maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(0, 0))
                             .activeSlots(EquipmentSlotGroup.ANY)
             );
         }));
