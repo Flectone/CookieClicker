@@ -111,7 +111,14 @@ public class UtilsCookie {
     }
 
     public void updateStats(net.minecraft.world.item.ItemStack item) {
-        if (item.getItem().equals(Items.AIR) || getFullFortune(item) == 0) return;
+        if (item.getItem().equals(Items.AIR)) return;
+        //чтобы мотыги и книги можно было нормально чарить
+        //да и вообще надо убрать это повышение стоимости
+        item.applyComponents(DataComponentPatch.builder()
+                .set(DataComponents.REPAIR_COST, 0)
+                .build()
+        );
+        if (getFullFortune(item) == 0) return;
         ItemLore itemLore = item.getComponents().get(DataComponents.LORE);
         List<net.minecraft.network.chat.Component> lores = new ArrayList<>();
         net.minecraft.network.chat.Component stat = conversionUtils.convertToNMSComponent(
