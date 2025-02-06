@@ -6,10 +6,11 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
-import net.flectone.cookieclicker.inventories.crafting.CraftingEvent;
-import net.flectone.cookieclicker.items.Recipes;
-import net.flectone.cookieclicker.events.*;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import net.flectone.cookieclicker.events.EatingEvent;
+import net.flectone.cookieclicker.events.Packets;
 import net.flectone.cookieclicker.items.ItemManager;
+import net.flectone.cookieclicker.items.Recipes;
 import net.flectone.cookieclicker.items.ShopManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -41,6 +42,11 @@ public final class CookieClicker extends JavaPlugin {
         injector.getInstance(ItemManager.class).load();
         injector.getInstance(ShopManager.class).loadSellingItems();
         injector.getInstance(Recipes.class).addRecipes();
+        
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+            commands.registrar().register(injector.getInstance(Commands.class).createOpenMenuCommand());
+        });
+
     }
 
     @Override
