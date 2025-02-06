@@ -37,8 +37,8 @@ public final class CookieClicker extends JavaPlugin {
         //Bukkit.getPluginManager().registerEvents(injector.getInstance(ClickInInvEvent.class), this);
         //Bukkit.getPluginManager().registerEvents(injector.getInstance(openAllItems.class), this);
         //Bukkit.getPluginManager().registerEvents(injector.getInstance(MenuInventories.class), this);
-        Bukkit.getPluginManager().registerEvents(injector.getInstance(CraftingEvent.class), this);
-        PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(Packets.class), PacketListenerPriority.HIGHEST);
+        //Bukkit.getPluginManager().registerEvents(injector.getInstance(CraftingEvent.class), this);
+        PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(Packets.class), PacketListenerPriority.NORMAL);
         injector.getInstance(ItemManager.class).load();
         injector.getInstance(ShopManager.class).loadSellingItems();
         injector.getInstance(Recipes.class).addRecipes();

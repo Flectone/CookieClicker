@@ -8,6 +8,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.CompactItems;
@@ -16,8 +17,8 @@ import net.flectone.cookieclicker.inventories.ClickerContainer;
 import net.flectone.cookieclicker.inventories.ContainerManager;
 import net.flectone.cookieclicker.inventories.MainMenu;
 import net.flectone.cookieclicker.inventories.Shops;
+import net.flectone.cookieclicker.inventories.crafting.Crafting;
 import net.flectone.cookieclicker.items.ItemManager;
-import net.flectone.cookieclicker.utility.CCConversionUtils;
 import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.decoration.ItemFrame;
@@ -34,19 +35,19 @@ public class Packets implements PacketListener {
     private final ItemManager manager;
     private final CookiePartBase cookiePartBase;
     private final ContainerManager containerManager;
-    private final CCConversionUtils conversionUtils;
+    private final Crafting crafting;
     private final Shops shops;
     private final MainMenu mainMenu;
 
     @Inject
     public Packets(CompactItems compact, ItemManager manager, MainMenu mainMenu,
-                   CookiePartBase cookiePartBase, ContainerManager containerManager, CCConversionUtils conversionUtils,
+                   CookiePartBase cookiePartBase, ContainerManager containerManager, Crafting crafting,
                    Shops shops) {
         this.compact = compact;
         this.manager = manager;
         this.cookiePartBase = cookiePartBase;
         this.containerManager = containerManager;
-        this.conversionUtils = conversionUtils;
+        this.crafting = crafting;
         this.shops = shops;
         this.mainMenu = mainMenu;
     }
@@ -111,13 +112,17 @@ public class Packets implements PacketListener {
     private void manageWindow(CookiePlayer cookiePlayer, WrapperPlayClientClickWindow clickPacket) {
         if (clickPacket.getSlot() == -999) return;
         ClickerContainer container = containerManager.getOpenedContainer(cookiePlayer.getUuid());
+
         switch (container.getWindowType()) {
             //наковальня
             case 8 -> containerManager.anvilClick(cookiePlayer.getPlayer(), clickPacket.getSlot());
             //инвентари 9 * x
             case 1, 2, 3, 4, 5 -> manageContainers(cookiePlayer, container, clickPacket);
             //верстак
-            case 12 -> {return;}
+            case 12 -> {
+                if (clickPacket.getSlot() == 0)
+                    crafting.onCraft(cookiePlayer, clickPacket.getWindowClickType());
+            }
         }
     }
 
@@ -147,7 +152,8 @@ public class Packets implements PacketListener {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getUser() == null) return;
-        Player player = conversionUtils.userToNMS(event.getUser());
+        CookiePlayer cookiePlayer = new CookiePlayer(event.getUser().getUUID());
+        Player player = cookiePlayer.getPlayer();
         if (player == null) return;
         if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) return;
         if (event.getPacketType() == PacketType.Play.Server.ENTITY_POSITION_SYNC) return;
@@ -167,6 +173,12 @@ public class Packets implements PacketListener {
             containerManager.setOpenedContainer(event.getUser().getUUID(), openContainerPacket, "default");
         }
         if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+            WrapperPlayServerSetSlot setSlotPacket = new WrapperPlayServerSetSlot(event);
+
+            if (containerManager.getOpenedContainer(cookiePlayer).getWindowType() == 12 && setSlotPacket.getSlot() != 0) {
+                crafting.prepareCraft(cookiePlayer);
+            }
+
             compact.compact(player.getInventory(), manager.getNMS("cookie"), manager.getNMS("ench_cookie"), 160);
             compact.compact(player.getInventory(), manager.getNMS("cocoa_beans"), manager.getNMS("ench_cocoa"), 320);
             compact.compact(player.getInventory(), manager.getNMS("wheat"), manager.getNMS("ench_wheat"), 160);

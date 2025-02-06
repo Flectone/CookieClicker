@@ -94,7 +94,7 @@ public class MainMenu {
 
         int slot = 0;
         for (CustomRecipe recipe : recipes.getAllRecipes().values()) {
-            recipesWindow.setItem(slot, CraftItemStack.asNMSCopy(recipe.getResult()));
+            recipesWindow.setItem(slot, recipe.getResult());
             slot++;
         }
 
@@ -105,8 +105,8 @@ public class MainMenu {
         ClickerContainer singleRecipe = new ClickerContainer(ClickerContainer.generateId(), 2, "recipe");
 
         int slot = 0;
-        for (org.bukkit.inventory.ItemStack itm : recipe.getAllIngredients()) {
-            singleRecipe.setItem(slot, CraftItemStack.asNMSCopy(itm));
+        for (ItemStack itm : recipe.getAllIngredients()) {
+            singleRecipe.setItem(slot, itm);
             slot++;
             if (slot == 3 || slot == 12)
                 slot += 6;
@@ -119,7 +119,7 @@ public class MainMenu {
         for (int i : List.of(3, 12, 21)) {
             singleRecipe.setItem(i, fillerItem);
         }
-        singleRecipe.setItem(13, CraftItemStack.asNMSCopy(recipe.getResult()));
+        singleRecipe.setItem(13, recipe.getResult());
         singleRecipe.setItem(8, closeWindowItem);
 
         containerManager.openContainer(cookiePlayer, singleRecipe);

@@ -43,6 +43,7 @@ public class UtilsCookie {
         this.conversionUtils = conversionUtils;
     }
 
+    @Deprecated
     public boolean compare(ItemStack item, ItemStack checkItem) {
         ItemStack checkItem2 = new ItemStack(checkItem.getType());
         checkItem2.setItemMeta(checkItem.getItemMeta());
@@ -65,7 +66,8 @@ public class UtilsCookie {
         }
         return equals;
     }
-    public ItemStack createItemAmount(ItemStack item, Integer cost) {
+    @Deprecated
+    public ItemStack createItemAmountBukkit(ItemStack item, Integer cost) {
         ItemStack priceItem = new ItemStack(item.getType(), cost);
         ItemMeta priceMeta = item.getItemMeta();
         priceItem.setItemMeta(priceMeta);
@@ -74,9 +76,11 @@ public class UtilsCookie {
     public net.minecraft.world.item.ItemStack createItemAmountNMS(net.minecraft.world.item.ItemStack item, Integer cost) {
         net.minecraft.world.item.ItemStack itemWithAmount = new net.minecraft.world.item.ItemStack(item.getItem(), cost);
         itemWithAmount.applyComponents(item.getComponents());
+        itemWithAmount.remove(DataComponents.ATTRIBUTE_MODIFIERS);
         return itemWithAmount.copy();
     }
 
+    @Deprecated
     public Integer getFullFortune(ItemStack item) {
         int fortune = Math.max(0, itemTagsUtility.getBaseFortune(item));
         Registry<Enchantment> enchantmentRegistry = RegistryAccess
@@ -91,6 +95,7 @@ public class UtilsCookie {
         }
         return fortune;
     }
+
     public Integer getFullFortune(net.minecraft.world.item.ItemStack item) {
         int fortune = Math.max(0, itemTagsUtility.getBaseFortune(item));
         for (Object2IntMap.Entry<Holder<net.minecraft.world.item.enchantment.Enchantment>> i : item.getEnchantments().entrySet()) {

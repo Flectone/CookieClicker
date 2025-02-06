@@ -15,6 +15,7 @@ import java.util.UUID;
 public class CookiePlayer {
     @Getter
     private final UUID uuid;
+    public boolean jigsawLock = true;
 
     public CookiePlayer(UUID uuid) {
         this.uuid = uuid;
