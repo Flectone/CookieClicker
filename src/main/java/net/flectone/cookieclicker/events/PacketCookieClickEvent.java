@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.cookiePart;
+package net.flectone.cookieclicker.events;
 
 import com.github.retrooper.packetevents.protocol.color.Color;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
@@ -11,6 +11,8 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.cookieclicker.cookiePart.BagHoeUpgrade;
+import net.flectone.cookieclicker.cookiePart.EpicHoeUtils;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.utility.CCConversionUtils;
 import net.flectone.cookieclicker.utility.CCobjects.CookieEntity;
@@ -36,7 +38,7 @@ import java.util.List;
 import java.util.Random;
 
 @Singleton
-public class CookiePartBase {
+public class PacketCookieClickEvent {
     //это жесть
     private final ItemManager manager;
     private final ItemTagsUtility itemTagsUtility;
@@ -49,9 +51,9 @@ public class CookiePartBase {
     private final List<Integer> bonusEntities = new ArrayList<>();
 
     @Inject
-    public CookiePartBase (ItemTagsUtility itemTagsUtility, ItemManager manager, UtilsCookie utilsCookie,
-                           PacketUtils packetUtils, EpicHoeUtils epicHoeUtils, BagHoeUpgrade bagHoeUpgrade,
-                           CCConversionUtils converter) {
+    public PacketCookieClickEvent(ItemTagsUtility itemTagsUtility, ItemManager manager, UtilsCookie utilsCookie,
+                                  PacketUtils packetUtils, EpicHoeUtils epicHoeUtils, BagHoeUpgrade bagHoeUpgrade,
+                                  CCConversionUtils converter) {
         this.manager = manager;
         this.itemTagsUtility = itemTagsUtility;
         this.packetUtils = packetUtils;

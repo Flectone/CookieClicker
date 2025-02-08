@@ -3,7 +3,7 @@ package net.flectone.cookieclicker.inventories;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.inventories.crafting.CustomRecipe;
+import net.flectone.cookieclicker.items.CustomRecipe;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.Recipes;
 import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
@@ -15,7 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
 
 import java.util.Collection;
 import java.util.List;

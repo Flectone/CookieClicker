@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.inventories.crafting;
+package net.flectone.cookieclicker.items;
 
 import com.google.inject.Singleton;
 import lombok.Getter;

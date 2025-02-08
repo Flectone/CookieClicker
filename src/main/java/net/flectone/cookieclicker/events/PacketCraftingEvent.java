@@ -1,9 +1,10 @@
-package net.flectone.cookieclicker.inventories.crafting;
+package net.flectone.cookieclicker.events;
 
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.inventories.ContainerManager;
+import net.flectone.cookieclicker.items.CustomRecipe;
 import net.flectone.cookieclicker.items.Recipes;
 import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
 import net.flectone.cookieclicker.utility.Pair;
@@ -16,13 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-public class Crafting {
+public class PacketCraftingEvent {
     private final UtilsCookie utilsCookie;
     private final ContainerManager containerManager;
     private final Recipes recipes;
 
     @Inject
-    public Crafting(UtilsCookie utilsCookie, ContainerManager containerManager, Recipes recipes) {
+    public PacketCraftingEvent(UtilsCookie utilsCookie, ContainerManager containerManager, Recipes recipes) {
         this.utilsCookie = utilsCookie;
         this.containerManager = containerManager;
         this.recipes = recipes;

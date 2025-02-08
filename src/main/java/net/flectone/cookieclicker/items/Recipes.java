@@ -2,7 +2,6 @@ package net.flectone.cookieclicker.items;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.inventories.crafting.CustomRecipe;
 import net.flectone.cookieclicker.utility.ItemTagsUtility;
 import net.flectone.cookieclicker.utility.Pair;
 import net.flectone.cookieclicker.utility.UtilsCookie;

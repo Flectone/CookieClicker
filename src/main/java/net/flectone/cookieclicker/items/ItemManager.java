@@ -84,7 +84,9 @@ public class ItemManager {
             }
         }));
         DataComponentPatch lore = DataComponentPatch.builder()
-                .set(DataComponents.LORE, new ItemLore(List.of(net.minecraft.network.chat.Component.literal("Этот чар повышает количество печенья!").withColor(11119017))))
+                .set(DataComponents.LORE, new ItemLore(List.of(net.minecraft.network.chat.Component.literal("Этот чар повышает количество печенья!").withColor(11119017),
+                        net.minecraft.network.chat.Component.literal("(Опыт можно получить, если съесть").withColor(11119017),
+                        net.minecraft.network.chat.Component.literal("зачарованное печенье)").withColor(11119017))))
                 .build();
         book.applyComponents(lore);
 
@@ -278,8 +280,7 @@ public class ItemManager {
                 "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Шляпа фермера",
                 "fHelmet");
         fhelmet.setFarmingFortune(100);
-        fhelmet.addLore("это просто победа", "поздравляю всех.",
-                "С новым годом!");
+        fhelmet.addLore("unused");
         fhelmet.setDyedColor(16493613);
 
         EquipmentItem fChest = new EquipmentItem(fhelmet, Material.LEATHER_CHESTPLATE, EquipmentSlot.CHEST,
@@ -295,10 +296,13 @@ public class ItemManager {
         items.put("fBoots", fBoots.toItemStack());
 
         // Healing melon
-        items.put("heal_melon", placeholder("Healing melon", "heal_melon"));
+        items.put("heal_melon", placeholder("[combat] Healing melon", "heal_melon"));
 
         // Pickaxe
         items.put("miningPart_pickaxe", placeholder("[mining] Кирка", "miningPart_pickaxe"));
+
+        // Cookie part final item
+        items.put("cake", placeholder("[cookie] Тортик", "cake"));
 
 
 
@@ -314,6 +318,7 @@ public class ItemManager {
         return items.values();
     }
 
+    @Deprecated
     private ItemStack placeholder(String name, String persistentData) {
         org.bukkit.inventory.ItemStack pholder = new org.bukkit.inventory.ItemStack(Material.BARRIER);
         ItemMeta meta = pholder.getItemMeta();
