@@ -52,9 +52,15 @@ public class CookiePlayer {
 
     public void sendPEpacket(PacketWrapper<?> packetWrapper, boolean silent) {
         if (silent)
-            getUser().sendPacketSilently(packetWrapper);
+            PacketEvents.getAPI().getProtocolManager().sendPacketSilently(
+                    PacketEvents.getAPI().getProtocolManager().getChannel(uuid),
+                    packetWrapper
+            );
         else
-            getUser().sendPacket(packetWrapper);
+            PacketEvents.getAPI().getProtocolManager().sendPacket(
+                    PacketEvents.getAPI().getProtocolManager().getChannel(uuid),
+                    packetWrapper
+            );
     }
 
     public void sendPEpacket(PacketWrapper<?> packetWrapper) {
@@ -66,7 +72,10 @@ public class CookiePlayer {
     }
 
     public void swingArm() {
-        WrapperPlayServerEntityAnimation animation = new WrapperPlayServerEntityAnimation(getId(), WrapperPlayServerEntityAnimation.EntityAnimationType.SWING_MAIN_ARM);
+        WrapperPlayServerEntityAnimation animation = new WrapperPlayServerEntityAnimation(
+                getId(),
+                WrapperPlayServerEntityAnimation.EntityAnimationType.SWING_MAIN_ARM
+        );
         sendPEpacket(animation);
     }
 }
