@@ -58,7 +58,7 @@ public class Recipes {
 
         CustomRecipe legendary_hoe = new CustomRecipe(manager.getNMS("leg_hoe"));
         legendary_hoe.setIngredient(0, manager.getNMS("ench_cookie"), 64);
-        legendary_hoe.setIngredient(1, manager.getNMS("wood_hoe"), 1);
+        legendary_hoe.setIngredient(1, manager.getNMS("final_cake"), 1);
         legendary_hoe.setIngredient(2, manager.getNMS("berries"), 64);
         legendary_hoe.setIngredient(3, manager.getNMS("ench_cocoa"), 64);
         legendary_hoe.setIngredient(4, manager.getNMS("epic_hoe"), 1);
@@ -67,6 +67,30 @@ public class Recipes {
         legendary_hoe.setIngredient(7, manager.getNMS("pie"), 64);
         legendary_hoe.setIngredient(8, manager.getNMS("pumpkin"), 64);
         registerRecipe(legendary_hoe);
+
+        CustomRecipe piston = new CustomRecipe(manager.getNMS("cookie_crafter"));
+        piston.setIngredient(0, manager.getNMS("ench_cookie"), 64);
+        piston.setIngredient(1, manager.getNMS("ench_wheat"), 99);
+        piston.setIngredient(2, manager.getNMS("ench_cookie"), 64);
+        piston.setIngredient(3, manager.getNMS("ench_cookie"), 64);
+        piston.setIngredient(4, manager.getNMS("stone_hoe"), 1);
+        piston.setIngredient(5, manager.getNMS("ench_cookie"), 64);
+        piston.setIngredient(6, manager.getNMS("ench_cookie"), 64);
+        piston.setIngredient(7, manager.getNMS("chocolate"), 64);
+        piston.setIngredient(8, manager.getNMS("ench_cookie"), 64);
+        registerRecipe(piston);
+
+        CustomRecipe cake = new CustomRecipe(manager.getNMS("final_cake"));
+        cake.setIngredient(0, manager.getNMS("glow_berries"), 64);
+        cake.setIngredient(1, manager.getNMS("pie"), 64);
+        cake.setIngredient(2, manager.getNMS("pumpkin"), 64);
+        cake.setIngredient(3, manager.getNMS("ench_cookie"), 64);
+        cake.setIngredient(4, manager.getNMS("chocolate"), 64);
+        cake.setIngredient(5, manager.getNMS("ench_cookie"), 64);
+        cake.setIngredient(6, manager.getNMS("cookie_block"), 1);
+        cake.setIngredient(7, manager.getNMS("cookie_block"), 1);
+        cake.setIngredient(8, manager.getNMS("cookie_block"), 1);
+        registerRecipe(cake);
 
         //Bukkit.updateRecipes();
     }
