@@ -22,7 +22,7 @@ import java.util.*;
 public abstract class ItemBase implements ClickerItems{
     protected final String displayName;
     protected final String itemTag;
-    protected final String equipType;
+    protected final String category;
     protected Material itemType;
     protected final List<Component> fullLore = new ArrayList<>(), preStatsLore = new ArrayList<>();
     protected final HashMap<NamespacedKey, Integer> stats = new HashMap<>();
@@ -33,10 +33,10 @@ public abstract class ItemBase implements ClickerItems{
     // на этом держатся все предметы этого плагина
     protected final List<DataComponentPatch> components = new ArrayList<>();
 
-    protected ItemBase(String displayName, String itemTag, String equipType, Material itemType) {
+    protected ItemBase(String displayName, String itemTag, String category, Material itemType) {
         this.displayName = displayName;
         this.itemTag = itemTag;
-        this.equipType = equipType;
+        this.category = category;
         this.itemType = itemType;
     }
 
@@ -75,7 +75,7 @@ public abstract class ItemBase implements ClickerItems{
     }
 
     protected void addStat(NamespacedKey statKey, Integer value) {
-        String lorePart = equipType.equals("tool") ? "в ведущей руке" : "экипировано";
+        String lorePart = category.equals("tool") ? "в ведущей руке" : "экипировано";
         if (value > 0) {
             this.stats.put(statKey, value);
             if (preStatsLore.isEmpty()) preStatsLore.add(miniMessage.deserialize("<gray><italic:false>Когда " + lorePart + ":"));
@@ -144,6 +144,7 @@ public abstract class ItemBase implements ClickerItems{
     private DataComponentPatch combineCustomData() {
         CompoundTag compoundTag = new CompoundTag();
         compoundTag.putString("item_tag", itemTag);
+        compoundTag.putString("category", category);
         if (!ability.equals("none")) {
             compoundTag.putString("ability", ability);
         }

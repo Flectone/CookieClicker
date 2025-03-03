@@ -14,7 +14,7 @@ public class HoeItem extends ItemBase{
     }
 
     public void setAbility(String newAbility, String... description) {
-        String lorePart = equipType.equals("tool") ? "в ведущей руке" : "экипировано";
+        String lorePart = category.equals("tool") ? "в ведущей руке" : "экипировано";
         if (preStatsLore.isEmpty()) preStatsLore.add(miniMessage.deserialize("<gray><italic:false>Когда " + lorePart + ":"));
         ability = newAbility;
         Arrays.stream(description).forEach(b -> preStatsLore.add(miniMessage.deserialize("<gold><italic:false> " + b)));

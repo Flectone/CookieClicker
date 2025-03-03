@@ -8,7 +8,7 @@ import org.bukkit.Material;
 public class NormalItem extends ItemBase {
 
     public NormalItem(Material itemType, String displayName, String itemTag, Integer stackSize) {
-        super(displayName, itemTag, "default", itemType);
+        super(displayName, itemTag, "item", itemType);
         components.add(DataComponentPatch.builder().set(DataComponents.MAX_STACK_SIZE, stackSize).build());
     }
 
