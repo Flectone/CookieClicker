@@ -3,6 +3,7 @@ package net.flectone.cookieclicker.inventories;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.cookieclicker.cookiePart.EpicHoeUtils;
 import net.flectone.cookieclicker.items.CustomRecipe;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.Recipes;
@@ -25,13 +26,16 @@ public class MainMenu {
     private final ContainerManager containerManager;
     private final UtilsCookie utilsCookie;
     private final Recipes recipes;
+    private final EpicHoeUtils epicHoeUtils;
 
     @Inject
-    public MainMenu(ContainerManager containerManager, ItemManager manager, UtilsCookie utilsCookie, Recipes recipes) {
+    public MainMenu(ContainerManager containerManager, ItemManager manager, UtilsCookie utilsCookie, Recipes recipes,
+                    EpicHoeUtils epicHoeUtils) {
         this.containerManager = containerManager;
         this.itemManager = manager;
         this.utilsCookie = utilsCookie;
         this.recipes = recipes;
+        this.epicHoeUtils = epicHoeUtils;
     }
 
     public void openMainMenu(CookiePlayer cookiePlayer) {
@@ -44,11 +48,34 @@ public class MainMenu {
         NormalItem stats = new NormalItem(Material.WRITABLE_BOOK,
                 "<gradient:#e5fffe:#e7f0ef><italic:false>Статистика игрока",
                 "none", 1);
-        stats.addLore("<#ffc40a><italic:false>Удача фермера: " + utilsCookie.extractFortune(cookiePlayer.getPlayer()).toString());
-        stats.addLore("<#ffb652><italic:false>Шанс на бонус: наверное 3%");
+        stats.addLore("<#e7f0ef><italic:false>Удача фермера: <#ffc40a>" + utilsCookie.extractFortune(cookiePlayer.getPlayer()).toString());
+        stats.addLore("<#e7f0ef><italic:false>Шанс на бонус: <#ffb652>наверное 3%");
+        stats.addLore("<#e7f0ef><italic:false>Уровень заряда: <#7524f1>" + epicHoeUtils.getCharge(cookiePlayer.getUuid()));
+        stats.addLore(String.format("<#e7f0ef><italic:false>Бонус от заряда: <#9631e1>x%.1f", 1f + (0.5f * epicHoeUtils.getTier(cookiePlayer.getUuid()))));
         NormalItem allItems = new NormalItem(Material.BOOK,
                 "<gradient:#ffc900:#f3e736:#f7d760:#e1b926:#f3e736:#ffc900><italic:false>Посмотреть все предметы",
                 "none", 1);
+
+        //beta version item
+        NormalItem info = new NormalItem(Material.ANCIENT_DEBRIS,
+                "<gradient:#a50404:#f34b4b><italic:false>v2.0-beta2",
+                "none", 1);
+        info.addLore("<#e7f0ef><italic:false> Это уже вторая тестовая версия плагина.",
+                " ",
+                "<#e7f0ef><italic:false> -Добавлен тортик, который улучшает броню",
+                "<#e7f0ef><italic:false>  (пока что 5 раз)",
+                "<#e7f0ef><italic:false> -Добавлен сборщик печенья",
+                "<#e7f0ef><italic:false> -512 чар. печенья могу конвертироваться в блок",
+                "<#e7f0ef><italic:false> -Добавлена задержка клика по рамке",
+                "<#e7f0ef><italic:false> -Предел удачи фермера увеличен с ~3000 до ~256000",
+                "<#e7f0ef><italic:false> -Крафт легендарной мотыги усложнён",
+                "<#e7f0ef><italic:false> -Стоимость брони немного увеличена",
+                "",
+                "<gray><italic:false> Возможно теперь будет немного сложнее. Если",
+                "<gray><italic:false> очень сложно, то придётся исправлять.");
+        menu.setItem(0, info.toItemStack());
+        //
+
 
         menu.setItem(11, recipe.toItemStack());
         menu.setItem(13, stats.toItemStack());
