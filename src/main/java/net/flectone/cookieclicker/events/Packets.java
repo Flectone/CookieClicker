@@ -115,7 +115,7 @@ public class Packets implements PacketListener {
     private void manageContainers(CookiePlayer cookiePlayer, ClickerContainer container, WrapperPlayClientClickWindow clickPacket) {
         switch (container.getCustomData()) {
             //покупка предмета
-            case "trading_farm" -> shops.buyItemFarmer(cookiePlayer, clickPacket);
+            case "trading_farm", "trading_armorer" -> shops.buyItem(cookiePlayer, clickPacket);
             //главное меню, выбор
             case "main_menu" ->  {
                 if (clickPacket.getSlot() == 15) mainMenu.openAllItems(cookiePlayer);
