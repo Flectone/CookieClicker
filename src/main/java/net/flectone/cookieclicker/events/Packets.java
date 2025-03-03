@@ -12,7 +12,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOp
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.CompactItems;
 import net.flectone.cookieclicker.inventories.ClickerContainer;
 import net.flectone.cookieclicker.inventories.ContainerManager;
 import net.flectone.cookieclicker.inventories.MainMenu;
@@ -20,12 +19,8 @@ import net.flectone.cookieclicker.inventories.Shops;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.decoration.ItemFrame;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.phys.EntityHitResult;
 
 @Singleton
 public class Packets implements PacketListener {
@@ -40,11 +35,14 @@ public class Packets implements PacketListener {
     private final MainMenu mainMenu;
     private final AnvilEvent anvilEvent;
 
+    private final PacketInteractEvent packetInteractEvent;
+
     @Inject
-    public Packets(CompactItems compact, ItemManager manager, MainMenu mainMenu, PacketEatingEvent packetEatingEvent,
+    public Packets(PacketSetSlotEvent setSlotEvent, ItemManager manager, MainMenu mainMenu, PacketEatingEvent packetEatingEvent,
                    PacketCookieClickEvent packetCookieClickEvent, ContainerManager containerManager,
-                   PacketCraftingEvent packetCraftingEvent, Shops shops) {
-        this.compact = compact;
+                   PacketCraftingEvent packetCraftingEvent, Shops shops, PacketInteractEvent packetInteractEvent,
+                   AnvilEvent anvilEvent) {
+        this.setSlotEvent = setSlotEvent;
         this.manager = manager;
         this.packetCookieClickEvent = packetCookieClickEvent;
         this.packetEatingEvent = packetEatingEvent;
@@ -52,6 +50,9 @@ public class Packets implements PacketListener {
         this.packetCraftingEvent = packetCraftingEvent;
         this.shops = shops;
         this.mainMenu = mainMenu;
+        this.anvilEvent = anvilEvent;
+
+        this.packetInteractEvent = packetInteractEvent;
     }
 
     @Override
@@ -72,8 +73,11 @@ public class Packets implements PacketListener {
                 packetCookieClickEvent.changeLegendaryHoeMode(user);
             }
             case PacketType.Play.Client.INTERACT_ENTITY -> {
-                if (manageInteract(cookiePlayer, new WrapperPlayClientInteractEntity(event)))
+                if (packetInteractEvent.checkEntity(new WrapperPlayClientInteractEntity(event), cookiePlayer)) {
                     event.setCancelled(true);
+                }
+//                if (packetInteractEvent.manageInteract(cookiePlayer, new WrapperPlayClientInteractEntity(event)))
+//                    event.setCancelled(true);
             }
             case PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT -> {
                 packetCookieClickEvent.bookShelfClick(user, player);
@@ -90,34 +94,13 @@ public class Packets implements PacketListener {
 
     }
 
-    private boolean manageInteract(CookiePlayer cookiePlayer, WrapperPlayClientInteractEntity interactPacket) {
-        if (interactPacket.getAction() != WrapperPlayClientInteractEntity.InteractAction.INTERACT) return false;
-        packetCookieClickEvent.checkForBonus(cookiePlayer, interactPacket.getEntityId());
-
-        EntityHitResult res = cookiePlayer.getPlayer().getTargetEntity(5);
-
-        boolean triggered = false;
-
-        if (res == null) return false;
-        if ((res.getEntity() instanceof ItemFrame itemFrame)) {
-            if (!itemFrame.getItem().getItem().equals(Items.COOKIE)) return false;
-            packetCookieClickEvent.cookieClickPacketEvent(cookiePlayer.getUser(), itemFrame);
-            triggered = true;
-        }
-        if ((res.getEntity() instanceof Villager villager) && villager.getVillagerData().getProfession().equals(VillagerProfession.FLETCHER)) {
-            shops.openCookiesShop(cookiePlayer);
-            triggered = true;
-        }
-        return triggered;
-    }
-
     private void manageWindow(CookiePlayer cookiePlayer, WrapperPlayClientClickWindow clickPacket) {
         if (clickPacket.getSlot() == -999) return;
         ClickerContainer container = containerManager.getOpenedContainer(cookiePlayer.getUuid());
 
         switch (container.getWindowType()) {
             //наковальня
-            case 8 -> containerManager.anvilClick(cookiePlayer.getPlayer(), clickPacket.getSlot());
+            case 8 -> anvilEvent.anvilClick(cookiePlayer.getPlayer(), clickPacket.getSlot());
             //инвентари 9 * x
             case 1, 2, 3, 4, 5 -> manageContainers(cookiePlayer, container, clickPacket);
             //верстак
