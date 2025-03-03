@@ -172,8 +172,8 @@ public class Packets implements PacketListener {
 
         if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {;
             WrapperPlayServerSetSlot setSlotPacket = new WrapperPlayServerSetSlot(event);
-
-            if (containerManager.getOpenedContainer(cookiePlayer).getWindowType() == 12 && setSlotPacket.getSlot() != 0) {
+            //&& setSlotPacket.getSlot() != 0
+            if (containerManager.getOpenedContainer(cookiePlayer).getWindowType() == 12) {
                 packetCraftingEvent.prepareCraft(cookiePlayer);
             }
 

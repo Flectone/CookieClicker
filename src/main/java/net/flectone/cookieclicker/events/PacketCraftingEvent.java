@@ -92,6 +92,8 @@ public class PacketCraftingEvent {
 
     public void prepareCraft(CookiePlayer cookiePlayer) {
         AbstractContainerMenu craftingContainer = cookiePlayer.getPlayer().containerMenu;
+        if (!craftingContainer.getSlot(0).getItem().getItem().equals(Items.AIR))
+            return;
         CustomRecipe recipe = findRecipe(craftingContainer);
         if (recipe == null) return;
 
