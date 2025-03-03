@@ -170,6 +170,7 @@ public class ItemManager {
                 "<gradient:#d5a51b:#ffe506><italic:false>Пшеница",
                 "wheat",
                 99);
+        wheat.setColor(16758272);
         items.put("wheat", wheat.toItemStack());
 
         // Enchanted Wheat
@@ -197,9 +198,9 @@ public class ItemManager {
                 "<gradient:#992e7a:#964b00:#c17529:#992e7a><italic:false>Зачарованные какао-бобы",
                 "ench_cocoa",
                 64);
-        ench_beans.addLore("<gray> Если держать в левой руке, будет</gray>",
-                "<gray>перекрашивать печенье в очень тёмный цвет.",
-                "<gray> Можно переплавить в шоколад");
+        ench_beans.addLore("<gray> Если держать в левой руке, то</gray>",
+                "<gray>с помощью <color:#f79459><italic:false>Уничтожителя печенья</color><italic:true>",
+                "<gray>можно создать шоколад");
         ench_beans.makeEnchGlint();
         items.put("ench_cocoa", ench_beans.toItemStack());
 
@@ -213,22 +214,13 @@ public class ItemManager {
         baguette.addLore("<gray> Используется для создания</gray>", "<gray>финальной мотыги.");
         items.put("baguette", baguette.toItemStack());
 
-        // Печенье или уголь? (coal)
-        // +
-        NormalItem coal = new NormalItem(Material.COAL,
-                "<gradient:#444444:#e78a1b><italic:false>Печенье в шоколаде",
-                "coal",
-                64);
-        coal.addLore("<gray> Сложно понять, это печенье</gray>", "<gray>или уголь.");
-        items.put("coal", coal.toItemStack());
-
         // Chocolate
         // +
         NormalItem chocolate = new NormalItem(Material.DARK_OAK_TRAPDOOR,
                 "<gradient:#884e0a:#b36810><italic:false>Шоколад",
                 "chocolate",
                 64);
-        chocolate.addLore("<gray> Используется для создания</gray>", "<gray>финальной мотыги.");
+        chocolate.addLore("<gray> Используется для создания</gray>", "<gray>предмета <black>???</black>.");
         items.put("chocolate", chocolate.toItemStack());
 
         // Chocolate stick
@@ -279,16 +271,21 @@ public class ItemManager {
                 EquipmentAssets.LEATHER,
                 "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Шляпа фермера",
                 "fHelmet");
-        fhelmet.setFarmingFortune(100);
-        fhelmet.addLore("unused");
+        fhelmet.setFarmingFortune(10);
+        fhelmet.addLore("<gray><italic:false> Можно улучшать с помощью тортиков");
         fhelmet.setDyedColor(16493613);
 
         EquipmentItem fChest = new EquipmentItem(fhelmet, Material.LEATHER_CHESTPLATE, EquipmentSlot.CHEST,
                 "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Нагрудник фермера", "fChest");
+        fChest.setFarmingFortune(40);
+
         EquipmentItem fLegs = new EquipmentItem(fhelmet, Material.LEATHER_LEGGINGS, EquipmentSlot.LEGS,
                 "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Штаны фермера", "fLegs");
+        fLegs.setFarmingFortune(25);
+
         EquipmentItem fBoots = new EquipmentItem(fhelmet, Material.LEATHER_BOOTS, EquipmentSlot.FEET,
                 "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Ботинки фермера", "fBoots");
+        fBoots.setFarmingFortune(15);
 
         items.put("fHelmet", fhelmet.toItemStack());
         items.put("fChest", fChest.toItemStack());
@@ -302,7 +299,29 @@ public class ItemManager {
         items.put("miningPart_pickaxe", placeholder("[mining] Кирка", "miningPart_pickaxe"));
 
         // Cookie part final item
-        items.put("cake", placeholder("[cookie] Тортик", "cake"));
+        NormalItem cake = new NormalItem(Material.CAKE,
+                "<gradient:#ece7d2:#ecdb95><italic:false>Тортик",
+                "final_cake",
+                1);
+        cake.makeEnchGlint();
+        items.put("final_cake", cake.toItemStack());
+
+        NormalItem voidConverter = new NormalItem(Material.PISTON,
+                "<italic:false>Сборщик печенья",
+                "cookie_crafter",
+                1);
+        voidConverter.addLore("<gray> Когда в левой руке, позволяет создавать</gray>", "<gray> блок печенья из 512 чар. печенья.</gray>");
+        voidConverter.setColorable();
+        items.put("cookie_crafter", voidConverter.toItemStack());
+
+        NormalItem voidCookie = new NormalItem(Material.RESIN_BLOCK,
+                "<gradient:#992e7a:#c66618:#f57b18:#992e7a><italic:false>Блок зачарованного печенья",
+                "cookie_block",
+                99);
+        voidCookie.makeEnchGlint();
+        items.put("cookie_block", voidCookie.toItemStack());
+
+
 
 
 
