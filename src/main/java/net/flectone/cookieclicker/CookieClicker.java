@@ -31,19 +31,20 @@ public final class CookieClicker extends JavaPlugin {
         PacketEvents.getAPI().init();
         this.plugin = getPlugin(CookieClicker.class);
         Injector injector = Guice.createInjector(new CookieClickerInject(this));
-        //slozhno.generateText();
-        //Bukkit.getPluginManager().registerEvents(injector.getInstance(InteractEvent.class), this);
-        //Bukkit.getPluginManager().registerEvents(injector.getInstance(EatingEvent.class), this);
-        //Bukkit.getPluginManager().registerEvents(injector.getInstance(BlockInteractEvent.class), this);
-        //Bukkit.getPluginManager().registerEvents(injector.getInstance(ClickInInvEvent.class), this);
-        //Bukkit.getPluginManager().registerEvents(injector.getInstance(openAllItems.class), this);
-        //Bukkit.getPluginManager().registerEvents(injector.getInstance(MenuInventories.class), this);
-        //Bukkit.getPluginManager().registerEvents(injector.getInstance(CraftingEvent.class), this);
+
         PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(Packets.class), PacketListenerPriority.NORMAL);
         injector.getInstance(ItemManager.class).load();
         injector.getInstance(ShopManager.class).loadSellingItems();
         injector.getInstance(Recipes.class).addRecipes();
-        
+
+        Path projectPath = plugin.getDataFolder().toPath();
+        Path configPath = projectPath.resolve("config.yml");
+
+        RegisteredEntitiesConfig config = new RegisteredEntitiesConfig(configPath);
+        config.reload();
+
+        injector.getInstance(PacketInteractEvent.class).setRegisteredEntitiesConfig(config);
+
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(injector.getInstance(Commands.class).createOpenMenuCommand());
         });

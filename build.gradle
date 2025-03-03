@@ -22,6 +22,7 @@ repositories {
 }
 
 dependencies {
+    implementation("net.elytrium:serializer:1.1.1")
     pluginRemapper("net.fabricmc:tiny-remapper:0.10.4:fat")
     paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
     implementation "com.github.retrooper:packetevents-spigot:2.7.0"
