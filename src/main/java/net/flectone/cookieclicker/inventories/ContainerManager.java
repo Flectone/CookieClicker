@@ -82,12 +82,6 @@ public class ContainerManager {
         cookiePlayer.sendNMSpacket(packet);
     }
 
-    public void anvilClick(Player player, Integer slot) {
-        if (slot != 2) return;
-        //в updateStats() есть проверка на воздух, поэтому можно не делать тут проверку
-        utilsCookie.updateStats(player.containerMenu.getSlot(2).getItem());
-    }
-
     private void setSlot(Player player, ClickerContainer container, Integer slot, ItemStack itemStack, boolean isPlayerInventory) {
         Connection playerConnection = ((ServerPlayer) player).connection.connection;
 
