@@ -11,8 +11,7 @@ import net.flectone.cookieclicker.events.Packets;
 import net.flectone.cookieclicker.events.PacketInteractEvent;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.Recipes;
-import net.flectone.cookieclicker.items.ShopManager;
-import org.bukkit.Bukkit;
+import net.flectone.cookieclicker.items.VillagerTrades;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,7 +25,6 @@ public final class CookieClicker extends JavaPlugin {
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().load();
-        Bukkit.getLogger().info("куки кликер загружается");
     }
 
     @Override
@@ -38,7 +36,7 @@ public final class CookieClicker extends JavaPlugin {
 
         PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(Packets.class), PacketListenerPriority.NORMAL);
         injector.getInstance(ItemManager.class).load();
-        injector.getInstance(ShopManager.class).loadSellingItems();
+        injector.getInstance(VillagerTrades.class).loadSellingItems();
         injector.getInstance(Recipes.class).addRecipes();
 
         Path projectPath = plugin.getDataFolder().toPath();
