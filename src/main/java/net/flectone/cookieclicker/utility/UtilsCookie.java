@@ -11,24 +11,23 @@ import net.flectone.cookieclicker.utility.CCobjects.Items.ClickerItems;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Singleton
 public class UtilsCookie {
@@ -83,7 +82,7 @@ public class UtilsCookie {
     @Deprecated
     public Integer getFullFortune(ItemStack item) {
         int fortune = Math.max(0, itemTagsUtility.getBaseFortune(item));
-        Registry<Enchantment> enchantmentRegistry = RegistryAccess
+        org.bukkit.Registry<Enchantment> enchantmentRegistry = RegistryAccess
                 .registryAccess()
                 .getRegistry(RegistryKey.ENCHANTMENT);
         Enchantment enchantment = enchantmentRegistry.getOrThrow(TypedKey.create(
@@ -114,6 +113,19 @@ public class UtilsCookie {
 
         farmingFortune += getFullFortune(player.getItemInHand(InteractionHand.MAIN_HAND));
         return farmingFortune;
+    }
+
+    public <E> Holder<E> getFromRegistry(ResourceKey<? extends Registry<E>> registry, String toFind) {
+        Optional<Registry<E>> registryOptional = MinecraftServer.getServer().registryAccess().lookup(registry);
+        if (registryOptional.isEmpty()) {
+            return null;
+        }
+        for (Holder<E> holder : registryOptional.get().asHolderIdMap()) {
+            if (holder.getRegisteredName().equals(toFind)) {
+                return holder;
+            }
+        }
+        return null;
     }
 
     public void updateStats(net.minecraft.world.item.ItemStack item) {
@@ -149,7 +161,7 @@ public class UtilsCookie {
     }
 
     public Integer convertFortune(Integer fortune) {
-        Random random = new Random();
+        Random random = new Random(System.currentTimeMillis());
         Integer baseAmount = fortune <= 1 ? 1 : random.nextInt(Math.max(1, fortune - 3), fortune + 1);
         Integer additionalAmount = fortune < 10 ? 0 : Math.round((float) random.nextInt(fortune - 10, fortune - 2) / 3);
         return baseAmount + additionalAmount;
