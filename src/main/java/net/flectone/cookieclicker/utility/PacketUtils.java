@@ -1,13 +1,17 @@
 package net.flectone.cookieclicker.utility;
 
+import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemModel;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
@@ -16,6 +20,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.flectone.cookieclicker.CookieClicker;
+import net.minecraft.core.component.DataComponents;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -46,7 +51,19 @@ public class PacketUtils {
 
         //данные для предмета, так как пакет на спавн только призывает предмет без данных
         List<EntityData> entityDataList = new ArrayList<>();
-        entityDataList.add(new EntityData(8, EntityDataTypes.ITEMSTACK, com.github.retrooper.packetevents.protocol.item.ItemStack.builder().type(ItemTypes.getByName(item.getItem().toString())).amount(item.getCount()).build()));
+        ItemStack.Builder itemBuilderPE = ItemStack.builder()
+                .type(ItemTypes.getByName(item.getItem().toString()))
+                .amount(item.getCount());
+
+        net.minecraft.resources.ResourceLocation resourceLocation = item.getComponents().get(DataComponents.ITEM_MODEL);
+        if (resourceLocation != null) {
+            //Bukkit.getLogger().info(resourceLocation.toString());
+            itemBuilderPE.component(ComponentTypes.ITEM_MODEL,
+                    new ItemModel(new ResourceLocation(resourceLocation.toString()))
+            );
+        }
+
+        entityDataList.add(new EntityData(8, EntityDataTypes.ITEMSTACK, itemBuilderPE.build()));
         //пакет на изменение данных предмета
         WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(newEntityId, entityDataList);
         //пакет на уничтожение предмета, позже понадобится
