@@ -30,7 +30,7 @@ import net.minecraft.world.phys.EntityHitResult;
 @Singleton
 public class Packets implements PacketListener {
 
-    private final CompactItems compact;
+    private final PacketSetSlotEvent setSlotEvent;
     private final ItemManager manager;
     private final PacketCookieClickEvent packetCookieClickEvent;
     private final PacketCraftingEvent packetCraftingEvent;
@@ -38,6 +38,7 @@ public class Packets implements PacketListener {
     private final ContainerManager containerManager;
     private final Shops shops;
     private final MainMenu mainMenu;
+    private final AnvilEvent anvilEvent;
 
     @Inject
     public Packets(CompactItems compact, ItemManager manager, MainMenu mainMenu, PacketEatingEvent packetEatingEvent,
@@ -164,16 +165,19 @@ public class Packets implements PacketListener {
             containerManager.setOpenedContainer(event.getUser().getUUID(), openContainerPacket, "default");
         }
 
-        if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
+        //200iq костыль, ну а хули
+        if (event.getPacketType() == PacketType.Play.Server.WINDOW_PROPERTY) {
+            anvilEvent.processUpgrade(cookiePlayer);
+        }
+
+        if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {;
             WrapperPlayServerSetSlot setSlotPacket = new WrapperPlayServerSetSlot(event);
 
             if (containerManager.getOpenedContainer(cookiePlayer).getWindowType() == 12 && setSlotPacket.getSlot() != 0) {
                 packetCraftingEvent.prepareCraft(cookiePlayer);
             }
 
-            compact.compact(player.getInventory(), manager.getNMS("cookie"), manager.getNMS("ench_cookie"), 160);
-            compact.compact(player.getInventory(), manager.getNMS("cocoa_beans"), manager.getNMS("ench_cocoa"), 320);
-            compact.compact(player.getInventory(), manager.getNMS("wheat"), manager.getNMS("ench_wheat"), 160);
+            setSlotEvent.compactItems(cookiePlayer);
             return;
         }
 
