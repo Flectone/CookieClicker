@@ -98,7 +98,7 @@ public class PacketCraftingEvent {
         if (recipe == null) return;
 
         if (!utilsCookie.compare(craftingContainer.getSlot(0).getItem(), recipe.getResult())) {
-            containerManager.setContainerSlot(cookiePlayer.getPlayer(),
+            containerManager.setContainerSlot(cookiePlayer,
                     containerManager.getOpenedContainer(cookiePlayer),
                     0,
                     recipe.getResult().copy()

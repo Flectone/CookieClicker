@@ -120,11 +120,11 @@ public class Packets implements PacketListener {
             case "main_menu" ->  {
                 if (clickPacket.getSlot() == 15) mainMenu.openAllItems(cookiePlayer);
                 if (clickPacket.getSlot() == 11) mainMenu.openAllRecipes(cookiePlayer);
-                containerManager.cancelClick(cookiePlayer.getPlayer(), container, clickPacket.getSlot(), clickPacket.getWindowClickType());
+                containerManager.cancelClick(cookiePlayer, container, clickPacket.getSlot(), clickPacket.getWindowClickType());
             }
             //возврат назад в меню выбора рецепта
             case "recipe" -> {
-                containerManager.cancelClick(cookiePlayer.getPlayer(), container, clickPacket.getSlot(), clickPacket.getWindowClickType());
+                containerManager.cancelClick(cookiePlayer, container, clickPacket.getSlot(), clickPacket.getWindowClickType());
                 if (clickPacket.getSlot() == 8) {
                     mainMenu.openAllRecipes(cookiePlayer);
                 }
@@ -132,7 +132,7 @@ public class Packets implements PacketListener {
             //выбор рецепта
             case "all_recipes" -> mainMenu.selectRecipe(cookiePlayer, clickPacket.getSlot(), clickPacket.getWindowClickType());
             //выбор предмета во всех предметах
-            case "all_items" -> mainMenu.getItemInMenu(clickPacket.getSlot(), cookiePlayer.getPlayer(), clickPacket.getWindowClickType());
+            case "all_items" -> mainMenu.getItemInMenu(clickPacket.getSlot(), cookiePlayer, clickPacket.getWindowClickType());
         }
     }
 

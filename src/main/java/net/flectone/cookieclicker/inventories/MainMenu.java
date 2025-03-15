@@ -97,10 +97,11 @@ public class MainMenu {
         containerManager.openContainer(cookiePlayer, allItemsScreen);
     }
 
-    public void getItemInMenu(Integer slot, Player player, WrapperPlayClientClickWindow.WindowClickType clickType) {
+    public void getItemInMenu(Integer slot, CookiePlayer cookiePlayer, WrapperPlayClientClickWindow.WindowClickType clickType) {
+        Player player = cookiePlayer.getPlayer();
         ClickerContainer container = containerManager.getOpenedContainer(player);
 
-        containerManager.cancelClick(player, container, slot, clickType);
+        containerManager.cancelClick(cookiePlayer, container, slot, clickType);
         if (!player.isCreative())
             return;
         if (slot > itemManager.allItems().size() - 1)
@@ -152,7 +153,7 @@ public class MainMenu {
     }
 
     public void selectRecipe(CookiePlayer cookiePlayer, Integer id, WrapperPlayClientClickWindow.WindowClickType clickType) {
-        containerManager.cancelClick(cookiePlayer.getPlayer(), containerManager.getOpenedContainer(cookiePlayer), id, clickType);
+        containerManager.cancelClick(cookiePlayer, containerManager.getOpenedContainer(cookiePlayer), id, clickType);
 
         Collection<CustomRecipe> allRecipes = recipes.getAllRecipes().values();
         if (id >= allRecipes.size() || id > containerManager.getOpenedContainer(cookiePlayer).getContainerItems().size())
