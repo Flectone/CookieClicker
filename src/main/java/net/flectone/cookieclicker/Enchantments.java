@@ -21,7 +21,7 @@ public class Enchantments implements PluginBootstrap {
 
                     TypedKey.create(RegistryKey.ENCHANTMENT, Key.key("cookie:ccboost")),
 
-                    b -> b.description(miniMessage.deserialize("<rainbow>Cookie Boost</rainbow>"))
+                    b -> b.description(miniMessage.deserialize("<gradient:#d8bfa2:#fcce99><italic:false>Cookie Boost</gradient>"))
                             .supportedItems(event.getOrCreateTag(ItemTypeTagKeys.HOES))
                             .anvilCost(1)
                             .maxLevel(10)
