@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.CompactItems;
 import net.flectone.cookieclicker.items.ItemManager;
-import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
+import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.utility.ItemTagsUtility;
 import net.minecraft.world.entity.player.Player;
 
@@ -21,8 +21,8 @@ public class PacketSetSlotEvent {
         this.manager = manager;
     }
 
-    public void compactItems(CookiePlayer cookiePlayer) {
-        Player player = cookiePlayer.getPlayer();
+    public void compactItems(ServerCookiePlayer serverCookiePlayer) {
+        Player player = serverCookiePlayer.getPlayer();
 
         if (itemTagsUtility.getItemTag(player.getOffhandItem()).equals("cookie_crafter")) {
             compact.compact(player.getInventory(), manager.getNMS("ench_cookie"), manager.getNMS("cookie_block"), 512);

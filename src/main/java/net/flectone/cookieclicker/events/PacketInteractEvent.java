@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.flectone.cookieclicker.RegisteredEntitiesConfig;
 import net.flectone.cookieclicker.inventories.Shops;
-import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
+import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 
@@ -68,8 +68,8 @@ public class PacketInteractEvent {
         loadAllEntities();
     }
 
-    private boolean checkLastClick(CookiePlayer cookiePlayer) {
-        UUID uuid = cookiePlayer.getUuid();
+    private boolean checkCooldown(ServerCookiePlayer serverCookiePlayer) {
+        UUID uuid = serverCookiePlayer.getUuid();
         long currentTime = System.currentTimeMillis();
 
         if (lastClick.isEmpty() || !lastClick.containsKey(uuid) || lastClick.get(uuid) < currentTime) {
@@ -79,24 +79,24 @@ public class PacketInteractEvent {
         return false;
     }
 
-    public boolean checkEntity(WrapperPlayClientInteractEntity interactPacket, CookiePlayer cookiePlayer) {
+    public boolean checkEntity(WrapperPlayClientInteractEntity interactPacket, ServerCookiePlayer serverCookiePlayer) {
         int entityId = interactPacket.getEntityId();
 
         if (interactPacket.getAction() != WrapperPlayClientInteractEntity.InteractAction.INTERACT) return false;
-        cookieClickEvent.checkForBonus(cookiePlayer, interactPacket.getEntityId());
+        cookieClickEvent.checkForBonus(serverCookiePlayer, interactPacket.getEntityId());
 
         if (tradingFarm.contains(entityId)) {
-            shops.openAnyShop(cookiePlayer, "trading_farm");
+            shops.openAnyShop(serverCookiePlayer, "trading_farm");
             return true;
         }
         if (tradingArmorer.contains(entityId)) {
-            shops.openAnyShop(cookiePlayer, "trading_armorer");
+            shops.openAnyShop(serverCookiePlayer, "trading_armorer");
             return true;
         }
         if (itemFrames.containsKey(entityId)) {
-            if (!checkLastClick(cookiePlayer))
+            if (!checkCooldown(serverCookiePlayer))
                 return true;
-            cookieClickEvent.onCookieClick(cookiePlayer, itemFrames.get(entityId));
+            cookieClickEvent.onCookieClick(serverCookiePlayer, itemFrames.get(entityId));
             return true;
         }
         return false;

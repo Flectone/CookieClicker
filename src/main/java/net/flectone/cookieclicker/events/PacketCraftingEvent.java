@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import net.flectone.cookieclicker.inventories.ContainerManager;
 import net.flectone.cookieclicker.items.CustomRecipe;
 import net.flectone.cookieclicker.items.Recipes;
-import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
+import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.utility.Pair;
 import net.flectone.cookieclicker.utility.UtilsCookie;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -53,8 +53,8 @@ public class PacketCraftingEvent {
         return amount;
     }
 
-    public void onCraft(CookiePlayer cookiePlayer, WrapperPlayClientClickWindow.WindowClickType windowClickType) {
-        AbstractContainerMenu craftingContainer = cookiePlayer.getPlayer().containerMenu;
+    public void onCraft(ServerCookiePlayer serverCookiePlayer, WrapperPlayClientClickWindow.WindowClickType windowClickType) {
+        AbstractContainerMenu craftingContainer = serverCookiePlayer.getPlayer().containerMenu;
         CustomRecipe recipe = findRecipe(craftingContainer);
 
         if (recipe == null) return;
@@ -82,7 +82,7 @@ public class PacketCraftingEvent {
 
         if (windowClickType.equals(WrapperPlayClientClickWindow.WindowClickType.QUICK_MOVE)) {
             resultItem.setCount(amount);
-            cookiePlayer.getPlayer().getInventory().add(resultItem);
+            serverCookiePlayer.getPlayer().getInventory().add(resultItem);
         } else {
             amount += utilsCookie.compare(craftingContainer.getCarried(), recipe.getResult()) ? craftingContainer.getCarried().getCount() : 0;
             resultItem.setCount(amount);
@@ -90,16 +90,16 @@ public class PacketCraftingEvent {
         }
     }
 
-    public void prepareCraft(CookiePlayer cookiePlayer) {
-        AbstractContainerMenu craftingContainer = cookiePlayer.getPlayer().containerMenu;
+    public void prepareCraft(ServerCookiePlayer serverCookiePlayer) {
+        AbstractContainerMenu craftingContainer = serverCookiePlayer.getPlayer().containerMenu;
         if (!craftingContainer.getSlot(0).getItem().getItem().equals(Items.AIR))
             return;
         CustomRecipe recipe = findRecipe(craftingContainer);
         if (recipe == null) return;
 
         if (!utilsCookie.compare(craftingContainer.getSlot(0).getItem(), recipe.getResult())) {
-            containerManager.setContainerSlot(cookiePlayer,
-                    containerManager.getOpenedContainer(cookiePlayer),
+            containerManager.setContainerSlot(serverCookiePlayer,
+                    containerManager.getOpenedContainer(serverCookiePlayer),
                     0,
                     recipe.getResult().copy()
             );
