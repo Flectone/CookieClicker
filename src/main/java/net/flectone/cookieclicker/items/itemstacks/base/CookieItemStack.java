@@ -1,5 +1,6 @@
 package net.flectone.cookieclicker.items.itemstacks.base;
 
+import lombok.Getter;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
 import net.minecraft.core.component.DataComponentPatch;
@@ -22,6 +23,7 @@ public abstract class CookieItemStack implements CookieItems {
     protected Item originalMaterial;
 
     //тег, категория, способности и статы
+    @Getter
     protected final Features features;
 
     private boolean removeAttribute = false;

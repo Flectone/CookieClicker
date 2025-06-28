@@ -2,11 +2,14 @@ package net.flectone.cookieclicker.items.itemstacks.base;
 
 import com.mojang.serialization.JavaOps;
 import io.papermc.paper.adventure.WrapperAwareSerializer;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.flectone.cookieclicker.items.attributes.CookieAbility;
+import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -16,6 +19,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
@@ -58,6 +63,8 @@ public class BaseCookieItem extends CookieItemStack {
         if (compoundTag.contains("cookies")) {
             customItem.fixOldItem();
         }
+
+        customItem.applyEnchantments(itemStack.getEnchantments());
 
         return customItem;
     }
@@ -103,6 +110,22 @@ public class BaseCookieItem extends CookieItemStack {
             //У меня пока что предметы становятся mojang_banner_pattern,
             //а у него есть редкость
             removeComponent(DataComponents.RARITY);
+        }
+    }
+
+    private void applyEnchantments(ItemEnchantments enchantments) {
+        if (enchantments == null)
+            return;
+
+        for (Object2IntMap.Entry<Holder<Enchantment>> enchantment : enchantments.entrySet()) {
+            switch (enchantment.getKey().getRegisteredName()) {
+                case "cookie:ccboost" -> {
+                    features.setStatFromEnchant(StatType.FARMING_FORTUNE, (int) Math.pow(2, enchantment.getIntValue() - 1));
+                }
+                case "cookie:mining_boost" -> {
+                    features.setStatFromEnchant(StatType.MINING_FORTUNE, enchantment.getIntValue());
+                }
+            }
         }
     }
 

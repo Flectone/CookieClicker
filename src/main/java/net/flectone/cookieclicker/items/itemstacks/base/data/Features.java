@@ -3,6 +3,7 @@ package net.flectone.cookieclicker.items.itemstacks.base.data;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.cookieclicker.items.attributes.CookieAbility;
+import net.flectone.cookieclicker.items.attributes.Stat;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItems;
@@ -21,7 +22,7 @@ public class Features {
     @Setter //способность
     public CookieAbility ability;
     //статы
-    private final HashMap<StatType, Integer> stats = new HashMap<>();
+    private final HashMap<StatType, Stat> stats = new HashMap<>();
     //категория, по сути нужна только для лора
     private final ToolType category;
 
@@ -45,13 +46,25 @@ public class Features {
             //все статы, если есть такие
             //в списке LOADED_STATS есть статы, которые типо сейчас используются
             CookieItems.LOADED_STATS.forEach(stat -> {
-                if (tag.contains(stat)) stats.put(StatType.from(stat), tag.getInt(stat));
+                if (tag.contains(stat)) stats.put(StatType.from(stat), new Stat(tag.getInt(stat)));
             });
         }
     }
 
     public void applyStat(StatType statType, Integer value) {
-        stats.put(statType, value);
+        Stat stat = stats.getOrDefault(statType, new Stat());
+        stat.setBaseValue(value);
+        stats.put(statType, stat);
+    }
+
+    public Integer getStat(StatType statType) {
+        return stats.getOrDefault(statType, new Stat()).getBaseValue();
+    }
+
+    public void setStatFromEnchant(StatType statType, Integer value) {
+        Stat stat = stats.getOrDefault(statType, new Stat());
+        stat.setAdditionalValue(value);
+        stats.put(statType, stat);
     }
 
     public CompoundTag createCompoundTag() {
@@ -69,7 +82,7 @@ public class Features {
         //Добавление всех статов, какие есть
         if (!stats.isEmpty()) {
             stats.entrySet().forEach(entry -> {
-                compoundTag.putInt(entry.getKey().getTag(), entry.getValue());
+                compoundTag.putInt(entry.getKey().getTag(), entry.getValue().getBaseValue());
             });
         }
 
@@ -97,8 +110,10 @@ public class Features {
 
         //Характеристики предмета
         if (!stats.isEmpty()) {
-            for (Map.Entry<StatType, Integer> singleStat : stats.entrySet()) {
-                listOfFeatures.add(String.format("<blue><italic:false>+%d %s", singleStat.getValue(), singleStat.getKey().getName()));
+            for (Map.Entry<StatType, Stat> singleStat : stats.entrySet()) {
+                //если у предмета был чар на увеличение стата, то стат увеличивается
+                int value = singleStat.getValue().getBaseValue() + singleStat.getValue().getAdditionalValue();
+                listOfFeatures.add(String.format("<blue><italic:false>+%d %s", value, singleStat.getKey().getName()));
             }
         }
 
