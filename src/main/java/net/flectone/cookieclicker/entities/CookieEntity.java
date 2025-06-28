@@ -1,9 +1,7 @@
-package net.flectone.cookieclicker.utility.CCobjects;
+package net.flectone.cookieclicker.entities;
 
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
-import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
-import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
@@ -13,7 +11,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import lombok.Getter;
 import lombok.Setter;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +20,10 @@ import java.util.UUID;
 public class CookieEntity {
     private final int entityId;
     private final UUID uuid;
-    private final EntityType entityType;
+    protected final EntityType entityType;
     @Setter
-    private Location location = new Location(0, 0, 0, 0, 0);
-    private final List<EntityData> entityData = new ArrayList<>();
+    protected Location location = new Location(0, 0, 0, 0, 0);
+    protected final List<EntityData> entityData = new ArrayList<>();
 
     //private final List<User> seeingPlayers = new ArrayList<>();
 
@@ -55,14 +52,6 @@ public class CookieEntity {
         );
         user.sendPacket(spawnPacket);
         user.sendPacket(metadataPacket);
-    }
-
-    public void setText(String text) {
-        if (!entityType.equals(EntityTypes.TEXT_DISPLAY)) return;
-        EntityData textData = new EntityData(23, EntityDataTypes.ADV_COMPONENT, MiniMessage.miniMessage().deserialize(text));
-        EntityData billboard = new EntityData(15, EntityDataTypes.BYTE,  (byte) 3);
-        entityData.add(textData);
-        entityData.add(billboard);
     }
 
     public void setLocation(Double x, Double y, Double z) {
