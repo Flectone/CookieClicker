@@ -50,7 +50,7 @@ public class GeneratedCookieItem extends BaseCookieItem {
 
         ItemLore itemLore = itemStack.getComponents().has(DataComponents.LORE) ? itemStack.getComponents().get(DataComponents.LORE) : null;
         if (itemLore != null && !itemLore.lines().isEmpty()) {
-            extractDescription(itemLore).forEach(customItem::addLore);
+            extractDescription(itemLore, hasTag(cookieClickerTag)).forEach(customItem::addLore);
         }
 
         if (compoundTag.contains("cookies")) {
@@ -63,12 +63,12 @@ public class GeneratedCookieItem extends BaseCookieItem {
     }
 
     //хз как нормально это сделать, ну вот
-    private static List<String> extractDescription(ItemLore itemLore) {
+    private static List<String> extractDescription(ItemLore itemLore, boolean removeFirstLine) {
         List<String> description = new ArrayList<>();
         String singleLine;
 
         List<net.minecraft.network.chat.Component> lore = new ArrayList<>(itemLore.lines());
-        lore.removeFirst(); //Убираем первую строку, в которой "#предмет"
+        if (removeFirstLine) lore.removeFirst(); //Убираем первую строку, в которой "#предмет"
 
         //Штука, которая переделывает nms компонент в adventure
         ComponentSerializer<Component, Component, net.minecraft.network.chat.Component> componentSerializer;
@@ -91,6 +91,14 @@ public class GeneratedCookieItem extends BaseCookieItem {
         description.removeIf(string -> description.indexOf(string) == description.size() - 1 && string.isEmpty());
 
         return description;
+    }
+
+    private static boolean hasTag(CompoundTag tag) {
+        if (!tag.contains(ITEM_TAG_KEY))
+            return false;
+
+        return !tag.getString(ITEM_TAG_KEY).equals("none");
+
     }
 
     private void fixOldItem() {

@@ -34,7 +34,9 @@ public abstract class CookieItemStack implements CookieItems {
 
         this.features = features;
 
-        lore.add("<dark_gray>#" + features.getItemTag());
+        if (!features.getItemTag().equals("none")) {
+            lore.add("<dark_gray>#" + features.getItemTag());
+        }
     }
 
     public String getItemTag() {

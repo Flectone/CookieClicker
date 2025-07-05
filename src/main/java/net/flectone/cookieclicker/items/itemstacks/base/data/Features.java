@@ -34,7 +34,7 @@ public class Features {
     @ApiStatus.Experimental
     public Features(CompoundTag tag) {
         if (tag.isEmpty()) {
-            this.itemTag = "vanilla";
+            this.itemTag = "none";
             this.category = ToolType.NONE;
         } else {
             this.category = ToolType.from(tag.getString("category"));
