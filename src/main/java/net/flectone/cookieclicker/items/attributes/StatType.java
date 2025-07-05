@@ -8,7 +8,7 @@ public enum StatType {
 
     UNUSED ("none", "чего-то"),
     FARMING_FORTUNE (CookieItems.FORTUNE_KEY, "Удача фермера"),
-    MINING_FORTUNE ("unused_mine_fortune", "Удача шахтёра");
+    MINING_FORTUNE (CookieItems.MINING_FORTUNE_KEY, "Удача шахтёра");
 
     private final String tag;
     private final String name;

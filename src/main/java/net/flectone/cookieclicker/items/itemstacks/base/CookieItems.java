@@ -34,11 +34,11 @@ public interface CookieItems {
 
     String OLD_FORTUNE_KEY = "ff"; //фф
 
-    List<String> LOADED_STATS = List.of(FORTUNE_KEY, OLD_FORTUNE_KEY);
-
     //когда-нибудь
     //Pair<String, String> DAMAGE_KEY = new Pair<>(PLUGIN_KEY, "dmg");
-    //Pair<String, String> MINING_FORTUNE_KEY = new Pair<>(PLUGIN_KEY, "mine_fortune");
+    String MINING_FORTUNE_KEY = "mine_fortune";
+
+    List<String> LOADED_STATS = List.of(FORTUNE_KEY, OLD_FORTUNE_KEY, MINING_FORTUNE_KEY);
 
 
 }

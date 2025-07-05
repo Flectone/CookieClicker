@@ -30,6 +30,18 @@ public class Enchantments implements PluginBootstrap {
                             .maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(0, 0))
                             .activeSlots(EquipmentSlotGroup.ANY)
             );
+            event.registry().register(
+                    TypedKey.create(RegistryKey.ENCHANTMENT, Key.key("cookie:mining_boost")),
+
+                    b -> b.description(miniMessage.deserialize("<gradient:#736c6b:#a6a09f><italic:false>Mining Boost</gradient>"))
+                            .supportedItems(event.getOrCreateTag(ItemTypeTagKeys.PICKAXES))
+                            .anvilCost(1)
+                            .maxLevel(10)
+                            .weight(10)
+                            .minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(0, 0))
+                            .maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(0, 0))
+                            .activeSlots(EquipmentSlotGroup.ANY)
+            );
         }));
     }
 
