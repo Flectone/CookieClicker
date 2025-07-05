@@ -10,6 +10,7 @@ import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -132,5 +133,9 @@ public class GeneratedCookieItem extends BaseCookieItem {
 
     public void addStat(StatType statType, Integer valueToAdd) {
         features.applyStat(statType, features.getStat(statType) + valueToAdd);
+    }
+
+    public <T> void setComponent(DataComponentType<T> type, T value) {
+        applyComponent(type, value);
     }
 }

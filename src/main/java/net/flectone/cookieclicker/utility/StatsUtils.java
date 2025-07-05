@@ -53,6 +53,14 @@ public class StatsUtils {
         return ability == null ? CookieAbility.NONE : ability;
     }
 
+    public ToolType getCategory(ItemStack itemStack) {
+        return getFeatures(itemStack).getCategory();
+    }
+
+    public Integer getTier(ItemStack itemStack) {
+        return getFeatures(itemStack).getStat(StatType.EQUIPMENT_TIER);
+    }
+
     private Integer getBaseFarmingFortune(ItemStack itemStack) {
         return getFeatures(itemStack).getStat(StatType.FARMING_FORTUNE);
     }

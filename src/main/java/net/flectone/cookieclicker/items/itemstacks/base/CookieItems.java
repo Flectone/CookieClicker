@@ -29,16 +29,16 @@ public interface CookieItems {
     String PLUGIN_KEY = "cc2";
     String ITEM_CATEGORY_KEY = "category";
     String ITEM_TAG_KEY = "item_tag";
-    String FORTUNE_KEY = "farm_fortune";
     String ABILITY_KEY = "ability";
 
     String OLD_FORTUNE_KEY = "ff"; //фф
 
-    //когда-нибудь
-    //Pair<String, String> DAMAGE_KEY = new Pair<>(PLUGIN_KEY, "dmg");
     String MINING_FORTUNE_KEY = "mine_fortune";
+    String FORTUNE_KEY = "farm_fortune";
 
-    List<String> LOADED_STATS = List.of(FORTUNE_KEY, OLD_FORTUNE_KEY, MINING_FORTUNE_KEY);
+    String EQUIPMENT_TIER = "tier";
+
+    List<String> LOADED_STATS = List.of(FORTUNE_KEY, OLD_FORTUNE_KEY, MINING_FORTUNE_KEY, EQUIPMENT_TIER);
 
 
 }

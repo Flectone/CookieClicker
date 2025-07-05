@@ -7,12 +7,9 @@ import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.utility.CCobjects.Items.ClickerItems;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Items;
@@ -23,7 +20,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Singleton
 public class UtilsCookie {
@@ -94,19 +90,6 @@ public class UtilsCookie {
 
         farmingFortune += getFullFortune(player.getItemInHand(InteractionHand.MAIN_HAND));
         return farmingFortune;
-    }
-
-    public <E> Holder<E> getFromRegistry(ResourceKey<? extends Registry<E>> registry, String toFind) {
-        Optional<Registry<E>> registryOptional = MinecraftServer.getServer().registryAccess().lookup(registry);
-        if (registryOptional.isEmpty()) {
-            return null;
-        }
-        for (Holder<E> holder : registryOptional.get().asHolderIdMap()) {
-            if (holder.getRegisteredName().equals(toFind)) {
-                return holder;
-            }
-        }
-        return null;
     }
 
 
