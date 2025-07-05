@@ -2,13 +2,9 @@ package net.flectone.cookieclicker.utility;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.papermc.paper.registry.RegistryAccess;
-import io.papermc.paper.registry.RegistryKey;
-import io.papermc.paper.registry.TypedKey;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.utility.CCobjects.Items.ClickerItems;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -21,13 +17,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class UtilsCookie {
@@ -50,6 +46,7 @@ public class UtilsCookie {
 
         return item.equals(checkItem2);
     }
+
 
     public boolean compare(net.minecraft.world.item.ItemStack item1, net.minecraft.world.item.ItemStack item2) {
         net.minecraft.world.item.ItemStack checkItem2 = new net.minecraft.world.item.ItemStack(item2.getItem(), item1.getCount());
@@ -77,22 +74,6 @@ public class UtilsCookie {
         itemWithAmount.applyComponents(item.getComponents());
         itemWithAmount.remove(DataComponents.ATTRIBUTE_MODIFIERS);
         return itemWithAmount.copy();
-    }
-
-    @Deprecated
-    public Integer getFullFortune(ItemStack item) {
-        int fortune = Math.max(0, itemTagsUtility.getBaseFortune(item));
-        org.bukkit.Registry<Enchantment> enchantmentRegistry = RegistryAccess
-                .registryAccess()
-                .getRegistry(RegistryKey.ENCHANTMENT);
-        Enchantment enchantment = enchantmentRegistry.getOrThrow(TypedKey.create(
-                RegistryKey.ENCHANTMENT, Key.key("cookie:ccboost"))
-        );
-        Map<Enchantment, Integer> enchants = item.getEnchantments();
-        if (!(item.getType().equals(Material.AIR)) && !(enchants.isEmpty())) {
-            fortune += enchants.getOrDefault(enchantment, 0);
-        }
-        return fortune;
     }
 
     public Integer getFullFortune(net.minecraft.world.item.ItemStack item) {
@@ -128,6 +109,10 @@ public class UtilsCookie {
         return null;
     }
 
+
+    //Короче когда буду обновлять
+    //Мб в классе сделать метод toComponentMap, а затем полученную мапу
+    //применить на предмет
     public void updateStats(net.minecraft.world.item.ItemStack item) {
         if (item.getItem().equals(Items.AIR)) return;
         //чтобы мотыги и книги можно было нормально чарить
@@ -158,12 +143,5 @@ public class UtilsCookie {
                         .set(DataComponents.LORE, new ItemLore(lores))
                         .build()
         );
-    }
-
-    public Integer convertFortune(Integer fortune) {
-        Random random = new Random(System.currentTimeMillis());
-        Integer baseAmount = fortune <= 1 ? 1 : random.nextInt(Math.max(1, fortune - 3), fortune + 1);
-        Integer additionalAmount = fortune < 10 ? 0 : Math.round((float) random.nextInt(fortune - 10, fortune - 2) / 3);
-        return baseAmount + additionalAmount;
     }
 }

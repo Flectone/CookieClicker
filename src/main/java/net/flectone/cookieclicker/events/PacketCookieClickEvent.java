@@ -9,17 +9,18 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerActionBar;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.cookiePart.BagHoeUpgrade;
+import net.flectone.cookieclicker.cookiePart.LegendaryHoeUpgrade;
 import net.flectone.cookieclicker.cookiePart.EpicHoeUtils;
 import net.flectone.cookieclicker.items.ItemManager;
-import net.flectone.cookieclicker.utility.CCConversionUtils;
-import net.flectone.cookieclicker.utility.CCobjects.CookieEntity;
-import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
-import net.flectone.cookieclicker.utility.ItemTagsUtility;
-import net.flectone.cookieclicker.utility.PacketUtils;
-import net.flectone.cookieclicker.utility.UtilsCookie;
+import net.flectone.cookieclicker.items.attributes.CookieAbility;
+import net.flectone.cookieclicker.items.attributes.StatType;
+import net.flectone.cookieclicker.utility.*;
+import net.flectone.cookieclicker.entities.CookieEntity;
+import net.flectone.cookieclicker.entities.CookieTextDisplay;
+import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -40,58 +41,58 @@ import java.util.Random;
 public class PacketCookieClickEvent {
     //это жесть
     private final ItemManager manager;
-    private final ItemTagsUtility itemTagsUtility;
+    private final StatsUtils statsUtils;
     private final PacketUtils packetUtils;
-    private final UtilsCookie utilsCookie;
     private final EpicHoeUtils epicHoeUtils;
-    private final BagHoeUpgrade bagHoeUpgrade;
-    private final CCConversionUtils converter;
+    private final LegendaryHoeUpgrade legendaryHoeUpgrade;
+    private final ConnectedPlayers connectedPlayers;
 
     private final List<Integer> bonusEntities = new ArrayList<>();
 
     @Inject
-    public PacketCookieClickEvent(ItemTagsUtility itemTagsUtility, ItemManager manager, UtilsCookie utilsCookie,
-                                  PacketUtils packetUtils, EpicHoeUtils epicHoeUtils, BagHoeUpgrade bagHoeUpgrade,
-                                  CCConversionUtils converter) {
+    public PacketCookieClickEvent(StatsUtils statsUtils, ItemManager manager,
+                                  PacketUtils packetUtils, EpicHoeUtils epicHoeUtils, LegendaryHoeUpgrade legendaryHoeUpgrade,
+                                  ConnectedPlayers connectedPlayers) {
         this.manager = manager;
-        this.itemTagsUtility = itemTagsUtility;
+        this.statsUtils = statsUtils;
         this.packetUtils = packetUtils;
-        this.utilsCookie = utilsCookie;
         this.epicHoeUtils = epicHoeUtils;
-        this.bagHoeUpgrade = bagHoeUpgrade;
-        this.converter = converter;
+        this.legendaryHoeUpgrade = legendaryHoeUpgrade;
+        this.connectedPlayers = connectedPlayers;
     }
 
-    public void onCookieClick(CookiePlayer cookiePlayer, Location location) {
-        User user = cookiePlayer.getUser();
-
-        Player player = converter.userToNMS(user);
-
-        //
-        int maxAmount = 0;
-
-        maxAmount += utilsCookie.extractFortune(player);
-        int droppedAmount = utilsCookie.convertFortune(maxAmount);
-
-        droppedAmount += Math.round(droppedAmount * (0.5f * epicHoeUtils.getTier(player.getUUID())));
-        String itemAbility = itemTagsUtility.getItemTag(player.getItemInHand(InteractionHand.MAIN_HAND));
-
-        //если эпическая мотыга
-        if (itemAbility != null && itemAbility.equals("epic_hoe")) {
-            onClickWithHoe(user, new Vector3d(location.getX(), location.getY(), location.getZ()));
-        }
-
-        displayActionBar(player, maxAmount, droppedAmount);
+    public void onCookieClick(ServerCookiePlayer serverCookiePlayer, Location location) {
+        User user = serverCookiePlayer.getUser();
+        Player player = serverCookiePlayer.getPlayer();
 
         Vector3d itemFrameVector3d = new Vector3d(location.getX(), location.getY(), location.getZ());
 
-        if (bagHoeUpgrade.updateHoe(user)) {
-            packetUtils.spawnParticle(user, new Particle<>(ParticleTypes.TRIAL_SPAWNER_DETECTION_OMINOUS), 1,
-                    itemFrameVector3d, 0.2f);
+        int maxAmount = 0;
+
+        maxAmount += statsUtils.extractStat(player, StatType.FARMING_FORTUNE);
+        int droppedAmount = statsUtils.convertFortuneToAmount(maxAmount);
+
+        droppedAmount += Math.round(droppedAmount * (0.5f * epicHoeUtils.getTier(player.getUUID())));
+
+        //Проверка на эпическую мотыгу
+        if (statsUtils.getItemTag(player.getMainHandItem()).equals("epic_hoe")) {
+            onClickWithHoe(user, itemFrameVector3d);
         }
 
-        spawnItems(cookiePlayer, droppedAmount,
+        //Проверка на легендарную мотыгу
+        legendaryHoeUpgrade.tryUpdateHoe(user, itemFrameVector3d);
+
+        displayActionBar(user, maxAmount, droppedAmount);
+
+        spawnItems(serverCookiePlayer, droppedAmount,
                 location);
+
+        //для базы данных
+        serverCookiePlayer.setIFrameClicks(serverCookiePlayer.getIFrameClicks() + 1);
+        serverCookiePlayer.addXp(droppedAmount);
+
+        connectedPlayers.save(serverCookiePlayer, true);
+        //
 
         packetUtils.spawnParticle(user,
                 new Particle<>(ParticleTypes.TRIAL_SPAWNER_DETECTION),
@@ -101,44 +102,43 @@ public class PacketCookieClickEvent {
         packetUtils.playSound(user, Sounds.ENTITY_GENERIC_EAT, 0.3f, 1f);
     }
 
-    private List<String> obtainAbilities(Player player) {
-        List<String> abilities = new ArrayList<>();
+    private Pair<CookieAbility, CookieAbility> obtainAbilities(Player player) {
+        CookieAbility first = statsUtils.getAbility(player.getItemInHand(InteractionHand.MAIN_HAND));
+        CookieAbility second = statsUtils.getAbility(player.getItemInHand(InteractionHand.OFF_HAND));
 
-        abilities.add(itemTagsUtility.getAbility(player.getItemInHand(InteractionHand.MAIN_HAND)));
-        abilities.add(abilities.getFirst().equals("transform") ? itemTagsUtility.getAbility(player.getItemInHand(InteractionHand.OFF_HAND)) : "none");
+        //Главная способность не может быть Transform
+        //Поэтому их надо менять местами
 
-        return abilities;
+        return first == CookieAbility.TRANSFORM
+                ? new Pair<>(second, first)
+                : new Pair<>(first, second);
     }
 
-    private String getMainAbility(Player player) {
-        List<String> abilities = obtainAbilities(player);
-
-        return abilities.get(1).equals("none") ? abilities.getFirst() : abilities.get(1);
+    private CookieAbility getMainAbility(Player player) {
+        return obtainAbilities(player).getKey();
     }
 
-    private String getSecondAbility(Player player) {
-        List<String> abilities = obtainAbilities(player);
-
-        return abilities.get(1).equals("none") ? "none" : abilities.getFirst();
+    private CookieAbility getSecondAbility(Player player) {
+        return obtainAbilities(player).getValue();
     }
 
     public List<ItemStack> calculateFullCount(String baseVariant, String enchantedVariant, Integer countNeeded, Integer currentCount) {
         List<ItemStack> items = new ArrayList<>();
 
         if (currentCount < countNeeded) {
-            items.add(utilsCookie.createItemAmountNMS(manager.getNMS(baseVariant), currentCount));
+            items.add(manager.getWithAmount(baseVariant, currentCount));
         }
         if (currentCount >= countNeeded) {
             if (currentCount % countNeeded > 0) {
-                items.add(utilsCookie.createItemAmountNMS(manager.getNMS(baseVariant), currentCount % countNeeded));
+                items.add(manager.getWithAmount(baseVariant, currentCount % countNeeded));
             }
-            items.add(utilsCookie.createItemAmountNMS(manager.getNMS(enchantedVariant), currentCount / countNeeded));
+            items.add(manager.getWithAmount(enchantedVariant, currentCount / countNeeded));
         }
         return items;
     }
 
-    private List<ItemStack> chooseItemDrops(CookiePlayer cookiePlayer, Integer finalFortune, boolean isAlternative) {
-        Player player = cookiePlayer.getPlayer();
+    private List<ItemStack> chooseItemDrops(ServerCookiePlayer serverCookiePlayer, Integer finalFortune, boolean isAlternative) {
+        Player player = serverCookiePlayer.getPlayer();
 
         //альтернативный предмет, если спец. условие выполнено, то этот предмет выпадет
         net.minecraft.world.item.ItemStack altItem = null;
@@ -146,20 +146,22 @@ public class PacketCookieClickEvent {
 
         //проверка на способность у мотыги
         switch (getMainAbility(player)) {
-            case "destroyer" -> {
-                if (utilsCookie.compare(player.getOffhandItem(), manager.getNMS("ench_cocoa"))) {
+            case DESTROYER -> {
+                if (statsUtils.hasTag(player.getOffhandItem(), "ench_cocoa")) {
                     dropItems.addAll(List.of());
-                    dropItems.add(utilsCookie.createItemAmountNMS(manager.getNMS("chocolate"), 1)); //если в левой руке какао-бобы
+                    dropItems.add(manager.getWithAmount("chocolate", 1)); //если в левой руке какао-бобы
                     player.getOffhandItem().setCount(player.getOffhandItem().getCount() - 1);
                 } else {
-                    dropItems.add(utilsCookie.createItemAmountNMS(manager.getNMS("cocoa_beans"), finalFortune));
-                    dropItems.add(utilsCookie.createItemAmountNMS(manager.getNMS("wheat"), finalFortune));
+                    dropItems.add(manager.getWithAmount("cocoa_beans", finalFortune));
+                    dropItems.add(manager.getWithAmount("wheat", finalFortune));
                 }
                 altItem = manager.getNMS("pumpkin");
             }
-            case "rose_bush" -> {
-                altItem = getSecondAbility(player).equals("transform") ? manager.getNMS("glow_berries") : manager.getNMS("berries");
-                dropItems.add(utilsCookie.createItemAmountNMS(manager.getNMS("cookie"), finalFortune));
+            case ROSE_BUSH -> {
+                altItem = getSecondAbility(player) == CookieAbility.TRANSFORM
+                        ? manager.getNMS("glow_berries")
+                        : manager.getNMS("berries");
+                dropItems.add(manager.getWithAmount("cookie", finalFortune));
             }
             default -> {
                 dropItems.addAll(calculateFullCount("cookie", "ench_cookie", 160, finalFortune));
@@ -170,15 +172,15 @@ public class PacketCookieClickEvent {
         return isAlternative ? List.of(altItem) : dropItems;
     }
 
-    public void spawnItems(CookiePlayer cookiePlayer, Integer droppedAmount, Location loca) {
-        User user = cookiePlayer.getUser();
-        Player player = cookiePlayer.getPlayer();
+    public void spawnItems(ServerCookiePlayer serverCookiePlayer, Integer droppedAmount, Location loca) {
+        User user = serverCookiePlayer.getUser();
+        Player player = serverCookiePlayer.getPlayer();
         //тут вероятность на спец. предмет
         Random rndB = new Random(System.currentTimeMillis());
 
         boolean altItem = false;
         if (rndB.nextInt(1, 100) >= 95
-                && (getSecondAbility(player).equals("transform") || getMainAbility(player).equals("rose_bush"))) {
+                && (getSecondAbility(player) == CookieAbility.TRANSFORM || getMainAbility(player) == CookieAbility.ROSE_BUSH)) {
             loca = new Location(loca.getX() + rndB.nextDouble(-2.5, 2.5),
                     loca.getY() + rndB.nextDouble(0, 4),
                     loca.getZ() + rndB.nextDouble(-2.5, 2.5), 1, 1);
@@ -186,7 +188,7 @@ public class PacketCookieClickEvent {
         }
 
 
-        List<ItemStack> dropItems = chooseItemDrops(cookiePlayer, droppedAmount, altItem);
+        List<ItemStack> dropItems = chooseItemDrops(serverCookiePlayer, droppedAmount, altItem);
 
         for (net.minecraft.world.item.ItemStack i : dropItems)
             packetUtils.spawnItem(user, loca, i);
@@ -195,12 +197,15 @@ public class PacketCookieClickEvent {
     }
 
     public void changeLegendaryHoeMode(User user) {
-        bagHoeUpgrade.LegHoeChange(user);
+        legendaryHoeUpgrade.legHoeChange(user);
     }
 
-    public void bookShelfClick(User user, Player player) {
+    public void bookShelfClick(ServerCookiePlayer serverCookiePlayer) {
+        Player player = serverCookiePlayer.getPlayer();
+        User user = serverCookiePlayer.getUser();
+
         ItemStack enchantedCookiesInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-        if (!utilsCookie.compare(enchantedCookiesInHand, manager.getNMS("ench_cookie"))) return;
+        if (!statsUtils.hasTag(enchantedCookiesInHand, "ench_cookie")) return;
         if (enchantedCookiesInHand.getCount() < 15) return;
 
         HitResult hitResult = player.getRayTrace(5, ClipContext.Fluid.NONE);
@@ -222,18 +227,10 @@ public class PacketCookieClickEvent {
         if (bookshelfBlockState.getOptionalValue(facingProperty).isEmpty()) return;
         //проверка, куда смотрит блок, чтобы спереди призывать предмет
         switch (bookshelfBlockState.getOptionalValue(facingProperty).get().toString()) {
-            case "north":
-                z--;
-                break;
-            case "south":
-                z++;
-                break;
-            case "west":
-                x--;
-                break;
-            case "east":
-                x++;
-                break;
+            case "north" -> z--;
+            case "south" -> z++;
+            case "west" -> x--;
+            case "east" -> x++;
         }
 
         Location bookLocation = new Location(x, y, z, 1, 1);
@@ -243,15 +240,17 @@ public class PacketCookieClickEvent {
         enchantedCookiesInHand.setCount(enchantedCookiesInHand.getCount() - 15);
     }
 
-    private void displayActionBar(Player player, Integer maxAmount, Integer droppedAmount) {
+    private void displayActionBar(User user, Integer maxAmount, Integer droppedAmount) {
         // Показ статистики
         // Первое число - общее количество удачи
         // Второе число - число выпавших предметов
         // В скобках первое - заряд от эпической мотыги
         // В скобках второе - уровень заряда, который увеличивает количество выпавших предметов (не удачу)
-        player.displayClientMessage(converter.convertToNMSComponent(MiniMessage.miniMessage().deserialize("<#eb6514>" + maxAmount + "⯫ "
+        WrapperPlayServerActionBar bar = new WrapperPlayServerActionBar(
+                MiniMessage.miniMessage().deserialize("<#eb6514>" + maxAmount + "⯫ "
                 + "<#e4a814>" + droppedAmount +"★ "
-                + "<#b014eb>[" + epicHoeUtils.getCharge(player.getUUID()) + "% " +  epicHoeUtils.getTier(player.getUUID()) + "☄]")), true);
+                + "<#b014eb>[" + epicHoeUtils.getCharge(user.getUUID()) + "% " +  epicHoeUtils.getTier(user.getUUID()) + "☄]"));
+        user.sendPacketSilently(bar);
     }
 
     public void onClickWithHoe(User user, Vector3d vector3d) {
@@ -268,21 +267,21 @@ public class PacketCookieClickEvent {
         epicHoeUtils.addCharge(user.getUUID(), 1);
     }
 
-    public void checkForBonus(CookiePlayer cookiePlayer, Integer entityId) {
+    public void checkForBonus(ServerCookiePlayer serverCookiePlayer, Integer entityId) {
         if (bonusEntities.isEmpty() || !bonusEntities.contains(entityId))
             return;
         //удаляем существ
-        CookieEntity.removeById(entityId, cookiePlayer.getUser());
-        CookieEntity.removeById(entityId + 10000, cookiePlayer.getUser());
+        CookieEntity.removeById(entityId, serverCookiePlayer.getUser());
+        CookieEntity.removeById(entityId + 10000, serverCookiePlayer.getUser());
         bonusEntities.remove(entityId);
-        packetUtils.playSound(cookiePlayer.getUser(), Sounds.ITEM_TRIDENT_RETURN, 1f, 0.7f);
+        packetUtils.playSound(serverCookiePlayer.getUser(), Sounds.ITEM_TRIDENT_RETURN, 1f, 0.7f);
 
-        int amount = utilsCookie.convertFortune(utilsCookie.extractFortune(cookiePlayer.getPlayer())) * 50;
+        int amount = statsUtils.convertFortuneToAmount(statsUtils.extractStat(serverCookiePlayer.getPlayer(), StatType.FARMING_FORTUNE)) * 50;
 
-        cookiePlayer.swingArm();
+        serverCookiePlayer.swingArm();
 
-        for (ItemStack itemStack : chooseItemDrops(cookiePlayer, amount, false)) {
-            cookiePlayer.getPlayer().getInventory().add(itemStack);
+        for (ItemStack itemStack : chooseItemDrops(serverCookiePlayer, amount, false)) {
+            serverCookiePlayer.getPlayer().getInventory().add(itemStack);
         }
     }
 
@@ -301,7 +300,7 @@ public class PacketCookieClickEvent {
         interactEntity.spawn(user);
 
         //200iq, тупо к айдишнику interaction прибавить 10000 и норм
-        CookieEntity textDisplay = new CookieEntity(EntityTypes.TEXT_DISPLAY, interactEntity.getEntityId() + 10000);
+        CookieTextDisplay textDisplay = new CookieTextDisplay(EntityTypes.TEXT_DISPLAY, interactEntity.getEntityId() + 10000);
         textDisplay.setText("клик");
         textDisplay.setLocation(randomLocation.getX(), randomLocation.getY() + 0.5, randomLocation.getZ());
         textDisplay.spawn(user);

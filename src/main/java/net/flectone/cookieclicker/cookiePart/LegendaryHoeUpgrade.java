@@ -43,14 +43,14 @@ public class LegendaryHoeUpgrade {
         this.statsUtils = statsUtils;
     }
 
-    public boolean updateHoe(User user) {
+    public void tryUpdateHoe(User user, Vector3d itemFrameLocation) {
         Player player = conversionUtils.userToNMS(user);
         ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
 
-        if (itemInHand.getItem().equals(Items.AIR)) return false;
+        if (itemInHand.getItem().equals(Items.AIR)) return;
 
         CookieAbility ability = statsUtils.getAbility(itemInHand);
-        if (ability != CookieAbility.INFINITY_UPGRADE) return false;
+        if (ability != CookieAbility.INFINITY_UPGRADE) return;
 
         //получаем текущую прочность
         Object currentDamage = itemInHand.getComponents().get(DataComponents.DAMAGE);
@@ -65,9 +65,11 @@ public class LegendaryHoeUpgrade {
             upgradeableItem.addStat(StatType.FARMING_FORTUNE, 1);
             player.setItemInHand(InteractionHand.MAIN_HAND, upgradeableItem.toNMS());
         }
-        packetUtils.playSound(user, Sounds.BLOCK_NETHERITE_BLOCK_BREAK, 1f, 1.8f);
 
-        return true;
+        packetUtils.playSound(user, Sounds.BLOCK_NETHERITE_BLOCK_BREAK, 1f, 1.8f);
+        packetUtils.spawnParticle(user, new Particle<>(ParticleTypes.TRIAL_SPAWNER_DETECTION_OMINOUS), 1,
+                itemFrameLocation, 0.2f);
+
     }
 
     public void setDamage(net.minecraft.world.item.ItemStack item, Integer value) {

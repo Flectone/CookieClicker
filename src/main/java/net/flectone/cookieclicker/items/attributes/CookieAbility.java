@@ -11,11 +11,7 @@ public enum CookieAbility {
     DESTROYER ("destroyer", "Разделяет печенье на какао-бобы", "и пшеницу."),
     ROSE_BUSH ("rose_bush", "C небольшой вероятностью создаёт", "ягоды вокруг игрока."),
     TRANSFORM ("transform", "С небольшой вероятность создаёт альтернативный", "предмет. Тип предмета также зависит от", "предмета в левой руке."),
-    INFINITY_UPGRADE ("infinity", "<yellow>Золотая версия</yellow>:",
-            " Каждые 100 кликов улучшается,",
-            " до бесконечности",
-            "<gray>Железная версия</gray>:",
-            " Создаёт альтернативные версии предметов.");
+    INFINITY_UPGRADE ("infinity", "Каждые 100 кликов повышает удачу фермера на 1,", "до бесконечности");
 
     private final String type;
     private final List<String> info = new ArrayList<>();

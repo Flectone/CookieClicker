@@ -27,7 +27,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class ItemManager {
@@ -326,15 +329,20 @@ public class ItemManager {
 
 
     }
-    @Deprecated
-    public org.bukkit.inventory.ItemStack get(String str) {
-        return CraftItemStack.asBukkitCopy(items.get(str).copy());
-    }
+
     public ItemStack getNMS(String str) {
         return items.get(str).copy();
     }
     public Collection<ItemStack> allItems() {
         return items.values();
+    }
+
+    public boolean has(String tag) {
+        return items.containsKey(tag);
+    }
+
+    public ItemStack getWithAmount(String itemName, Integer amount) {
+        return items.get(itemName).copyWithCount(amount);
     }
 
     @Deprecated
