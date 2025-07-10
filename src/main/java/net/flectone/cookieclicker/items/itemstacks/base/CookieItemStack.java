@@ -63,7 +63,7 @@ public abstract class CookieItemStack implements CookieItems {
         removeAttribute = b;
     }
 
-    public ItemStack toNMS() {
+    public ItemStack toMinecraftStack() {
         combineLore();
         applyFeatures();
 

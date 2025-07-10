@@ -65,7 +65,7 @@ public class AnvilEvent {
         //Наверное не самый оптимизированный вариант...
         GeneratedCookieItem cookieAnvilItem = GeneratedCookieItem.fromItemStack(anvilItem);
 
-        player.containerMenu.setItem(2, player.containerMenu.getStateId(), cookieAnvilItem.toNMS());
+        player.containerMenu.setItem(2, player.containerMenu.getStateId(), cookieAnvilItem.toMinecraftStack());
     }
 
     public void processUpgrade(ServerCookiePlayer serverCookiePlayer) {
@@ -107,7 +107,7 @@ public class AnvilEvent {
         updatedItem.setComponent(DataComponents.TRIM, armorTrim);
         updatedItem.setComponent(DataComponents.CUSTOM_NAME, createNameComponent(itemStack.getCustomName()));
 
-        return updatedItem.toNMS();
+        return updatedItem.toMinecraftStack();
     }
 
     private Component createNameComponent(Component originalName) {

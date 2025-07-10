@@ -304,7 +304,7 @@ public class ItemManager {
     }
 
     public ItemStack getNMS(String tag) {
-        return itemsToLoad.getOrDefault(tag, emptyItem).toNMS().copy();
+        return itemsToLoad.getOrDefault(tag, emptyItem).toMinecraftStack().copy();
     }
 
     public boolean has(String itemTag) {
@@ -312,7 +312,7 @@ public class ItemManager {
     }
 
     public ItemStack getWithAmount(String itemName, Integer amount) {
-        return itemsToLoad.getOrDefault(itemName, emptyItem).toNMS().copyWithCount(amount);
+        return itemsToLoad.getOrDefault(itemName, emptyItem).toMinecraftStack().copyWithCount(amount);
     }
 
     public Collection<CookieItemStack> allItemsRaw() {

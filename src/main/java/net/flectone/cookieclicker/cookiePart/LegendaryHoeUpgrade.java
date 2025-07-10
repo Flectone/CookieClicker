@@ -63,7 +63,7 @@ public class LegendaryHoeUpgrade {
 
             GeneratedCookieItem upgradeableItem = GeneratedCookieItem.fromItemStack(itemInHand);
             upgradeableItem.addStat(StatType.FARMING_FORTUNE, 1);
-            player.setItemInHand(InteractionHand.MAIN_HAND, upgradeableItem.toNMS());
+            player.setItemInHand(InteractionHand.MAIN_HAND, upgradeableItem.toMinecraftStack());
         }
 
         packetUtils.playSound(user, Sounds.BLOCK_NETHERITE_BLOCK_BREAK, 1f, 1.8f);
@@ -110,7 +110,7 @@ public class LegendaryHoeUpgrade {
                 ? CookieAbility.TRANSFORM
                 : CookieAbility.INFINITY_UPGRADE);
 
-        player.setItemInHand(InteractionHand.MAIN_HAND, legendaryHoe.toNMS());
+        player.setItemInHand(InteractionHand.MAIN_HAND, legendaryHoe.toMinecraftStack());
 
         //частицы красивые
         ParticleDustColorTransitionData particleDustColorTransitionData = new ParticleDustColorTransitionData(1f,

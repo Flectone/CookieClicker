@@ -59,7 +59,7 @@ public class RegisteredCommands {
                     nmsExecutor.displayClientMessage(Component.literal("Предмет в вашей руке был переделан"), false);
 
                     GeneratedCookieItem convertedCookieItem = GeneratedCookieItem.fromItemStack(nmsExecutor.getMainHandItem());
-                    ItemStack covertedMinecraftItem = convertedCookieItem.toNMS();
+                    ItemStack covertedMinecraftItem = convertedCookieItem.toMinecraftStack();
                     covertedMinecraftItem.setCount(nmsExecutor.getMainHandItem().getCount());
 
                     nmsExecutor.setItemInHand(InteractionHand.MAIN_HAND, covertedMinecraftItem);
