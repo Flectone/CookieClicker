@@ -3,12 +3,12 @@ package net.flectone.cookieclicker.events;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.inventories.ContainerManager;
 import net.flectone.cookieclicker.items.CustomRecipe;
+import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.Recipes;
 import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.utility.Pair;
-import net.flectone.cookieclicker.utility.UtilsCookie;
+import net.flectone.cookieclicker.utility.StatsUtils;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -18,36 +18,40 @@ import java.util.List;
 
 @Singleton
 public class PacketCraftingEvent {
-    private final UtilsCookie utilsCookie;
-    private final ContainerManager containerManager;
+    private final StatsUtils statsUtils;
     private final Recipes recipes;
+    private final ItemManager loadedItems;
 
     @Inject
-    public PacketCraftingEvent(UtilsCookie utilsCookie, ContainerManager containerManager, Recipes recipes) {
-        this.utilsCookie = utilsCookie;
-        this.containerManager = containerManager;
+    public PacketCraftingEvent(Recipes recipes, StatsUtils statsUtils, ItemManager loadedItems) {
         this.recipes = recipes;
+        this.statsUtils = statsUtils;
+        this.loadedItems = loadedItems;
     }
 
-    private List<ItemStack> createList (AbstractContainerMenu inv) {
-        List<ItemStack> itemStackList = new ArrayList<>();
+    private List<Pair<String, Integer>> createList (AbstractContainerMenu inv) {
+        List<Pair<String, Integer>> itemsList = new ArrayList<>();
+
         for (int i = 1; i < 10; i++) {
             ItemStack item = inv.getSlot(i).getItem();
-            itemStackList.add(item.copy());
+            itemsList.add(new Pair<>(
+                    item.getItem() == Items.AIR ? "air" : statsUtils.getItemTag(item),
+                    item.getCount()
+            ));
         }
-        return itemStackList;
+        return itemsList;
     }
 
     public CustomRecipe findRecipe(AbstractContainerMenu craftingContainer) {
-        List<ItemStack> ingredients = createList(craftingContainer);
-        return recipes.findRecipe(ingredients);
+        List<Pair<String, Integer>> ingredients = createList(craftingContainer);
+        return recipes.getRecipeIfExists(ingredients);
     }
 
     public Integer calculateAmount(CustomRecipe recipe, AbstractContainerMenu craftingGrid) {
         int amount = 0;
 
-        for (Pair<Integer, Integer> pair : recipes.getAmountPairs(createList(craftingGrid), recipe.getAllIngredients())) {
-            int possibleAmount = Math.round(pair.getKey()) / pair.getValue();
+        for (Pair<Integer, Integer> pair : recipes.createListOfAmounts(createList(craftingGrid), recipe)) {
+            int possibleAmount = pair.left() / pair.right();
             amount = amount == 0 ? possibleAmount : Math.min(amount, possibleAmount);
         }
         return amount;
@@ -58,36 +62,51 @@ public class PacketCraftingEvent {
         CustomRecipe recipe = findRecipe(craftingContainer);
 
         if (recipe == null) return;
+        //Если курсор уже держит предмет, то в крафте можно взять только шифтом
         if (!windowClickType.equals(WrapperPlayClientClickWindow.WindowClickType.QUICK_MOVE)
-                && (!utilsCookie.compare(craftingContainer.getCarried(), recipe.getResult())
+                && (!statsUtils.hasTag(craftingContainer.getCarried(), recipe.getResultTag())
                 && !craftingContainer.getCarried().getItem().equals(Items.AIR))) return;
+
+        craftingContainer.setItem(0, craftingContainer.getStateId(), new ItemStack(Items.AIR));
 
         //тут будет проблема, что при крафте всегда получается один предмет, если сделать больше, то оно не будет работать
         int amount = windowClickType.equals(WrapperPlayClientClickWindow.WindowClickType.QUICK_MOVE)
                 ? calculateAmount(recipe, craftingContainer)
                 : 1;
 
-        List<ItemStack> recipeIngredients = recipes.makeCleanList(recipe.getAllIngredients());
-        int index = 0;
+        List<Integer> recipeIng = recipes.getAmountsList(recipe.getAllIngredients());
+        int ingIndex = 0;
         for (int i = 1; i < 10; i++) {
-            //получение предмета в сетке крафта
-            ItemStack item = craftingContainer.getSlot(i).getItem();
-            if (item.getItem().equals(Items.AIR))
+            ItemStack itemStack = craftingContainer.getSlot(i).getItem();
+            if (itemStack.getItem() == Items.AIR)
                 continue;
-            item.setCount(item.getCount() - recipeIngredients.get(index).getCount() * amount);
-            index++;
+            itemStack.setCount(itemStack.getCount() - recipeIng.get(ingIndex) * amount);
+            ingIndex++;
+
         }
-        //Bukkit.getLogger().info("done crafting!");
-        ItemStack resultItem = recipe.getResult().copy();
+
+        System.out.println("done crafting");
+        ItemStack resultItem = loadedItems.getNMS(recipe.getResultTag());
 
         if (windowClickType.equals(WrapperPlayClientClickWindow.WindowClickType.QUICK_MOVE)) {
             resultItem.setCount(amount);
             serverCookiePlayer.getPlayer().getInventory().add(resultItem);
         } else {
-            amount += utilsCookie.compare(craftingContainer.getCarried(), recipe.getResult()) ? craftingContainer.getCarried().getCount() : 0;
+            amount += getCarriedAmount(craftingContainer.getCarried(), recipe.getResultTag());
             resultItem.setCount(amount);
             craftingContainer.setCarried(resultItem);
         }
+    }
+
+    private Integer getCarriedAmount(ItemStack carriedItemStack, String resultTag) {
+        int amount = 0;
+        if (carriedItemStack.getItem() == Items.AIR)
+            return amount;
+
+        if (statsUtils.hasTag(carriedItemStack, resultTag)) {
+            amount += carriedItemStack.getCount();
+        }
+        return amount;
     }
 
     public void prepareCraft(ServerCookiePlayer serverCookiePlayer) {
@@ -97,14 +116,11 @@ public class PacketCraftingEvent {
         CustomRecipe recipe = findRecipe(craftingContainer);
         if (recipe == null) return;
 
-        if (!utilsCookie.compare(craftingContainer.getSlot(0).getItem(), recipe.getResult())) {
-            containerManager.setContainerSlot(serverCookiePlayer,
-                    containerManager.getOpenedContainer(serverCookiePlayer),
-                    0,
-                    recipe.getResult().copy()
-            );
-            //craftingContainer.setItem(0, 0, recipe.getResult().copy());
-            //Bukkit.getLogger().info("found recipe " + recipe.getResult().getItem());
+        List<Pair<Integer, Integer>> craftingAndRecipeIngredients = recipes.createListOfAmounts(createList(craftingContainer), recipe);
+        for (Pair<Integer, Integer> pair : craftingAndRecipeIngredients) {
+            if (pair.left() < pair.right()) return;
         }
+
+        craftingContainer.setItem(0, craftingContainer.getStateId(), loadedItems.getNMS(recipe.getResultTag()));
     }
 }
