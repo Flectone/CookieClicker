@@ -12,8 +12,14 @@ import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySele
 import net.flectone.cookieclicker.events.PacketInteractEvent;
 import net.flectone.cookieclicker.inventories.MainMenu;
 import net.flectone.cookieclicker.items.VillagerTrades;
-import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
+import net.flectone.cookieclicker.items.itemstacks.GeneratedCookieItem;
+import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.utility.CCConversionUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.bukkit.entity.Entity;
 
 import java.util.HashSet;
@@ -25,27 +31,57 @@ public class RegisteredCommands {
     private final MainMenu mainMenu;
     private final VillagerTrades villagerTrades;
     private final PacketInteractEvent packetInteractEvent;
+    private final CCConversionUtils convertUtils;
 
     @Inject
-    public RegisteredCommands(MainMenu mainMenu, VillagerTrades villagerTrades, PacketInteractEvent packetInteractEvent) {
+    public RegisteredCommands(MainMenu mainMenu, VillagerTrades villagerTrades, PacketInteractEvent packetInteractEvent,
+                              CCConversionUtils convertUtils) {
         this.mainMenu = mainMenu;
         this.villagerTrades = villagerTrades;
         this.packetInteractEvent = packetInteractEvent;
+        this.convertUtils = convertUtils;
+    }
+
+    public LiteralCommandNode<CommandSourceStack> createCookieClickerCommand() {
+        LiteralArgumentBuilder<CommandSourceStack> cookieClicker = Commands.literal("cookieclicker2")
+                .then(createCookieClickerConvert())
+                .then(createCookieEntityCommand());
+        return cookieClicker.build();
+    }
+
+    public LiteralCommandNode<CommandSourceStack> createCookieClickerConvert() {
+        LiteralArgumentBuilder<CommandSourceStack> convert = Commands.literal("convert")
+                .executes(ctx -> {
+                    Entity bukkitExecutor = ctx.getSource().getExecutor();
+                    if (bukkitExecutor == null)
+                        return 0;
+                    Player nmsExecutor = convertUtils.getNMSplayerByUUID(ctx.getSource().getExecutor().getUniqueId());
+                    nmsExecutor.displayClientMessage(Component.literal("Предмет в вашей руке был переделан"), false);
+
+                    GeneratedCookieItem convertedCookieItem = GeneratedCookieItem.fromItemStack(nmsExecutor.getMainHandItem());
+                    ItemStack covertedMinecraftItem = convertedCookieItem.toNMS();
+                    covertedMinecraftItem.setCount(nmsExecutor.getMainHandItem().getCount());
+
+                    nmsExecutor.setItemInHand(InteractionHand.MAIN_HAND, covertedMinecraftItem);
+
+                   return Command.SINGLE_SUCCESS;
+                });
+        return convert.build();
     }
 
     public LiteralCommandNode<CommandSourceStack> createOpenMenuCommand() {
         LiteralArgumentBuilder<CommandSourceStack> openMenu = Commands.literal("menu")
                 .executes(ctx -> {
-                    CookiePlayer cookiePlayer = new CookiePlayer(ctx.getSource().getExecutor().getUniqueId());
+                    ServerCookiePlayer serverCookiePlayer = new ServerCookiePlayer(ctx.getSource().getExecutor().getUniqueId());
 
-                    mainMenu.openMainMenu(cookiePlayer);
+                    mainMenu.openMainMenu(serverCookiePlayer);
                     return Command.SINGLE_SUCCESS;
                 });
         return openMenu.build();
     }
 
     public LiteralCommandNode<CommandSourceStack> createCookieEntityCommand() {
-        LiteralArgumentBuilder<CommandSourceStack> ccEntityCommand = Commands.literal("cc_entity");
+        LiteralArgumentBuilder<CommandSourceStack> ccEntityCommand = Commands.literal("entities");
         ccEntityCommand.requires(sender -> sender.getSender().isOp());
         ccEntityCommand.then(createEntityCommand("register", true));
         ccEntityCommand.then(createEntityCommand("unregister", false));

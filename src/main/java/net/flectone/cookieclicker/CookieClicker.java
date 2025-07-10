@@ -7,11 +7,12 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import net.flectone.cookieclicker.events.Packets;
 import net.flectone.cookieclicker.events.PacketInteractEvent;
+import net.flectone.cookieclicker.events.Packets;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.Recipes;
 import net.flectone.cookieclicker.items.VillagerTrades;
+import net.flectone.cookieclicker.utility.Database;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,12 +49,18 @@ public final class CookieClicker extends JavaPlugin {
         injector.getInstance(PacketInteractEvent.class).setRegisteredEntitiesConfig(config);
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+            commands.registrar().register(injector.getInstance(RegisteredCommands.class).createCookieClickerCommand());
             commands.registrar().register(injector.getInstance(RegisteredCommands.class).createOpenMenuCommand());
-            commands.registrar().register(injector.getInstance(RegisteredCommands.class).createCookieEntityCommand());
         });
 
-        injector.getInstance(PacketInteractEvent.class).loadAllEntities();
+        try {
+            injector.getInstance(Database.class).connect(projectPath);
+        } catch (Exception e) {
+            getLogger().warning("Failed to connect database");
+            return;
+        }
 
+        injector.getInstance(PacketInteractEvent.class).loadAllEntities();
     }
 
     @Override
