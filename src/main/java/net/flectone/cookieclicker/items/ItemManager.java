@@ -1,358 +1,321 @@
 package net.flectone.cookieclicker.items;
 
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.papermc.paper.registry.RegistryAccess;
-import io.papermc.paper.registry.RegistryKey;
-import net.flectone.cookieclicker.utility.CCobjects.Items.ClickerItems;
-import net.flectone.cookieclicker.utility.CCobjects.Items.EquipmentItem;
-import net.flectone.cookieclicker.utility.CCobjects.Items.HoeItem;
-import net.flectone.cookieclicker.utility.CCobjects.Items.NormalItem;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.Registries;
+import net.flectone.cookieclicker.items.attributes.CookieAbility;
+import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.CookieEnchantmentBook;
+import net.flectone.cookieclicker.items.itemstacks.EquipmentCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.HoeCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.base.CookieItemStack;
+import net.flectone.cookieclicker.items.itemstacks.base.data.EquipmentData;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.ItemLore;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.item.equipment.EquipmentAssets;
-import org.bukkit.Material;
-import org.bukkit.Registry;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
 
 @Singleton
 public class ItemManager {
-    //LinkedHashMap использую, потому что тут предметы добавляются в мапу в таком же порядке,
-    //в каком они написаны в коде, в игре проще понять, где какой предмет
-    private final LinkedHashMap<String, ItemStack> items = new LinkedHashMap<>();
-    //public final HashMap<String, ItemStack> items = new HashMap<>();
+    private final LinkedHashMap<String, CookieItemStack> itemsToLoad = new LinkedHashMap<>();
 
-    private final MiniMessage miniMessage = MiniMessage.miniMessage();
-    private final Registry<Enchantment> enchantmentRegistry = RegistryAccess
-            .registryAccess()
-            .getRegistry(RegistryKey.ENCHANTMENT);
+    private final CommonCookieItem emptyItem = new CommonCookieItem(
+            Items.STRUCTURE_VOID,
+            "none",
+            "Этого предмета не существует"
+    );
 
-    @Inject
-    public ItemManager() {
+    private void registerItem(CookieItemStack item) {
+        itemsToLoad.put(item.getItemTag(), item);
     }
 
     public void load() {
-        // Base Cookie
-        // +
-        NormalItem basicCookie = new NormalItem(Material.COOKIE,
-                "<gradient:#ff8009:#ffdd09><italic:false>Печенье",
-                "cookie",
-                99);
+        //cookie
+        CommonCookieItem cookie = new CommonCookieItem(
+                Items.COOKIE, "cookie",
+                "<gradient:#ff8009:#ffdd09><italic:false>Печенье");
+        cookie.setAmount(99);
+        registerItem(cookie);
 
-        items.put("cookie", basicCookie.toItemStack());
+        //Enchanted Cookie
+        CommonCookieItem enchantedCookie = new CommonCookieItem(
+                Items.COOKIE, "ench_cookie",
+                "<gradient:#992e7a:#ff8009:#992e7a><italic:false>Зачарованное печенье"
+        );
+        enchantedCookie.setAmount(64);
+        enchantedCookie.setEnchantmentGlint();
+        enchantedCookie.hideItem();
+        enchantedCookie.setEatable();
+        registerItem(enchantedCookie);
 
-        // Compressed Cookie
-        // +
-        NormalItem enchCookie = new NormalItem(Material.COOKIE,
-                "<gradient:#992e7a:#ff8009:#992e7a><italic:false>Зачарованное печенье",
-                "ench_cookie",
-                64);
-        enchCookie.makeEnchGlint();
-        enchCookie.setColor(16443647);
-        enchCookie.setEatable();
-        items.put("ench_cookie", enchCookie.toItemStack());
+        //Enchanted book
+        CookieEnchantmentBook cookieEnchantmentBook = new CookieEnchantmentBook("ench_book");
+        cookieEnchantmentBook.setStoredEnchantment("Cookie Boost");
+        registerItem(cookieEnchantmentBook);
 
-        // Enchanted Book(Cookie Boost)
-        // a
-        ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
-        Optional<net.minecraft.core.Registry<net.minecraft.world.item.enchantment.Enchantment>> enchantmentRegistry =
-                MinecraftServer.getServer().registryAccess().lookup(Registries.ENCHANTMENT);
+        //Wood hoe
+        HoeCookieItem woodenHoe = new HoeCookieItem(
+                Items.WOODEN_HOE, "wood_hoe",
+                "<white><italic:false>Деревянная мотыга"
+        );
+        woodenHoe.setFarmingFortune(1);
+        registerItem(woodenHoe);
 
-        enchantmentRegistry.ifPresent(enchantments -> enchantments.asHolderIdMap().forEach(b -> {
-            if (b.value().description().getString().equals("Cookie Boost")) {
-                ItemEnchantments.Mutable itemEnchantments = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
-                itemEnchantments.set(b, 1);
+        //Stone hoe
+        HoeCookieItem stoneHoe = new HoeCookieItem(
+                Items.STONE_HOE, "stone_hoe",
+                "<gradient:#535351:#878781><italic:false>Каменная <white>мотыга"
+        );
+        stoneHoe.setFarmingFortune(2);
+        registerItem(stoneHoe);
 
-                DataComponentPatch storedEnchantsComponent = DataComponentPatch.builder()
-                        .set(DataComponents.STORED_ENCHANTMENTS, itemEnchantments.toImmutable())
-                        .build();
-                book.applyComponents(storedEnchantsComponent);
-            }
-        }));
-        DataComponentPatch lore = DataComponentPatch.builder()
-                .set(DataComponents.LORE, new ItemLore(List.of(net.minecraft.network.chat.Component.literal("Этот чар повышает количество печенья!").withColor(11119017),
-                        net.minecraft.network.chat.Component.literal("(Опыт можно получить, если съесть").withColor(11119017),
-                        net.minecraft.network.chat.Component.literal("зачарованное печенье)").withColor(11119017))))
-                .build();
-        book.applyComponents(lore);
+        //Destroyer
+        HoeCookieItem destroyer = new HoeCookieItem(
+                Items.NETHERITE_HOE, "destroyer",
+                "<#f79459><italic:false>Уничтожитель печенья"
+        );
+        destroyer.setAbility(CookieAbility.DESTROYER);
+        registerItem(destroyer);
 
-        items.put("book_boost1", book);
+        //Rose bush
+        HoeCookieItem roseBush = new HoeCookieItem(
+                Items.ROSE_BUSH, "rose_bush",
+                "<gradient:#e16953:#f7b8ac><italic:false>Розовый (или ягодный) <dark_green>куст"
+        );
+        roseBush.setAbility(CookieAbility.ROSE_BUSH);
+        roseBush.hideItem();
+        registerItem(roseBush);
 
-        // Wooden hoe (+1)
-        // +
-        HoeItem wood_hoe = new HoeItem(Material.WOODEN_HOE,
-                "<white><italic:false>Деревянная мотыга",
-                "wood_hoe",
-                1);
-        items.put("wood_hoe", wood_hoe.toItemStack());
+        //Epic hoe
+        HoeCookieItem epicHoe = new HoeCookieItem(
+                Items.DIAMOND_HOE, "epic_hoe",
+                "<gradient:#9e29ff:#c44dff><italic:false>Эпическая мотыга"
+        );
+        epicHoe.addLore("<gray> Чем дольше вы кликаете, тем больше печенья получите");
+        epicHoe.setAbility(CookieAbility.TRANSFORM);
+        epicHoe.setFarmingFortune(25);
+        registerItem(epicHoe);
 
-        // Stone hoe (+2)
-        // +
-        HoeItem stone_hoe = new HoeItem(Material.STONE_HOE,
-                "<gradient:#535351:#878781><italic:false>Каменная <white>мотыга",
-                "stone_hoe",
-                2);
-        items.put("stone_hoe", stone_hoe.toItemStack());
+        //Legendary hoe
+        HoeCookieItem legHoe = new HoeCookieItem(
+                Items.GOLDEN_HOE, "leg_hoe",
+                "<gradient:#790dbf:#ffae00:#ffae00:#d27f16:#d27f16:#790dbf><italic:false>Легендарная мотыга"
+        );
+        legHoe.addLore("<gray> Работает в двух режимах: <italic:false><yellow>Золотом</yellow><italic:true> и <italic:false><gray>Железном</gray>.",
+                "<gray> (Чтобы переключить режим, лкм по воздуху)");
+        legHoe.setFarmingFortune(10);
+        legHoe.setAbility(CookieAbility.INFINITY_UPGRADE);
+        registerItem(legHoe);
 
-        // Destroyer of Cookies
-        // +
-        HoeItem destroyer_hoe = new HoeItem(Material.NETHERITE_HOE,
-                "<#f79459><italic:false>Уничтожитель печенья",
-                "destroyer",
-                0);
-        destroyer_hoe.setAbility("destroyer",
-                "Разделяет печенье на какао-бобы",
-                "и пшеницу.");
-        items.put("destroyer", destroyer_hoe.toItemStack());
+        //Cocoa beans
+        CommonCookieItem cocoaBeans = new CommonCookieItem(
+                Items.COCOA_BEANS, "cocoa_beans",
+                "<gradient:#964b00:#c17529><italic:false>Какао-бобы"
+        );
+        cocoaBeans.setAmount(99);
+        registerItem(cocoaBeans);
 
-        // Rose bush
-        // +
-        HoeItem rose_bush = new HoeItem(Material.ROSE_BUSH,
-                "<gradient:#e16953:#f7b8ac><italic:false>Розовый (или ягодный) <dark_green>куст",
-                "rose_bush",
-                0);
-        rose_bush.setAbility("rose_bush",
-                "C небольшой вероятностью создаёт",
-                "ягоды вокруг игрока.");
-        rose_bush.setColor(16722731);
-        items.put("rose_bush", rose_bush.toItemStack());
-
-        // Epic hoe
-        // +
-        HoeItem epic_hoe = new HoeItem(Material.DIAMOND_HOE,
-                "<gradient:#9e29ff:#c44dff><italic:false>Эпическая мотыга",
-                "epic_hoe",
-                25);
-        //epic_hoe.setColor(10354943);
-        epic_hoe.addLore("<gray> С помощью частиц вокруг создаёт печенье");
-        epic_hoe.setAbility("transform", "С небольшой вероятность создаёт альтернативный", "предмет. Тип предмета также зависит от", "предмета в левой руке.");
-        items.put("epic_hoe", epic_hoe.toItemStack());
-
-        // Legendary Hoe
-        // +
-        HoeItem leg_hoe = new HoeItem(Material.GOLDEN_HOE,
-                "<gradient:#790dbf:#ffae00:#ffae00:#d27f16:#d27f16:#790dbf><italic:false>Легендарная мотыга",
-                "leg_hoe",
-                10);
-        leg_hoe.setAbility("infinity", "<yellow>Золотая версия</yellow>:",
-                " Каждые 100 кликов улучшается,",
-                " до бесконечности",
-                "<gray>Железная версия</gray>:",
-                " Создаёт альтернативные версии предметов.");
-        leg_hoe.setColor(16758272);
-        items.put("leg_hoe", leg_hoe.toItemStack());
-
-        // Cocoa beans (cocoa_beans)
-        // +
-        NormalItem cocoa = new NormalItem(Material.COCOA_BEANS,
-                "<gradient:#964b00:#c17529><italic:false>Какао-бобы",
-                "cocoa_beans",
-                99);
-        items.put("cocoa_beans", cocoa.toItemStack());
-
-        // Wheat
-        // +
-        NormalItem wheat = new NormalItem(Material.WHEAT,
-                "<gradient:#d5a51b:#ffe506><italic:false>Пшеница",
-                "wheat",
-                99);
-        wheat.setColor(16758272);
-        items.put("wheat", wheat.toItemStack());
-
-        // Enchanted Wheat
-        // +
-        NormalItem ench_wheat = new NormalItem(Material.WHEAT,
-                "<gradient:#992e7a:#d5a51b:#ffe506:#992e7a><italic:false>Зачарованная пшеница",
-                "ench_wheat",
-                99);
-        ench_wheat.setColorable();
-        ench_wheat.makeEnchGlint();
-        items.put("ench_wheat", ench_wheat.toItemStack());
-
-        // Bread
-        // +
-        NormalItem bread = new NormalItem(Material.BREAD,
-                "<gradient:#a28e63:#c9ac6f><italic:false>Хлеб",
-                "bread",
-                52);
-        bread.setEatable();
-        items.put("bread", bread.toItemStack());
-
-        // Compressed cocoa beans (ench_cocoa)
-        // +
-        NormalItem ench_beans = new NormalItem(Material.COCOA_BEANS,
-                "<gradient:#992e7a:#964b00:#c17529:#992e7a><italic:false>Зачарованные какао-бобы",
-                "ench_cocoa",
-                64);
-        ench_beans.addLore("<gray> Если держать в левой руке, то</gray>",
+        //Enchanted cocoa
+        CommonCookieItem enchantedCocoaBeans = new CommonCookieItem(
+                Items.COCOA_BEANS, "ench_cocoa",
+                "<gradient:#992e7a:#964b00:#c17529:#992e7a><italic:false>Зачарованные какао-бобы"
+        );
+        enchantedCocoaBeans.setEnchantmentGlint();
+        enchantedCocoaBeans.addLore("<gray> Если держать в левой руке, то</gray>",
                 "<gray>с помощью <color:#f79459><italic:false>Уничтожителя печенья</color><italic:true>",
                 "<gray>можно создать шоколад");
-        ench_beans.makeEnchGlint();
-        items.put("ench_cocoa", ench_beans.toItemStack());
+        registerItem(enchantedCocoaBeans);
 
-        // Baguette (baguette)
-        // +
-        NormalItem baguette = new NormalItem(Material.BREAD,
-                "<gradient:#ac7604:#f7eb91><italic:false>Багет",
-                "baguette",
-                64);
-        baguette.makeEnchGlint();
+        //Wheat
+        CommonCookieItem wheat = new CommonCookieItem(
+                Items.WHEAT, "wheat",
+                "<gradient:#d5a51b:#ffe506><italic:false>Пшеница"
+        );
+        wheat.hideItem();
+        wheat.setAmount(99);
+        registerItem(wheat);
+
+        //Enchanted wheat
+        CommonCookieItem enchantedWheat = new CommonCookieItem(
+                Items.WHEAT, "ench_wheat",
+                "<gradient:#992e7a:#d5a51b:#ffe506:#992e7a><italic:false>Зачарованная пшеница"
+        );
+        enchantedWheat.addLore("<gray> Можно сделать хлеб");
+        enchantedWheat.hideItem();
+        enchantedWheat.setAmount(99);
+        enchantedWheat.setEnchantmentGlint();
+        registerItem(enchantedWheat);
+
+        //Bread
+        CommonCookieItem bread = new CommonCookieItem(
+                Items.BREAD, "bread",
+                "<gradient:#a28e63:#c9ac6f><italic:false>Хлеб"
+        );
+        bread.setAmount(52);
+        registerItem(bread);
+
+        //Baguette
+        CommonCookieItem baguette = new CommonCookieItem(
+                Items.BREAD, "baguette",
+                "<gradient:#ac7604:#f7eb91><italic:false>Багет"
+        );
+        baguette.setEnchantmentGlint();
         baguette.addLore("<gray> Используется для создания</gray>", "<gray>финальной мотыги.");
-        items.put("baguette", baguette.toItemStack());
+        registerItem(baguette);
 
-        // Chocolate
-        // +
-        NormalItem chocolate = new NormalItem(Material.DARK_OAK_TRAPDOOR,
-                "<gradient:#884e0a:#b36810><italic:false>Шоколад",
-                "chocolate",
-                64);
+        //Chocolate
+        CommonCookieItem chocolate = new CommonCookieItem(
+                Items.DARK_OAK_TRAPDOOR, "chocolate",
+                "<gradient:#884e0a:#b36810><italic:false>Шоколад"
+        );
+        chocolate.hideItem();
         chocolate.addLore("<gray> Используется для создания</gray>", "<gray>предмета <black>???</black>.");
-        items.put("chocolate", chocolate.toItemStack());
+        registerItem(chocolate);
 
-        // Chocolate stick
-        //items.put("stick", placeholder("Палка (из шоколада)", "stick"));
-
-        // Sweet Berries
-        // +
-        NormalItem berry = new NormalItem(Material.SWEET_BERRIES,
-                "<gradient:#c80b47:#ff286c><italic:false>Сладкие ягоды",
+        //Sweet berries
+        CommonCookieItem berries = new CommonCookieItem(
+                Items.SWEET_BERRIES,
                 "berries",
-                64);
-        items.put("berries", berry.toItemStack());
+                "<gradient:#c80b47:#ff286c><italic:false>Сладкие ягоды"
+        );
+        registerItem(berries);
 
-        // Glow Berries (sweet_berries alt)
-        // +
-        NormalItem glow_berry = new NormalItem(Material.GLOW_BERRIES,
-                "<gradient:#ffb128:#ffde28:#efab0f:#f7990a:#ffb748><italic:false>Светящиеся ягоды",
+        //Farmer Armor base
+        EquipmentData equipmentData = new EquipmentData(EquipmentAssets.LEATHER);
+        equipmentData.setColor(16493613);
+        equipmentData.addLore("<gray> Можно улучшать с помощью", "<gray>тортиков на наковальне");
+
+        //Farmer Armor
+        EquipmentCookieItem farmHelmet = new EquipmentCookieItem(
+                Items.LEATHER_HELMET, "fHelmet",
+                "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Шляпа фермера",
+                equipmentData, EquipmentSlot.HEAD
+        );
+        farmHelmet.setFarmingFortune(10);
+        registerItem(farmHelmet);
+
+        EquipmentCookieItem farmChest = new EquipmentCookieItem(
+                Items.LEATHER_CHESTPLATE, "fChest",
+                "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Нагрудник фермера",
+                equipmentData, EquipmentSlot.CHEST
+        );
+        farmChest.setFarmingFortune(40);
+        registerItem(farmChest);
+
+        EquipmentCookieItem farmLeggings = new EquipmentCookieItem(
+                Items.LEATHER_LEGGINGS, "fLegs",
+                "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Штаны фермера",
+                equipmentData, EquipmentSlot.LEGS
+        );
+        farmLeggings.setFarmingFortune(25);
+        registerItem(farmLeggings);
+
+        EquipmentCookieItem farmBoots = new EquipmentCookieItem(
+                Items.LEATHER_BOOTS, "fBoots",
+                "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Ботинки фермера",
+                equipmentData, EquipmentSlot.FEET
+        );
+        farmBoots.setFarmingFortune(15);
+        registerItem(farmBoots);
+
+        //(test) healing melon
+        CommonCookieItem healMelon = new CommonCookieItem(
+                Items.GLISTERING_MELON_SLICE,
+                "heal_melon",
+                "<gradient:#ff9b00:#ff2300:#ff9b00><italic:false>Сверкающий ломтик арбуза"
+        );
+        healMelon.addLore("<gray> Пока что ничего не делает");
+        healMelon.setEatable();
+        registerItem(healMelon);
+
+        //(test) pickaxe
+        CommonCookieItem pickaxe = new CommonCookieItem(
+                Items.GOLDEN_PICKAXE,
+                "pickaxe",
+                "<gradient:#ffbd00:#ffec00><italic:false>Золотая <white>кирка"
+        );
+        pickaxe.addLore("<gray> Пока что ничего не делает.", "<gray> Скоро тут будет", "<gray> +1 удача шахтёра");
+        registerItem(pickaxe);
+
+        //Cake
+        CommonCookieItem finalCake = new CommonCookieItem(
+                Items.CAKE,
+                "final_cake",
+                "<gradient:#ece7d2:#ecdb95><italic:false>Тортик"
+        );
+        finalCake.setEnchantmentGlint();
+        registerItem(finalCake);
+
+        //Cookie compactor
+        CommonCookieItem cookieCompactor = new CommonCookieItem(
+                Items.PISTON,
+                "cookie_crafter",
+                "<italic:false>Сборщик печенья"
+        );
+        cookieCompactor.addLore("<gray> Если положить в левую руку, позволяет создавать</gray>", "<gray> блок печенья из 512 чар. печенья.</gray>");
+        cookieCompactor.hideItem();
+        registerItem(cookieCompactor);
+
+        CommonCookieItem cookieBlock = new CommonCookieItem(
+                Items.RESIN_BLOCK,
+                "cookie_block",
+                "<gradient:#992e7a:#c66618:#f57b18:#992e7a><italic:false>Блок зачарованного печенья"
+        );
+        cookieBlock.setAmount(99);
+        cookieBlock.setEnchantmentGlint();
+        registerItem(cookieBlock);
+
+        //Glow berries
+        CommonCookieItem glowBerries = new CommonCookieItem(
+                Items.GLOW_BERRIES,
                 "glow_berries",
-                64);
-        glow_berry.addLore("<gray> Создано эпической мотыгой",
+                "<gradient:#ffb128:#ffde28:#efab0f:#f7990a:#ffb748><italic:false>Светящиеся ягоды"
+        );
+        glowBerries.addLore("<gray> Создано эпической мотыгой",
                 "<gray> Альтернатива сладким ягодам");
-        items.put("glow_berries", glow_berry.toItemStack());
+        registerItem(glowBerries);
 
-        // Pumpkin pie (cookie alt)
-        // +
-        NormalItem pie = new NormalItem(Material.PUMPKIN_PIE,
-                "<gradient:#ffd96c:#ff8700:#ffd96c><italic:false>Тыквенный пирог",
+        //Pumpkin pie
+        CommonCookieItem pumpkinPie = new CommonCookieItem(
+                Items.PUMPKIN_PIE,
                 "pie",
-                64);
-        pie.addLore("<gray> Создано эпической мотыгой",
+                "<gradient:#ffd96c:#ff8700:#ffd96c><italic:false>Тыквенный пирог"
+        );
+        pumpkinPie.addLore("<gray> Создано эпической мотыгой",
                 "<gray> Альтернатива печенью");
-        items.put("pie", pie.toItemStack());
+        registerItem(pumpkinPie);
 
-        // Pumpkin
-        // +
-        NormalItem pumpkin = new NormalItem(Material.PUMPKIN,
-                "<gradient:#ff8f00:#ff7000><italic:false>Тыква",
+        //Pumpkin
+        CommonCookieItem pumpkin = new CommonCookieItem(
+                Items.PUMPKIN,
                 "pumpkin",
-                64);
+                "<gradient:#ff8f00:#ff7000><italic:false>Тыква"
+        );
+        pumpkin.hideItem();
+        pumpkin.setAmount(64);
         pumpkin.addLore("<gray> Создано эпической мотыгой",
                 "<gray> Альтернатива пшенице и какао-бобам");
-        pumpkin.setColorable();
-        items.put("pumpkin", pumpkin.toItemStack());
+        registerItem(pumpkin);
 
-        //exp
-        EquipmentItem fhelmet = new EquipmentItem(Material.LEATHER_HELMET,
-                EquipmentSlot.HEAD,
-                EquipmentAssets.LEATHER,
-                "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Шляпа фермера",
-                "fHelmet");
-        fhelmet.setFarmingFortune(10);
-        fhelmet.addLore("<gray><italic:false> Можно улучшать с помощью тортиков");
-        fhelmet.setDyedColor(16493613);
-
-        EquipmentItem fChest = new EquipmentItem(fhelmet, Material.LEATHER_CHESTPLATE, EquipmentSlot.CHEST,
-                "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Нагрудник фермера", "fChest");
-        fChest.setFarmingFortune(40);
-
-        EquipmentItem fLegs = new EquipmentItem(fhelmet, Material.LEATHER_LEGGINGS, EquipmentSlot.LEGS,
-                "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Штаны фермера", "fLegs");
-        fLegs.setFarmingFortune(25);
-
-        EquipmentItem fBoots = new EquipmentItem(fhelmet, Material.LEATHER_BOOTS, EquipmentSlot.FEET,
-                "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Ботинки фермера", "fBoots");
-        fBoots.setFarmingFortune(15);
-
-        items.put("fHelmet", fhelmet.toItemStack());
-        items.put("fChest", fChest.toItemStack());
-        items.put("fLegs", fLegs.toItemStack());
-        items.put("fBoots", fBoots.toItemStack());
-
-        // Healing melon
-        items.put("heal_melon", placeholder("[combat] Healing melon", "heal_melon"));
-
-        // Pickaxe
-        items.put("miningPart_pickaxe", placeholder("[mining] Кирка", "miningPart_pickaxe"));
-
-        // Cookie part final item
-        NormalItem cake = new NormalItem(Material.CAKE,
-                "<gradient:#ece7d2:#ecdb95><italic:false>Тортик",
-                "final_cake",
-                1);
-        cake.makeEnchGlint();
-        items.put("final_cake", cake.toItemStack());
-
-        NormalItem voidConverter = new NormalItem(Material.PISTON,
-                "<italic:false>Сборщик печенья",
-                "cookie_crafter",
-                1);
-        voidConverter.addLore("<gray> Когда в левой руке, позволяет создавать</gray>", "<gray> блок печенья из 512 чар. печенья.</gray>");
-        voidConverter.setColorable();
-        items.put("cookie_crafter", voidConverter.toItemStack());
-
-        NormalItem voidCookie = new NormalItem(Material.RESIN_BLOCK,
-                "<gradient:#992e7a:#c66618:#f57b18:#992e7a><italic:false>Блок зачарованного печенья",
-                "cookie_block",
-                99);
-        voidCookie.makeEnchGlint();
-        items.put("cookie_block", voidCookie.toItemStack());
-
-
-
-
-
+        MinecraftServer.getServer().sendSystemMessage(Component.literal("[CookieClicker] loaded items: " + itemsToLoad.size()));
     }
 
-    public ItemStack getNMS(String str) {
-        return items.get(str).copy();
-    }
-    public Collection<ItemStack> allItems() {
-        return items.values();
+    public ItemStack getNMS(String tag) {
+        return itemsToLoad.getOrDefault(tag, emptyItem).toNMS().copy();
     }
 
-    public boolean has(String tag) {
-        return items.containsKey(tag);
+    public boolean has(String itemTag) {
+        return itemsToLoad.containsKey(itemTag);
     }
 
     public ItemStack getWithAmount(String itemName, Integer amount) {
-        return items.get(itemName).copyWithCount(amount);
+        return itemsToLoad.getOrDefault(itemName, emptyItem).toNMS().copyWithCount(amount);
     }
 
-    @Deprecated
-    private ItemStack placeholder(String name, String persistentData) {
-        org.bukkit.inventory.ItemStack pholder = new org.bukkit.inventory.ItemStack(Material.BARRIER);
-        ItemMeta meta = pholder.getItemMeta();
-        meta.displayName(MiniMessage.miniMessage().deserialize("<gradient:#a50404:#f34b4b><italic:false>Предмет"));
-        meta.lore(List.of(Component.text(name), Component.text(persistentData)));
-        meta.getPersistentDataContainer().set(ClickerItems.itemTagKey, PersistentDataType.STRING, persistentData);
-        pholder.setItemMeta(meta);
-        return CraftItemStack.asNMSCopy(pholder);
+    public Collection<CookieItemStack> allItemsRaw() {
+        return itemsToLoad.values();
     }
 }
