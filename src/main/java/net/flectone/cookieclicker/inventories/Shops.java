@@ -5,35 +5,32 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.CompactItems;
 import net.flectone.cookieclicker.items.VillagerTrades;
-import net.flectone.cookieclicker.utility.CCConversionUtils;
-import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
+import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 
 @Singleton
 public class Shops {
     private final ContainerManager containerManager;
     private final VillagerTrades villagerTrades;
-    private final CCConversionUtils converter;
     private final CompactItems compactItems;
 
     @Inject
-    public Shops(ContainerManager containerManager, VillagerTrades villagerTrades, CCConversionUtils converter,
+    public Shops(ContainerManager containerManager, VillagerTrades villagerTrades,
                  CompactItems compactItems) {
         this.containerManager = containerManager;
         this.villagerTrades = villagerTrades;
-        this.converter = converter;
         this.compactItems = compactItems;
     }
 
-    public void openAnyShop(CookiePlayer cookiePlayer, String traderType) {
-        containerManager.openContainer(cookiePlayer, villagerTrades.createAnyShop(traderType));
+    public void openAnyShop(ServerCookiePlayer serverCookiePlayer, String traderType) {
+        containerManager.openContainer(serverCookiePlayer, villagerTrades.createAnyShop(traderType));
     }
 
-    public void buyItem(CookiePlayer cookiePlayer, WrapperPlayClientClickWindow packet) {
+    public void buyItem(ServerCookiePlayer serverCookiePlayer, WrapperPlayClientClickWindow packet) {
         int slot = packet.getSlot();
 
-        ClickerContainer container = containerManager.getOpenedContainer(cookiePlayer.getUser());
+        ClickerContainer container = containerManager.getOpenedContainer(serverCookiePlayer.getUser());
 
-        containerManager.cancelClick(cookiePlayer, container, slot, packet.getWindowClickType());
+        containerManager.cancelClick(serverCookiePlayer, container, slot, packet.getWindowClickType());
 
         if (container.getContainerItems().size() - 1 < slot) return;
 
@@ -42,7 +39,7 @@ public class Shops {
         if (slot < 9 || villagerTrades.itemsLength(traderType) <= slot - 9)
             return;
 
-        compactItems.compact(cookiePlayer.getPlayer().getInventory(),
+        compactItems.compact(serverCookiePlayer.getPlayer().getInventory(),
                 villagerTrades.getPriceItem(traderType, slot - 9),
                 villagerTrades.getItem(traderType, slot - 9),
                 villagerTrades.getPriceCount(traderType, slot - 9), 1);

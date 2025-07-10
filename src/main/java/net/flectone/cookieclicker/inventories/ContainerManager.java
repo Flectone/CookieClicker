@@ -6,7 +6,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.utility.CCConversionUtils;
-import net.flectone.cookieclicker.utility.CCobjects.CookiePlayer;
+import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.MinecraftServer;
@@ -39,9 +39,8 @@ public class ContainerManager {
         setOpenedContainer(uuid, container);
     }
 
-    public Integer closeContainer(User user) {
+    public Integer closeContainer(UUID uuid) {
         int containerId = 0;
-        UUID uuid = user.getUUID();
         if (!openedContainers.isEmpty() && openedContainers.containsKey(uuid)) {
             containerId = openedContainers.get(uuid).getWindowId();
             openedContainers.remove(uuid);
@@ -57,8 +56,8 @@ public class ContainerManager {
         return getOpenedContainer(user.getUUID());
     }
 
-    public ClickerContainer getOpenedContainer(CookiePlayer cookiePlayer) {
-        return getOpenedContainer(cookiePlayer.getUuid());
+    public ClickerContainer getOpenedContainer(ServerCookiePlayer serverCookiePlayer) {
+        return getOpenedContainer(serverCookiePlayer.getUuid());
     }
 
     public ClickerContainer getOpenedContainer(UUID uuid) {
@@ -67,74 +66,76 @@ public class ContainerManager {
         return openedContainers.get(uuid);
     }
 
-    public void openContainer(CookiePlayer cookiePlayer, ClickerContainer container) {
+    public void openContainer(ServerCookiePlayer serverCookiePlayer, ClickerContainer container) {
         WrapperPlayServerOpenWindow openWindowPacket = new WrapperPlayServerOpenWindow(container.getWindowId(),
                 container.getWindowType(),
                 MiniMessage.miniMessage().deserialize(container.getTitle()));
 
-        setOpenedContainer(cookiePlayer.getUuid(), container);
-        cookiePlayer.sendPEpacket(openWindowPacket, true);
+        setOpenedContainer(serverCookiePlayer.getUuid(), container);
+        serverCookiePlayer.sendPEpacket(openWindowPacket, true);
 
         List<com.github.retrooper.packetevents.protocol.item.ItemStack> convertedList = new ArrayList<>();
         container.getContainerItems().forEach(itemStack -> {
             convertedList.add(converter.fromMinecraftStack(itemStack, MinecraftServer.getServer().registryAccess()));
         });
 
-        cookiePlayer.sendPEpacket(new WrapperPlayServerWindowItems(container.getWindowId(), 1, convertedList, null));
+        serverCookiePlayer.sendPEpacket(new WrapperPlayServerWindowItems(container.getWindowId(), 1, convertedList, null));
 
 //        ClientboundContainerSetContentPacket packet = new ClientboundContainerSetContentPacket(container.getWindowId(),
 //                1, container.getContainerItems(), new net.minecraft.world.item.ItemStack(Items.AIR));
 //        cookiePlayer.sendNMSpacket(packet);
     }
 
-    private void setSlot(CookiePlayer cookiePlayer, ClickerContainer container, Integer slot, ItemStack itemStack, boolean isPlayerInventory) {
+    private void setSlot(ServerCookiePlayer serverCookiePlayer, ClickerContainer container, Integer slot, ItemStack itemStack, boolean isPlayerInventory) {
         com.github.retrooper.packetevents.protocol.item.ItemStack convertedStack = converter.fromMinecraftStack(itemStack, MinecraftServer.getServer().registryAccess());
 
         if (slot == -1) {
-            cookiePlayer.sendPEpacket(new WrapperPlayServerSetCursorItem(convertedStack));
+            serverCookiePlayer.sendPEpacket(new WrapperPlayServerSetCursorItem(convertedStack));
             return;
         }
 
-        cookiePlayer.sendPEpacket(isPlayerInventory
+        serverCookiePlayer.sendPEpacket(isPlayerInventory
                     ? new WrapperPlayServerSetPlayerInventory(slot, convertedStack)
-                    : new WrapperPlayServerSetSlot(container.getWindowId(), 1, slot, convertedStack));
+                    : new WrapperPlayServerSetSlot(container.getWindowId(), 1, slot, convertedStack),
+                true
+        );
     }
 
-    public void setContainerSlot(CookiePlayer cookiePlayer, ClickerContainer container, Integer slot, ItemStack itemStack) {
-        setSlot(cookiePlayer, container, slot, itemStack, false);
+    public void setContainerSlot(ServerCookiePlayer serverCookiePlayer, ClickerContainer container, Integer slot, ItemStack itemStack) {
+        setSlot(serverCookiePlayer, container, slot, itemStack, false);
     }
 
-    public void setPlayerSlot(CookiePlayer cookiePlayer, Integer slot, ItemStack itemStack) {
-        setSlot(cookiePlayer, null, slot, itemStack, true);
+    public void setPlayerSlot(ServerCookiePlayer serverCookiePlayer, Integer slot, ItemStack itemStack) {
+        setSlot(serverCookiePlayer, null, slot, itemStack, true);
     }
 
-    public void updatePlayerInventory(CookiePlayer cookiePlayer) {
+    public void updatePlayerInventory(ServerCookiePlayer serverCookiePlayer) {
         for (int i = 0; i < 36; i++) {
-            setPlayerSlot(cookiePlayer, i, cookiePlayer.getPlayer().getInventory().getItem(i));
+            setPlayerSlot(serverCookiePlayer, i, serverCookiePlayer.getPlayer().getInventory().getItem(i));
         }
         //почему слот 40 - левая рука, я хз, должен быть слот 45
-        setPlayerSlot(cookiePlayer, 40, cookiePlayer.getPlayer().getItemInHand(InteractionHand.OFF_HAND));
+        setPlayerSlot(serverCookiePlayer, 40, serverCookiePlayer.getPlayer().getItemInHand(InteractionHand.OFF_HAND));
     }
 
-    public void updateContainer(CookiePlayer cookiePlayer, ClickerContainer container) {
+    public void updateContainer(ServerCookiePlayer serverCookiePlayer, ClickerContainer container) {
         NonNullList<ItemStack> itemsInContainer = container.getContainerItems();
         for (int slot = 0; slot < itemsInContainer.size(); slot++) {
-            setContainerSlot(cookiePlayer, container,
+            setContainerSlot(serverCookiePlayer, container,
                     slot, itemsInContainer.get(slot));
         }
     }
 
-    public void cancelClick(CookiePlayer cookiePlayer, ClickerContainer container, Integer slot, WrapperPlayClientClickWindow.WindowClickType clickType) {
+    public void cancelClick(ServerCookiePlayer serverCookiePlayer, ClickerContainer container, Integer slot, WrapperPlayClientClickWindow.WindowClickType clickType) {
         if (slot < container.getContainerItems().size()) {
-            setContainerSlot(cookiePlayer, container, slot, container.getContainerItems().get(slot));
+            setContainerSlot(serverCookiePlayer, container, slot, container.getContainerItems().get(slot));
         }
-        setContainerSlot(cookiePlayer, container, -1, new ItemStack(Items.AIR));
+        setContainerSlot(serverCookiePlayer, container, -1, new ItemStack(Items.AIR));
 
-        updatePlayerInventory(cookiePlayer);
+        updatePlayerInventory(serverCookiePlayer);
 
         //если шифт клик
         if (clickType.equals(WrapperPlayClientClickWindow.WindowClickType.QUICK_MOVE)) {
-            updateContainer(cookiePlayer, container);
+            updateContainer(serverCookiePlayer, container);
         }
     }
 }
