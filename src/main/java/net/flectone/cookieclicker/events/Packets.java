@@ -57,7 +57,6 @@ public class Packets implements PacketListener {
 
     @Override
     public void onUserLogin(UserLoginEvent event) {
-        System.out.println("кто-то зашёл");
         connectedPlayers.processPlayerJoin(event.getUser().getUUID(), event.getUser().getName());
     }
 

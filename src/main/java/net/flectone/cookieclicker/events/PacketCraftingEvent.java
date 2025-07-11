@@ -85,7 +85,6 @@ public class PacketCraftingEvent {
 
         }
 
-        System.out.println("done crafting");
         ItemStack resultItem = loadedItems.getNMS(recipe.getResultTag());
 
         if (windowClickType.equals(WrapperPlayClientClickWindow.WindowClickType.QUICK_MOVE)) {

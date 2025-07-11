@@ -83,7 +83,6 @@ public class ConnectedPlayers {
             statement.setString(4, cookiePlayer.getUuid().toString());
 
             statement.executeUpdate();
-            MinecraftServer.getServer().sendSystemMessage(Component.literal("база данных обновлена!"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
