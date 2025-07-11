@@ -27,8 +27,8 @@ public class PacketUtils {
     private final CCConversionUtils converter;
 
     @Inject
-    public PacketUtils(CCConversionUtils CCConverter) {
-        this.converter = CCConverter;
+    public PacketUtils(CCConversionUtils converter) {
+        this.converter = converter;
     }
 
     public void spawnItem(User user, com.github.retrooper.packetevents.protocol.world.Location location, net.minecraft.world.item.ItemStack item) {
@@ -82,11 +82,12 @@ public class PacketUtils {
 
     public void playSound(User user, Sound sound, Float volume, Float pitch) {
         net.minecraft.world.entity.player.Player player = converter.userToNMS(user);
-        Vector3i position = new Vector3i((int) player.getX(), (int) player.getY(), (int) player.getZ());
+
+        Vector3i position = new Vector3i((int) (player.getX() * 8), (int) (player.getY() * 8), (int) (player.getZ() * 8));
 
         WrapperPlayServerSoundEffect soundPacket = new WrapperPlayServerSoundEffect(sound,
                 SoundCategory.MASTER,
-                position.multiply(8), // надо умножать координаты на 8
+                position,
                 volume, pitch);
 
 
