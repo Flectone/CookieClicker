@@ -37,7 +37,7 @@ public final class CookieClicker extends JavaPlugin {
 
         PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(Packets.class), PacketListenerPriority.NORMAL);
         injector.getInstance(ItemManager.class).load();
-        injector.getInstance(VillagerTrades.class).loadSellingItems();
+        injector.getInstance(VillagerTrades.class).loadSellingItems(this.getLogger());
         injector.getInstance(Recipes.class).addRecipes();
 
         Path projectPath = plugin.getDataFolder().toPath();
