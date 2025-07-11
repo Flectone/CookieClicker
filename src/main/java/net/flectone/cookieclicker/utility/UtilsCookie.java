@@ -4,22 +4,15 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.flectone.cookieclicker.items.ItemManager;
-import net.flectone.cookieclicker.utility.CCobjects.Items.ClickerItems;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.ItemLore;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Singleton
 public class UtilsCookie {
@@ -96,35 +89,35 @@ public class UtilsCookie {
     //Короче когда буду обновлять
     //Мб в классе сделать метод toComponentMap, а затем полученную мапу
     //применить на предмет
-    public void updateStats(net.minecraft.world.item.ItemStack item) {
-        if (item.getItem().equals(Items.AIR)) return;
-        //чтобы мотыги и книги можно было нормально чарить
-        //да и вообще надо убрать это повышение стоимости
-        item.applyComponents(DataComponentPatch.builder()
-                .set(DataComponents.REPAIR_COST, 0)
-                .build()
-        );
-        if (getFullFortune(item) == 0) return;
-        ItemLore itemLore = item.getComponents().get(DataComponents.LORE);
-        List<net.minecraft.network.chat.Component> lores = new ArrayList<>();
-        net.minecraft.network.chat.Component stat = conversionUtils.convertToNMSComponent(
-                MiniMessage.miniMessage().deserialize("<blue><italic:false>+" + getFullFortune(item) + " Удача фермера"));
-        //просто написать lores = itemLore.lines() нельзя
-        //потом лор везде меняется, в каждом предмете
-        if (itemLore != null) lores.addAll(itemLore.lines());
-
-        if (lores.isEmpty()) {
-            lores.add(conversionUtils.convertToNMSComponent(MiniMessage.miniMessage().deserialize("<gray><italic:false>Когда в ведущей руке:")));
-        }
-        if (itemTagsUtility.getBaseFortune(item) == 0) {
-            lores.add(stat);
-            itemTagsUtility.setStat(item, ClickerItems.fortuneTag, -1);
-        }
-        else
-            lores.set(lores.size()-1, stat);
-        item.applyComponents(DataComponentPatch.builder()
-                        .set(DataComponents.LORE, new ItemLore(lores))
-                        .build()
-        );
-    }
+//    public void updateStats(net.minecraft.world.item.ItemStack item) {
+//        if (item.getItem().equals(Items.AIR)) return;
+//        //чтобы мотыги и книги можно было нормально чарить
+//        //да и вообще надо убрать это повышение стоимости
+//        item.applyComponents(DataComponentPatch.builder()
+//                .set(DataComponents.REPAIR_COST, 0)
+//                .build()
+//        );
+//        if (getFullFortune(item) == 0) return;
+//        ItemLore itemLore = item.getComponents().get(DataComponents.LORE);
+//        List<net.minecraft.network.chat.Component> lores = new ArrayList<>();
+//        net.minecraft.network.chat.Component stat = conversionUtils.convertToNMSComponent(
+//                MiniMessage.miniMessage().deserialize("<blue><italic:false>+" + getFullFortune(item) + " Удача фермера"));
+//        //просто написать lores = itemLore.lines() нельзя
+//        //потом лор везде меняется, в каждом предмете
+//        if (itemLore != null) lores.addAll(itemLore.lines());
+//
+//        if (lores.isEmpty()) {
+//            lores.add(conversionUtils.convertToNMSComponent(MiniMessage.miniMessage().deserialize("<gray><italic:false>Когда в ведущей руке:")));
+//        }
+//        if (itemTagsUtility.getBaseFortune(item) == 0) {
+//            lores.add(stat);
+//            itemTagsUtility.setStat(item, CookieItems.OLD_FORTUNE_KEY, -1);
+//        }
+//        else
+//            lores.set(lores.size()-1, stat);
+//        item.applyComponents(DataComponentPatch.builder()
+//                        .set(DataComponents.LORE, new ItemLore(lores))
+//                        .build()
+//        );
+//    }
 }

@@ -4,18 +4,18 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.cookieclicker.inventories.ClickerContainer;
+import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
 import net.flectone.cookieclicker.utility.CCConversionUtils;
 import net.flectone.cookieclicker.utility.CCobjects.CookieTrader;
-import net.flectone.cookieclicker.utility.CCobjects.Items.NormalItem;
 import net.flectone.cookieclicker.utility.CCobjects.TradeItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,15 +72,14 @@ public class VillagerTrades {
     private ClickerContainer createBasicShop(Integer windowType, String customData) {
         ClickerContainer basicContainer = new ClickerContainer(ClickerContainer.generateId(),
                 windowType, customData);
-        NormalItem upperItem = new NormalItem(Material.WHITE_STAINED_GLASS_PANE,
-                "<gradient:#ffffff:#cccccc><italic:false>Здесь вы можете купить",
-                "none", 1);
+        CommonCookieItem upperItem = new CommonCookieItem(Items.WHITE_STAINED_GLASS_PANE, "none",
+                "<gradient:#ffffff:#cccccc><italic:false>Здесь вы можете купить");
         upperItem.addLore("<gradient:#ffffff:#cccccc><italic:false>различные вещи");
 
         basicContainer.setTitle("торговля жесть в шоке все");
 
         for (int i = 0; i < 9; i++) {
-            basicContainer.setItem(i, upperItem.toItemStack());
+            basicContainer.setItem(i, upperItem.toMinecraftStack());
         }
 
         int slot = 9;

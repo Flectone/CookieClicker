@@ -1,7 +1,7 @@
 package net.flectone.cookieclicker.utility;
 
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.utility.CCobjects.Items.ClickerItems;
+import net.flectone.cookieclicker.items.itemstacks.base.CookieItems;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -34,12 +34,9 @@ public class ItemTagsUtility {
 
 
     //Получить фарминг фортуну только с данных, чары не учитываются
-    public Integer getBaseFortune(ItemStack item) {
-        return getStat(item, ClickerItems.fortuneTag);
-    }
     //nms version
     public Integer getBaseFortune(net.minecraft.world.item.ItemStack item) {
-        return getStat(item, ClickerItems.fortuneTag);
+        return getStat(item, CookieItems.OLD_FORTUNE_KEY);
     }
 
     public String getAbility(ItemStack itemNotNMS) {
