@@ -24,7 +24,7 @@ public class ServerCookiePlayer extends CookiePlayer {
 
         while (currentXP <= 0) {
             lvl++;
-            newXp = (int) ((Math.log(lvl)/Math.log(1.1d)) + 20 * lvl + 1500);
+            newXp = (int) ((Math.log(lvl)/Math.log(1.1d)) + 50 * lvl + 150000);
             currentXP = newXp - Math.abs(currentXP);
         }
         remainingXp = currentXP;

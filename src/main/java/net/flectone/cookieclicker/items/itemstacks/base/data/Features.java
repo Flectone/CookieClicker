@@ -10,45 +10,36 @@ import net.flectone.cookieclicker.items.itemstacks.base.CookieItems;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 public class Features {
     //тег предмета
-    private final String itemTag;
+    private final ItemTag itemTag;
     @Setter //способность
     public CookieAbility ability;
     //статы
-    private final HashMap<StatType, Stat> stats = new HashMap<>();
+    private final Map<StatType, Stat> stats = new EnumMap<>(StatType.class);
     //категория, по сути нужна только для лора
     private final ToolType category;
 
-    public Features(String itemTag, ToolType category) {
+    public Features(ItemTag itemTag, ToolType category) {
         this.itemTag = itemTag;
         this.category = category;
     }
 
     @ApiStatus.Experimental
     public Features(CompoundTag tag) {
-        if (tag.isEmpty()) {
-            this.itemTag = "none";
-            this.category = ToolType.NONE;
-        } else {
-            this.category = ToolType.from(tag.getString("category"));
-            this.itemTag = tag.getString(CookieItems.ITEM_TAG_KEY);
+        this.category = ToolType.from(tag.getString("category").orElse(ToolType.NONE.getType()));
+        this.itemTag = ItemTag.fromString(tag.getString(CookieItems.ITEM_TAG_KEY).orElse("none"));
 
-            //способность
-            if (tag.contains("ability")) ability = CookieAbility.from(tag.getString("ability"));
+        //способность
+        tag.getString(CookieItems.ABILITY_KEY).ifPresent(s -> ability = CookieAbility.from(s));
 
-            //все статы, если есть такие
-            //в списке LOADED_STATS есть статы, которые типо сейчас используются
-            CookieItems.LOADED_STATS.forEach(stat -> {
-                if (tag.contains(stat)) stats.put(StatType.from(stat), new Stat(tag.getInt(stat)));
-            });
-        }
+        //все статы, если есть такие
+        //в списке LOADED_STATS есть статы, которые типо сейчас используются
+        CookieItems.LOADED_STATS.forEach(stat -> tag.getInt(stat)
+                .ifPresent(integer -> stats.put(StatType.from(stat), new Stat(integer))));
     }
 
     public void applyStat(StatType statType, Integer value) {
@@ -70,7 +61,7 @@ public class Features {
     public CompoundTag createCompoundTag() {
         CompoundTag compoundTag = new CompoundTag();
         //Добавление тега предмета
-        compoundTag.putString(CookieItems.ITEM_TAG_KEY, itemTag);
+        compoundTag.putString(CookieItems.ITEM_TAG_KEY, itemTag.getRealTag());
         //Добавление категории
         compoundTag.putString(CookieItems.ITEM_CATEGORY_KEY, category.getType());
 
@@ -81,9 +72,7 @@ public class Features {
 
         //Добавление всех статов, какие есть
         if (!stats.isEmpty()) {
-            stats.entrySet().forEach(entry -> {
-                compoundTag.putInt(entry.getKey().getTag(), entry.getValue().getBaseValue());
-            });
+            stats.forEach((key, value) -> compoundTag.putInt(key.getTag(), value.getBaseValue()));
         }
 
         CompoundTag createdTag = new CompoundTag();

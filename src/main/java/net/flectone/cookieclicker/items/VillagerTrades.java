@@ -2,8 +2,9 @@ package net.flectone.cookieclicker.items;
 
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.cookieclicker.utility.CCobjects.CookieTrader;
-import net.flectone.cookieclicker.utility.CCobjects.TradeItem;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
+import net.flectone.cookieclicker.items.trades.CookieTrader;
+import net.flectone.cookieclicker.items.trades.TradeItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,26 +18,26 @@ public class VillagerTrades {
 
     public void loadSellingItems(Logger information) {
         CookieTrader farmer = new CookieTrader("trading_farm");
-        farmer.addTrade(new TradeItem("wood_hoe")
-                .withPrice("ench_cookie", 10));
-        farmer.addTrade(new TradeItem("destroyer")
-                .withPrice("ench_cookie", 100));
-        farmer.addTrade(new TradeItem("stone_hoe")
-                .withPrice("ench_cookie", 30));
-        farmer.addTrade(new TradeItem("rose_bush")
-                .withPrice("baguette", 60));
+        farmer.addTrade(new TradeItem(ItemTag.WOODEN_HOE)
+                .withPrice(ItemTag.ENCHANTED_COOKIE, 10));
+        farmer.addTrade(new TradeItem(ItemTag.STONE_HOE)
+                .withPrice(ItemTag.ENCHANTED_COOKIE, 100));
+        farmer.addTrade(new TradeItem(ItemTag.STONE_HOE)
+                .withPrice(ItemTag.ENCHANTED_COOKIE, 30));
+        farmer.addTrade(new TradeItem(ItemTag.ROSE_BUSH_HOE)
+                .withPrice(ItemTag.BAGUETTE, 60));
 
         registerTrader(farmer);
 
         CookieTrader armorer = new CookieTrader("trading_armorer");
-        armorer.addTrade(new TradeItem("fHelmet")
-                .withPrice("ench_cookie", 450));
-        armorer.addTrade(new TradeItem("fChest")
-                .withPrice("berries", 300));
-        armorer.addTrade(new TradeItem("fLegs")
-                .withPrice("baguette", 150));
-        armorer.addTrade(new TradeItem("fBoots")
-                .withPrice("ench_cocoa", 250));
+        armorer.addTrade(new TradeItem(ItemTag.FARMER_HELMET)
+                .withPrice(ItemTag.ENCHANTED_COOKIE, 450));
+        armorer.addTrade(new TradeItem(ItemTag.FARMER_CHESTPLATE)
+                .withPrice(ItemTag.SWEET_BERRIES, 300));
+        armorer.addTrade(new TradeItem(ItemTag.FARMER_LEGGINGS)
+                .withPrice(ItemTag.BAGUETTE, 150));
+        armorer.addTrade(new TradeItem(ItemTag.FARMER_BOOTS)
+                .withPrice(ItemTag.ENCHANTED_COCOA_BEANS, 250));
 
         registerTrader(armorer);
 
@@ -58,11 +59,11 @@ public class VillagerTrades {
         return getShopItems(traderType).size();
     }
 
-    public String getItem(String traderType, Integer num) {
+    public ItemTag getItem(String traderType, Integer num) {
         return getShopItems(traderType).get(num).getSellingItemTag();
     }
 
-    public String getPriceItem(String traderType, Integer num) {
+    public ItemTag getPriceItem(String traderType, Integer num) {
         return getShopItems(traderType).get(num).getPrice().getKey();
     }
 

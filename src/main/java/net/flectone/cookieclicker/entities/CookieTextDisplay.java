@@ -18,8 +18,8 @@ public class CookieTextDisplay extends CookieEntity {
 
     public void setText(String text) {
         if (!entityType.equals(EntityTypes.TEXT_DISPLAY)) return;
-        EntityData textData = new EntityData(23, EntityDataTypes.ADV_COMPONENT, MiniMessage.miniMessage().deserialize(text));
-        EntityData billboard = new EntityData(15, EntityDataTypes.BYTE,  (byte) 3);
+        EntityData<?> textData = new EntityData<>(23, EntityDataTypes.ADV_COMPONENT, MiniMessage.miniMessage().deserialize(text));
+        EntityData<?> billboard = new EntityData<>(15, EntityDataTypes.BYTE,  (byte) 3);
         entityData.add(textData);
         entityData.add(billboard);
     }

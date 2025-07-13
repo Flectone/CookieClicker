@@ -8,6 +8,7 @@ import net.flectone.cookieclicker.items.itemstacks.EquipmentCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.HoeCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItemStack;
 import net.flectone.cookieclicker.items.itemstacks.base.data.EquipmentData;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -24,25 +25,25 @@ public class ItemManager {
 
     private final CommonCookieItem emptyItem = new CommonCookieItem(
             Items.STRUCTURE_VOID,
-            "none",
+            ItemTag.EMPTY,
             "Этого предмета не существует"
     );
 
     private void registerItem(CookieItemStack item) {
-        itemsToLoad.put(item.getItemTag(), item);
+        itemsToLoad.put(item.getItemTag().getRealTag(), item);
     }
 
     public void load() {
         //cookie
         CommonCookieItem cookie = new CommonCookieItem(
-                Items.COOKIE, "cookie",
+                Items.COOKIE, ItemTag.COOKIE,
                 "<gradient:#ff8009:#ffdd09><italic:false>Печенье");
         cookie.setAmount(99);
         registerItem(cookie);
 
         //Enchanted Cookie
         CommonCookieItem enchantedCookie = new CommonCookieItem(
-                Items.COOKIE, "ench_cookie",
+                Items.COOKIE, ItemTag.ENCHANTED_COOKIE,
                 "<gradient:#992e7a:#ff8009:#992e7a><italic:false>Зачарованное печенье"
         );
         enchantedCookie.setAmount(64);
@@ -52,13 +53,13 @@ public class ItemManager {
         registerItem(enchantedCookie);
 
         //Enchanted book
-        CookieEnchantmentBook cookieEnchantmentBook = new CookieEnchantmentBook("ench_book");
+        CookieEnchantmentBook cookieEnchantmentBook = new CookieEnchantmentBook(ItemTag.BOOK_COOKIE_BOOST);
         cookieEnchantmentBook.setStoredEnchantment("Cookie Boost");
         registerItem(cookieEnchantmentBook);
 
         //Wood hoe
         HoeCookieItem woodenHoe = new HoeCookieItem(
-                Items.WOODEN_HOE, "wood_hoe",
+                Items.WOODEN_HOE, ItemTag.WOODEN_HOE,
                 "<white><italic:false>Деревянная мотыга"
         );
         woodenHoe.setFarmingFortune(1);
@@ -66,7 +67,7 @@ public class ItemManager {
 
         //Stone hoe
         HoeCookieItem stoneHoe = new HoeCookieItem(
-                Items.STONE_HOE, "stone_hoe",
+                Items.STONE_HOE, ItemTag.STONE_HOE,
                 "<gradient:#535351:#878781><italic:false>Каменная <white>мотыга"
         );
         stoneHoe.setFarmingFortune(2);
@@ -74,7 +75,7 @@ public class ItemManager {
 
         //Destroyer
         HoeCookieItem destroyer = new HoeCookieItem(
-                Items.NETHERITE_HOE, "destroyer",
+                Items.NETHERITE_HOE, ItemTag.COOKIE_DESTROYER_HOE,
                 "<#f79459><italic:false>Уничтожитель печенья"
         );
         destroyer.setAbility(CookieAbility.DESTROYER);
@@ -82,7 +83,7 @@ public class ItemManager {
 
         //Rose bush
         HoeCookieItem roseBush = new HoeCookieItem(
-                Items.ROSE_BUSH, "rose_bush",
+                Items.ROSE_BUSH, ItemTag.ROSE_BUSH_HOE,
                 "<gradient:#e16953:#f7b8ac><italic:false>Розовый (или ягодный) <dark_green>куст"
         );
         roseBush.setAbility(CookieAbility.ROSE_BUSH);
@@ -91,7 +92,7 @@ public class ItemManager {
 
         //Epic hoe
         HoeCookieItem epicHoe = new HoeCookieItem(
-                Items.DIAMOND_HOE, "epic_hoe",
+                Items.DIAMOND_HOE, ItemTag.EPIC_HOE,
                 "<gradient:#9e29ff:#c44dff><italic:false>Эпическая мотыга"
         );
         epicHoe.addLore("<gray> Чем дольше вы кликаете, тем больше печенья получите");
@@ -101,7 +102,7 @@ public class ItemManager {
 
         //Legendary hoe
         HoeCookieItem legHoe = new HoeCookieItem(
-                Items.GOLDEN_HOE, "leg_hoe",
+                Items.GOLDEN_HOE, ItemTag.LEGENDARY_HOE,
                 "<gradient:#790dbf:#ffae00:#ffae00:#d27f16:#d27f16:#790dbf><italic:false>Легендарная мотыга"
         );
         legHoe.addLore("<gray> Работает в двух режимах: <italic:false><yellow>Золотом</yellow><italic:true> и <italic:false><gray>Железном</gray>.",
@@ -112,7 +113,7 @@ public class ItemManager {
 
         //Cocoa beans
         CommonCookieItem cocoaBeans = new CommonCookieItem(
-                Items.COCOA_BEANS, "cocoa_beans",
+                Items.COCOA_BEANS, ItemTag.COCOA_BEANS,
                 "<gradient:#964b00:#c17529><italic:false>Какао-бобы"
         );
         cocoaBeans.setAmount(99);
@@ -120,7 +121,7 @@ public class ItemManager {
 
         //Enchanted cocoa
         CommonCookieItem enchantedCocoaBeans = new CommonCookieItem(
-                Items.COCOA_BEANS, "ench_cocoa",
+                Items.COCOA_BEANS, ItemTag.ENCHANTED_COCOA_BEANS,
                 "<gradient:#992e7a:#964b00:#c17529:#992e7a><italic:false>Зачарованные какао-бобы"
         );
         enchantedCocoaBeans.setEnchantmentGlint();
@@ -131,7 +132,7 @@ public class ItemManager {
 
         //Wheat
         CommonCookieItem wheat = new CommonCookieItem(
-                Items.WHEAT, "wheat",
+                Items.WHEAT, ItemTag.WHEAT,
                 "<gradient:#d5a51b:#ffe506><italic:false>Пшеница"
         );
         wheat.hideItem();
@@ -140,7 +141,7 @@ public class ItemManager {
 
         //Enchanted wheat
         CommonCookieItem enchantedWheat = new CommonCookieItem(
-                Items.WHEAT, "ench_wheat",
+                Items.WHEAT, ItemTag.ENCHANTED_WHEAT,
                 "<gradient:#992e7a:#d5a51b:#ffe506:#992e7a><italic:false>Зачарованная пшеница"
         );
         enchantedWheat.addLore("<gray> Можно сделать хлеб");
@@ -151,7 +152,7 @@ public class ItemManager {
 
         //Bread
         CommonCookieItem bread = new CommonCookieItem(
-                Items.BREAD, "bread",
+                Items.BREAD, ItemTag.BREAD,
                 "<gradient:#a28e63:#c9ac6f><italic:false>Хлеб"
         );
         bread.setAmount(52);
@@ -159,7 +160,7 @@ public class ItemManager {
 
         //Baguette
         CommonCookieItem baguette = new CommonCookieItem(
-                Items.BREAD, "baguette",
+                Items.BREAD, ItemTag.BAGUETTE,
                 "<gradient:#ac7604:#f7eb91><italic:false>Багет"
         );
         baguette.setEnchantmentGlint();
@@ -168,7 +169,7 @@ public class ItemManager {
 
         //Chocolate
         CommonCookieItem chocolate = new CommonCookieItem(
-                Items.DARK_OAK_TRAPDOOR, "chocolate",
+                Items.DARK_OAK_TRAPDOOR, ItemTag.CHOCOLATE,
                 "<gradient:#884e0a:#b36810><italic:false>Шоколад"
         );
         chocolate.hideItem();
@@ -178,7 +179,7 @@ public class ItemManager {
         //Sweet berries
         CommonCookieItem berries = new CommonCookieItem(
                 Items.SWEET_BERRIES,
-                "berries",
+                ItemTag.SWEET_BERRIES,
                 "<gradient:#c80b47:#ff286c><italic:false>Сладкие ягоды"
         );
         registerItem(berries);
@@ -190,7 +191,7 @@ public class ItemManager {
 
         //Farmer Armor
         EquipmentCookieItem farmHelmet = new EquipmentCookieItem(
-                Items.LEATHER_HELMET, "fHelmet",
+                Items.LEATHER_HELMET, ItemTag.FARMER_HELMET,
                 "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Шляпа фермера",
                 equipmentData, EquipmentSlot.HEAD
         );
@@ -198,7 +199,7 @@ public class ItemManager {
         registerItem(farmHelmet);
 
         EquipmentCookieItem farmChest = new EquipmentCookieItem(
-                Items.LEATHER_CHESTPLATE, "fChest",
+                Items.LEATHER_CHESTPLATE, ItemTag.FARMER_CHESTPLATE,
                 "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Нагрудник фермера",
                 equipmentData, EquipmentSlot.CHEST
         );
@@ -206,7 +207,7 @@ public class ItemManager {
         registerItem(farmChest);
 
         EquipmentCookieItem farmLeggings = new EquipmentCookieItem(
-                Items.LEATHER_LEGGINGS, "fLegs",
+                Items.LEATHER_LEGGINGS, ItemTag.FARMER_LEGGINGS,
                 "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Штаны фермера",
                 equipmentData, EquipmentSlot.LEGS
         );
@@ -214,7 +215,7 @@ public class ItemManager {
         registerItem(farmLeggings);
 
         EquipmentCookieItem farmBoots = new EquipmentCookieItem(
-                Items.LEATHER_BOOTS, "fBoots",
+                Items.LEATHER_BOOTS, ItemTag.FARMER_BOOTS,
                 "<gradient:#f5bb37:#fcda8c:#f99300:#b37113><italic:false>Ботинки фермера",
                 equipmentData, EquipmentSlot.FEET
         );
@@ -224,7 +225,7 @@ public class ItemManager {
         //(test) healing melon
         CommonCookieItem healMelon = new CommonCookieItem(
                 Items.GLISTERING_MELON_SLICE,
-                "heal_melon",
+                ItemTag.HEALING_MELON,
                 "<gradient:#ff9b00:#ff2300:#ff9b00><italic:false>Сверкающий ломтик арбуза"
         );
         healMelon.addLore("<gray> Пока что ничего не делает");
@@ -234,7 +235,7 @@ public class ItemManager {
         //(test) pickaxe
         CommonCookieItem pickaxe = new CommonCookieItem(
                 Items.GOLDEN_PICKAXE,
-                "pickaxe",
+                ItemTag.PICKAXE,
                 "<gradient:#ffbd00:#ffec00><italic:false>Золотая <white>кирка"
         );
         pickaxe.addLore("<gray> Пока что ничего не делает.", "<gray> Скоро тут будет", "<gray> +1 удача шахтёра");
@@ -243,7 +244,7 @@ public class ItemManager {
         //Cake
         CommonCookieItem finalCake = new CommonCookieItem(
                 Items.CAKE,
-                "final_cake",
+                ItemTag.CAKE_UPGRADE_ITEM,
                 "<gradient:#ece7d2:#ecdb95><italic:false>Тортик"
         );
         finalCake.setEnchantmentGlint();
@@ -252,7 +253,7 @@ public class ItemManager {
         //Cookie compactor
         CommonCookieItem cookieCompactor = new CommonCookieItem(
                 Items.PISTON,
-                "cookie_crafter",
+                ItemTag.COOKIE_CRAFTER,
                 "<italic:false>Сборщик печенья"
         );
         cookieCompactor.addLore("<gray> Если положить в левую руку, позволяет создавать</gray>", "<gray> блок печенья из 512 чар. печенья.</gray>");
@@ -261,7 +262,7 @@ public class ItemManager {
 
         CommonCookieItem cookieBlock = new CommonCookieItem(
                 Items.RESIN_BLOCK,
-                "cookie_block",
+                ItemTag.BLOCK_OF_COOKIE,
                 "<gradient:#992e7a:#c66618:#f57b18:#992e7a><italic:false>Блок зачарованного печенья"
         );
         cookieBlock.setAmount(99);
@@ -271,7 +272,7 @@ public class ItemManager {
         //Glow berries
         CommonCookieItem glowBerries = new CommonCookieItem(
                 Items.GLOW_BERRIES,
-                "glow_berries",
+                ItemTag.GLOW_BERRIES,
                 "<gradient:#ffb128:#ffde28:#efab0f:#f7990a:#ffb748><italic:false>Светящиеся ягоды"
         );
         glowBerries.addLore("<gray> Создано эпической мотыгой",
@@ -281,7 +282,7 @@ public class ItemManager {
         //Pumpkin pie
         CommonCookieItem pumpkinPie = new CommonCookieItem(
                 Items.PUMPKIN_PIE,
-                "pie",
+                ItemTag.PUMPKIN_PIE,
                 "<gradient:#ffd96c:#ff8700:#ffd96c><italic:false>Тыквенный пирог"
         );
         pumpkinPie.addLore("<gray> Создано эпической мотыгой",
@@ -291,7 +292,7 @@ public class ItemManager {
         //Pumpkin
         CommonCookieItem pumpkin = new CommonCookieItem(
                 Items.PUMPKIN,
-                "pumpkin",
+                ItemTag.PUMPKIN,
                 "<gradient:#ff8f00:#ff7000><italic:false>Тыква"
         );
         pumpkin.hideItem();
@@ -303,16 +304,16 @@ public class ItemManager {
         MinecraftServer.getServer().sendSystemMessage(Component.literal("[CookieClicker] loaded items: " + itemsToLoad.size()));
     }
 
-    public ItemStack getNMS(String tag) {
-        return itemsToLoad.getOrDefault(tag, emptyItem).toMinecraftStack().copy();
+    public ItemStack get(ItemTag tag) {
+        return itemsToLoad.getOrDefault(tag.getRealTag(), emptyItem).toMinecraftStack().copy();
+    }
+
+    public ItemStack get(ItemTag tag, Integer amount) {
+        return itemsToLoad.getOrDefault(tag.getRealTag(), emptyItem).toMinecraftStack().copyWithCount(amount);
     }
 
     public boolean has(String itemTag) {
         return itemsToLoad.containsKey(itemTag);
-    }
-
-    public ItemStack getWithAmount(String itemName, Integer amount) {
-        return itemsToLoad.getOrDefault(itemName, emptyItem).toMinecraftStack().copyWithCount(amount);
     }
 
     public Collection<CookieItemStack> allItemsRaw() {

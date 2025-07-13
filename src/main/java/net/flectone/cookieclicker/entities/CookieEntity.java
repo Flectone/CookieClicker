@@ -23,9 +23,7 @@ public class CookieEntity {
     protected final EntityType entityType;
     @Setter
     protected Location location = new Location(0, 0, 0, 0, 0);
-    protected final List<EntityData> entityData = new ArrayList<>();
-
-    //private final List<User> seeingPlayers = new ArrayList<>();
+    protected final List<EntityData<?>> entityData = new ArrayList<>();
 
     public CookieEntity(EntityType entityType) {
         this(entityType, SpigotReflectionUtil.generateEntityId());

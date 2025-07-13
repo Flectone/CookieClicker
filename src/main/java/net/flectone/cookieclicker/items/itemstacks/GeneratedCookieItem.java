@@ -25,6 +25,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GeneratedCookieItem extends BaseCookieItem {
     private GeneratedCookieItem(Item originalMaterial, Features features) {
@@ -35,23 +36,21 @@ public class GeneratedCookieItem extends BaseCookieItem {
     public static GeneratedCookieItem fromItemStack(ItemStack itemStack) {
         CustomData customData = itemStack.getComponents().get(DataComponents.CUSTOM_DATA);
         CompoundTag compoundTag = customData != null ? customData.copyTag() : new CompoundTag();
-        CompoundTag cookieClickerTag = compoundTag.contains(CookieItems.PLUGIN_KEY)
-                ? compoundTag.getCompound(CookieItems.PLUGIN_KEY)
-                : new CompoundTag();
 
+        Optional<CompoundTag> cookieClickerTag = compoundTag.getCompound(CookieItems.PLUGIN_KEY);
+        cookieClickerTag = cookieClickerTag.isEmpty() ? compoundTag.getCompound("cookies") : cookieClickerTag;
+
+        CompoundTag itemStackFeature = cookieClickerTag.orElse(new CompoundTag());
         //конвертация старых предметов
-        cookieClickerTag = compoundTag.contains("cookies")
-                ? compoundTag.getCompound("cookies")
-                : cookieClickerTag;
         //
 
-        GeneratedCookieItem customItem = new GeneratedCookieItem(itemStack.getItem(), new Features(cookieClickerTag));
+        GeneratedCookieItem customItem = new GeneratedCookieItem(itemStack.getItem(), new Features(itemStackFeature));
 
         itemStack.getComponents().forEach(customItem::applyComponent);
 
         ItemLore itemLore = itemStack.getComponents().has(DataComponents.LORE) ? itemStack.getComponents().get(DataComponents.LORE) : null;
         if (itemLore != null && !itemLore.lines().isEmpty()) {
-            extractDescription(itemLore, hasTag(cookieClickerTag)).forEach(customItem::addLore);
+            extractDescription(itemLore, hasTag(itemStackFeature)).forEach(customItem::addLore);
         }
 
         if (compoundTag.contains("cookies")) {
@@ -94,12 +93,10 @@ public class GeneratedCookieItem extends BaseCookieItem {
         return description;
     }
 
-    private static boolean hasTag(CompoundTag tag) {
-        if (!tag.contains(ITEM_TAG_KEY))
-            return false;
+    private static boolean hasTag(CompoundTag customData) {
+        Optional<String> tag = customData.getString(ITEM_TAG_KEY);
 
-        return !tag.getString(ITEM_TAG_KEY).equals("none");
-
+        return tag.isPresent() && !tag.get().equals("none");
     }
 
     private void fixOldItem() {
@@ -121,12 +118,10 @@ public class GeneratedCookieItem extends BaseCookieItem {
 
         for (Object2IntMap.Entry<Holder<Enchantment>> enchantment : enchantments.entrySet()) {
             switch (enchantment.getKey().getRegisteredName()) {
-                case "cookie:ccboost" -> {
-                    features.setStatFromEnchant(StatType.FARMING_FORTUNE, (int) Math.pow(2, enchantment.getIntValue() - 1));
-                }
-                case "cookie:mining_boost" -> {
-                    features.setStatFromEnchant(StatType.MINING_FORTUNE, enchantment.getIntValue());
-                }
+                case COOKIE_BOOST_ENCHANTMENT -> features.setStatFromEnchant(
+                        StatType.FARMING_FORTUNE, 1 << (enchantment.getIntValue() - 1));
+                case MINING_BOOST_ENCHANTMENT -> features.setStatFromEnchant(
+                        StatType.MINING_FORTUNE, enchantment.getIntValue());
             }
         }
     }

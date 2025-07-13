@@ -2,6 +2,7 @@ package net.flectone.cookieclicker;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.utility.StatsUtils;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -18,7 +19,7 @@ public class CompactItems {
     public CompactItems(StatsUtils statsUtils) {
         this.statsUtils = statsUtils;
     }
-    public void compact(net.minecraft.world.entity.player.Inventory inv, String findItemTag, ItemStack resultItem, Integer countToFind) {
+    public void compact(net.minecraft.world.entity.player.Inventory inv, ItemTag findItemTag, ItemStack resultItem, Integer countToFind) {
         compact(inv, findItemTag, resultItem, countToFind, 100);
     }
 
@@ -26,7 +27,7 @@ public class CompactItems {
         compact(inv, statsUtils.getItemTag(findItem), resultItem, countToFind, times);
     }
 
-    public void compact(Inventory inv, String findItemTag, ItemStack resultItem, Integer countToFind, Integer times) {
+    public void compact(Inventory inv, ItemTag findItemTag, ItemStack resultItem, Integer countToFind, Integer times) {
         HashMap<Integer, Integer> mapa = new HashMap<>();// Слот : количество предметов
         int itemsCount = 0;
         for (int i = 0; i <= 35; i++) {

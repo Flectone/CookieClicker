@@ -15,6 +15,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.UUID;
+
 @Singleton
 public class CCConversionUtils {
 
@@ -26,10 +28,14 @@ public class CCConversionUtils {
     }
 
     public Player userToNMS (User user) {
+        return getNMSplayerByUUID(user.getUUID());
+    }
+
+    public Player getNMSplayerByUUID (UUID uuid) {
         //короче, тут я беру всех игроков на сервере и с помощью UUID нахожу нужного
         Player player = null;
         for (Player i : MinecraftServer.getServer().getPlayerList().players) {
-            if (i.getUUID().equals(user.getUUID()))
+            if (i.getUUID().equals(uuid))
                 player = i;
         }
         return player;

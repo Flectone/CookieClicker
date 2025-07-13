@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import net.flectone.cookieclicker.items.CustomRecipe;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.Recipes;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.utility.Pair;
 import net.flectone.cookieclicker.utility.StatsUtils;
@@ -29,13 +30,13 @@ public class PacketCraftingEvent {
         this.loadedItems = loadedItems;
     }
 
-    private List<Pair<String, Integer>> createList (AbstractContainerMenu inv) {
-        List<Pair<String, Integer>> itemsList = new ArrayList<>();
+    private List<Pair<ItemTag, Integer>> createList (AbstractContainerMenu inv) {
+        List<Pair<ItemTag, Integer>> itemsList = new ArrayList<>();
 
         for (int i = 1; i < 10; i++) {
             ItemStack item = inv.getSlot(i).getItem();
             itemsList.add(new Pair<>(
-                    item.getItem() == Items.AIR ? "air" : statsUtils.getItemTag(item),
+                    item.getItem() == Items.AIR ? ItemTag.AIR : statsUtils.getItemTag(item),
                     item.getCount()
             ));
         }
@@ -43,7 +44,7 @@ public class PacketCraftingEvent {
     }
 
     public CustomRecipe findRecipe(AbstractContainerMenu craftingContainer) {
-        List<Pair<String, Integer>> ingredients = createList(craftingContainer);
+        List<Pair<ItemTag, Integer>> ingredients = createList(craftingContainer);
         return recipes.getRecipeIfExists(ingredients);
     }
 
@@ -85,7 +86,7 @@ public class PacketCraftingEvent {
 
         }
 
-        ItemStack resultItem = loadedItems.getNMS(recipe.getResultTag());
+        ItemStack resultItem = loadedItems.get(recipe.getResultTag());
 
         if (windowClickType.equals(WrapperPlayClientClickWindow.WindowClickType.QUICK_MOVE)) {
             resultItem.setCount(amount);
@@ -97,7 +98,7 @@ public class PacketCraftingEvent {
         }
     }
 
-    private Integer getCarriedAmount(ItemStack carriedItemStack, String resultTag) {
+    private Integer getCarriedAmount(ItemStack carriedItemStack, ItemTag resultTag) {
         int amount = 0;
         if (carriedItemStack.getItem() == Items.AIR)
             return amount;
@@ -120,6 +121,6 @@ public class PacketCraftingEvent {
             if (pair.left() < pair.right()) return;
         }
 
-        craftingContainer.setItem(0, craftingContainer.getStateId(), loadedItems.getNMS(recipe.getResultTag()));
+        craftingContainer.setItem(0, craftingContainer.getStateId(), loadedItems.get(recipe.getResultTag()));
     }
 }

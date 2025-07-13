@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.utility.CCobjects;
+package net.flectone.cookieclicker.items.trades;
 
 import lombok.Getter;
 

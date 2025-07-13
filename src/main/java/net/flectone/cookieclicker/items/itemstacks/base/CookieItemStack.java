@@ -2,6 +2,7 @@ package net.flectone.cookieclicker.items.itemstacks.base;
 
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
@@ -34,12 +35,12 @@ public abstract class CookieItemStack implements CookieItems {
 
         this.features = features;
 
-        if (!features.getItemTag().equals("none")) {
-            lore.add("<dark_gray>#" + features.getItemTag());
+        if (features.getItemTag() != ItemTag.EMPTY) {
+            lore.add("<dark_gray>#" + features.getItemTag().getRealTag());
         }
     }
 
-    public String getItemTag() {
+    public ItemTag getItemTag() {
         return features.getItemTag();
     }
 
@@ -90,9 +91,7 @@ public abstract class CookieItemStack implements CookieItems {
         //Запись всех характеристик и способностей в лор
         List<String> featuresList = features.getStatsAsLoreList();
 
-        featuresList.forEach(string -> {
-            fullLore.add(convertToNMSComponent(miniMessage.deserialize(string)));
-        });
+        featuresList.forEach(string -> fullLore.add(convertToNMSComponent(miniMessage.deserialize(string))));
 
         //Создание компонента для предмета
         TypedDataComponent<ItemLore> loreData = new TypedDataComponent<>(DataComponents.LORE, new ItemLore(fullLore));

@@ -3,23 +3,25 @@ package net.flectone.cookieclicker.inventories;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.cookiePart.EpicHoeUtils;
+import net.flectone.cookieclicker.cookiepart.EpicHoeUtils;
 import net.flectone.cookieclicker.items.CustomRecipe;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.Recipes;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItemStack;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.utility.Pair;
 import net.flectone.cookieclicker.utility.StatsUtils;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.util.Unit;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Singleton
@@ -44,9 +46,9 @@ public class MainMenu {
         ClickerContainer menu = new ClickerContainer(ClickerContainer.generateId(), 2,
                 "main_menu");
 
-        CommonCookieItem recipe = new CommonCookieItem(Items.KNOWLEDGE_BOOK, "none",
+        CommonCookieItem recipe = new CommonCookieItem(Items.KNOWLEDGE_BOOK, ItemTag.EMPTY,
                 "<gradient:#01e14f:#30a257><italic:false>Посмотреть все рецепты");
-        CommonCookieItem stats = new CommonCookieItem(Items.WRITABLE_BOOK, "none",
+        CommonCookieItem stats = new CommonCookieItem(Items.WRITABLE_BOOK, ItemTag.EMPTY,
                 "<gradient:#e5fffe:#e7f0ef><italic:false>Статистика игрока");
         stats.addLore(String.format("<#eee2d2><italic:false>   Уровень: <#f28423>%d", serverCookiePlayer.getLvl()));
         stats.addLore(String.format("<#e7f0ef><italic:false>(До %d-го: <#f7bb86>%d<#e7f0ef>)", serverCookiePlayer.getLvl() + 1, serverCookiePlayer.getRemainingXp()));
@@ -55,11 +57,11 @@ public class MainMenu {
         stats.addLore("<#e7f0ef><italic:false>Уровень заряда: <#7524f1>" + epicHoeUtils.getCharge(serverCookiePlayer.getUuid()));
         stats.addLore(String.format("<#e7f0ef><italic:false>Множитель от заряда: <#9631e1>x%.1f", 1f + (0.5f * epicHoeUtils.getTier(serverCookiePlayer.getUuid()))));
         stats.addLore(String.format("<#e7f0ef><italic:false>Кликов по рамке: <#bd702d>%d", serverCookiePlayer.getIFrameClicks()));
-        CommonCookieItem allItems = new CommonCookieItem(Items.BOOK, "none",
+        CommonCookieItem allItems = new CommonCookieItem(Items.BOOK, ItemTag.EMPTY,
                 "<gradient:#ffc900:#f3e736:#f7d760:#e1b926:#f3e736:#ffc900><italic:false>Посмотреть все предметы");
 
         //beta version item
-        CommonCookieItem info = new CommonCookieItem(Items.LECTERN, "none",
+        CommonCookieItem info = new CommonCookieItem(Items.LECTERN, ItemTag.EMPTY,
                 "<gradient:#a50404:#f34b4b><italic:false>v2.0-beta3.1");
         info.addLore("<#e7f0ef><italic:false> Это третья тестовая версия плагина!",
                 " ",
@@ -122,7 +124,7 @@ public class MainMenu {
 
         int slot = 0;
         for (CustomRecipe recipe : recipes.getAllRecipes().values()) {
-            recipesWindow.setItem(slot, loadedItems.getNMS(recipe.getResultTag()));
+            recipesWindow.setItem(slot, loadedItems.get(recipe.getResultTag()));
             slot++;
         }
 
@@ -133,8 +135,8 @@ public class MainMenu {
         ClickerContainer singleRecipe = new ClickerContainer(ClickerContainer.generateId(), 2, "recipe");
 
         int slot = 0;
-        for (Pair<String, Integer> ingredient : recipe.getAllIngredients()) {
-            ItemStack item = loadedItems.getNMS(ingredient.left());
+        for (Pair<ItemTag, Integer> ingredient : recipe.getAllIngredients()) {
+            ItemStack item = loadedItems.get(ingredient.left());
             item.setCount(ingredient.right());
 
             singleRecipe.setItem(slot, item);
@@ -143,14 +145,14 @@ public class MainMenu {
                 slot += 6;
         }
         ItemStack fillerItem = new ItemStack(Items.WHITE_STAINED_GLASS_PANE);
-        fillerItem.set(DataComponents.HIDE_TOOLTIP, Unit.INSTANCE);
+        fillerItem.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, new LinkedHashSet<>()));
         ItemStack closeWindowItem = new ItemStack(Items.RED_STAINED_GLASS_PANE);
-        closeWindowItem.set(DataComponents.HIDE_TOOLTIP, Unit.INSTANCE);
+        closeWindowItem.set(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, new LinkedHashSet<>()));
 
         for (int i : List.of(3, 12, 21)) {
             singleRecipe.setItem(i, fillerItem);
         }
-        singleRecipe.setItem(13, loadedItems.getNMS(recipe.getResultTag()));
+        singleRecipe.setItem(13, loadedItems.get(recipe.getResultTag()));
         singleRecipe.setItem(8, closeWindowItem);
 
         containerManager.openContainer(serverCookiePlayer, singleRecipe);

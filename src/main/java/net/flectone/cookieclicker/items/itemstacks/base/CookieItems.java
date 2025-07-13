@@ -40,5 +40,8 @@ public interface CookieItems {
 
     List<String> LOADED_STATS = List.of(FORTUNE_KEY, OLD_FORTUNE_KEY, MINING_FORTUNE_KEY, EQUIPMENT_TIER);
 
+    String COOKIE_BOOST_ENCHANTMENT = PLUGIN_KEY + ":ccboost";
+    String MINING_BOOST_ENCHANTMENT = PLUGIN_KEY + ":mining_boost";
+
 
 }

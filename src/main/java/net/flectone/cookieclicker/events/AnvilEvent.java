@@ -2,14 +2,13 @@ package net.flectone.cookieclicker.events;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.GeneratedCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.utility.Pair;
 import net.flectone.cookieclicker.utility.StatsUtils;
-import net.flectone.cookieclicker.utility.UtilsCookie;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
@@ -33,28 +32,23 @@ import java.util.Optional;
 
 @Singleton
 public class AnvilEvent {
-    private final UtilsCookie utilsCookie;
     private final StatsUtils statsUtils;
-    private final ItemManager manager;
 
-    private final List<Pair<String, String>> UPGRADE_STAGES = List.of(
-            new Pair<>("final_cake", "quartz"),
-            new Pair<>("final_cake", "emerald"),
-            new Pair<>("final_cake", "diamond"),
-            new Pair<>("final_cake", "amethyst"),
-            new Pair<>("final_cake", "gold"),
-            new Pair<>("cookie", "netherite")
+    private final List<Pair<ItemTag, String>> stages = List.of(
+            new Pair<>(ItemTag.CAKE_UPGRADE_ITEM, "quartz"),
+            new Pair<>(ItemTag.CAKE_UPGRADE_ITEM, "emerald"),
+            new Pair<>(ItemTag.CAKE_UPGRADE_ITEM, "diamond"),
+            new Pair<>(ItemTag.CAKE_UPGRADE_ITEM, "amethyst"),
+            new Pair<>(ItemTag.CAKE_UPGRADE_ITEM, "gold"),
+            new Pair<>(ItemTag.COOKIE, "netherite")
     );
 
     @Inject
-    public AnvilEvent(UtilsCookie utilsCookie, ItemManager manager, StatsUtils statsUtils) {
-        this.utilsCookie = utilsCookie;
-        this.manager = manager;
+    public AnvilEvent(StatsUtils statsUtils) {
         this.statsUtils = statsUtils;
     }
 
     public void anvilClick(Player player, Integer slot) {
-        //processUpgrade((AnvilMenu) player.containerMenu);
         if (slot != 2) return;
 
         ItemStack anvilItem = player.containerMenu.getSlot(2).getItem();
@@ -91,13 +85,12 @@ public class AnvilEvent {
     private ItemStack addStarToEquipment(ItemStack itemStack, ItemStack upgradeItem) {
         int currentTier = statsUtils.getTier(itemStack);
 
-        if (currentTier == UPGRADE_STAGES.size() || !statsUtils.hasTag(upgradeItem, UPGRADE_STAGES.get(currentTier).left()))
+        if (currentTier == stages.size() || !statsUtils.hasTag(upgradeItem, stages.get(currentTier).left()))
             return null;
 
         ArmorTrim armorTrim = new ArmorTrim(
-                getCurrentTrimMaterial(UPGRADE_STAGES.get(currentTier).getValue()),
-                getSentryTrimPattern(),
-                false
+                getCurrentTrimMaterial(stages.get(currentTier).getValue()),
+                getSentryTrimPattern()
         );
 
         GeneratedCookieItem updatedItem = GeneratedCookieItem.fromItemStack(itemStack);

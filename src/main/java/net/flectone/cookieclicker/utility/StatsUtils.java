@@ -7,6 +7,7 @@ import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItems;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -36,12 +37,12 @@ public class StatsUtils {
                 : new Features(new CompoundTag());
     }
 
-    public String getItemTag(ItemStack itemStack) {
+    public ItemTag getItemTag(ItemStack itemStack) {
         return getFeatures(itemStack).getItemTag();
     }
 
-    public boolean hasTag(ItemStack item, String tag) {
-        return getItemTag(item).equals(tag);
+    public boolean hasTag(ItemStack item, ItemTag tag) {
+        return getItemTag(item) == tag;
     }
 
     public boolean compareTags(ItemStack firstItem, ItemStack secondItem) {
@@ -69,8 +70,8 @@ public class StatsUtils {
         int amount = getBaseFarmingFortune(itemStack);
 
         for (Object2IntMap.Entry<Holder<Enchantment>> enchantment : itemStack.getEnchantments().entrySet()) {
-            if (enchantment.getKey().getRegisteredName().equals("cookie:ccboost"))
-                amount += (int) Math.pow(2, enchantment.getIntValue() - 1);
+            if (enchantment.getKey().getRegisteredName().equals(CookieItems.COOKIE_BOOST_ENCHANTMENT))
+                amount += 1 << (enchantment.getIntValue() - 1);
         }
         return amount;
     }

@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.cookiePart;
+package net.flectone.cookieclicker.cookiepart;
 
 
 import com.github.retrooper.packetevents.protocol.color.Color;
@@ -13,6 +13,7 @@ import com.google.inject.Singleton;
 import net.flectone.cookieclicker.items.attributes.CookieAbility;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.itemstacks.GeneratedCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.utility.*;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
@@ -26,18 +27,14 @@ import net.minecraft.world.phys.HitResult;
 
 @Singleton
 public class LegendaryHoeUpgrade {
-    private final UtilsCookie utilsCookie;
-    private final ItemTagsUtility itemTagsUtility;
     private final PacketUtils packetUtils;
     private final CCConversionUtils conversionUtils;
     private final StatsUtils statsUtils;
 
 
     @Inject
-    public LegendaryHoeUpgrade(UtilsCookie utilsCookie, ItemTagsUtility itemTagsUtility, PacketUtils packetUtils,
+    public LegendaryHoeUpgrade(PacketUtils packetUtils,
                                CCConversionUtils conversionUtils, StatsUtils statsUtils) {
-        this.utilsCookie = utilsCookie;
-        this.itemTagsUtility = itemTagsUtility;
         this.packetUtils = packetUtils;
         this.conversionUtils = conversionUtils;
         this.statsUtils = statsUtils;
@@ -89,7 +86,7 @@ public class LegendaryHoeUpgrade {
 
         //предмет в руке
         ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-        if (!statsUtils.getItemTag(itemInHand).equals("leg_hoe")) return;
+        if (statsUtils.getItemTag(itemInHand) != ItemTag.LEGENDARY_HOE) return;
 
         GeneratedCookieItem legendaryHoe = GeneratedCookieItem.fromItemStack(itemInHand);
 

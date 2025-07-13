@@ -7,8 +7,9 @@ import net.flectone.cookieclicker.CompactItems;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.VillagerTrades;
 import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
-import net.flectone.cookieclicker.utility.CCobjects.TradeItem;
+import net.flectone.cookieclicker.items.trades.TradeItem;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -56,7 +57,7 @@ public class Shops {
         compactItems.compact(
                 serverCookiePlayer.getPlayer().getInventory(),
                 villagerTrades.getPriceItem(traderType, slot - 9),
-                loadedItems.getNMS(villagerTrades.getItem(traderType, slot - 9)),
+                loadedItems.get(villagerTrades.getItem(traderType, slot - 9)),
                 villagerTrades.getPriceCount(traderType, slot - 9),
                 1
         );
@@ -65,7 +66,7 @@ public class Shops {
     private ClickerContainer createBasicShop(Integer windowType, String customData) {
         ClickerContainer basicContainer = new ClickerContainer(ClickerContainer.generateId(),
                 windowType, customData);
-        CommonCookieItem upperItem = new CommonCookieItem(Items.WHITE_STAINED_GLASS_PANE, "none",
+        CommonCookieItem upperItem = new CommonCookieItem(Items.WHITE_STAINED_GLASS_PANE, ItemTag.EMPTY,
                 "<gradient:#ffffff:#cccccc><italic:false>Здесь вы можете купить");
         upperItem.addLore("<gradient:#ffffff:#cccccc><italic:false>различные вещи");
 
@@ -85,13 +86,13 @@ public class Shops {
     }
 
     private ItemStack addPriceToSellItem(TradeItem tradeItem) {
-        ItemStack finalItem = loadedItems.getNMS(tradeItem.getSellingItemTag());
+        ItemStack finalItem = loadedItems.get(tradeItem.getSellingItemTag());
         List<Component> lore = new ArrayList<>();
         ItemLore itemLore = finalItem.getComponents().get(DataComponents.LORE);
         if (itemLore != null) lore.addAll(itemLore.lines());
 
         Component cost = Component.literal(String.format(
-                "Стоимость: %d %s", tradeItem.getPrice().getValue(), loadedItems.getNMS(tradeItem.getPrice().getKey()).getDisplayName().getString()
+                "Стоимость: %d %s", tradeItem.getPrice().getValue(), loadedItems.get(tradeItem.getPrice().getKey()).getDisplayName().getString()
         )).withColor(13041721);
 
         lore.addFirst(cost);

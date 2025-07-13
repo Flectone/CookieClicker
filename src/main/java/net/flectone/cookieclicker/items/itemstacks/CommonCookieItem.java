@@ -3,13 +3,14 @@ package net.flectone.cookieclicker.items.itemstacks;
 import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.base.BaseCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.component.Consumable;
 
 public class CommonCookieItem extends BaseCookieItem {
-    public CommonCookieItem(Item originalMaterial, String tag, String name) {
+    public CommonCookieItem(Item originalMaterial, ItemTag tag, String name) {
         super(originalMaterial, new Features(tag, ToolType.NONE));
         setName(name);
         removeVisibleAttributes(false);

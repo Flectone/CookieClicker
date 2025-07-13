@@ -9,6 +9,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySelectorArgumentResolver;
+import net.flectone.cookieclicker.events.ConnectedPlayers;
 import net.flectone.cookieclicker.events.PacketInteractEvent;
 import net.flectone.cookieclicker.inventories.MainMenu;
 import net.flectone.cookieclicker.items.VillagerTrades;
@@ -16,7 +17,6 @@ import net.flectone.cookieclicker.items.itemstacks.GeneratedCookieItem;
 import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.utility.CCConversionUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -35,14 +35,16 @@ public class RegisteredCommands {
     private final VillagerTrades villagerTrades;
     private final PacketInteractEvent packetInteractEvent;
     private final CCConversionUtils convertUtils;
+    private final ConnectedPlayers connectedPlayers;
 
     @Inject
     public RegisteredCommands(MainMenu mainMenu, VillagerTrades villagerTrades, PacketInteractEvent packetInteractEvent,
-                              CCConversionUtils convertUtils) {
+                              CCConversionUtils convertUtils, ConnectedPlayers connectedPlayers) {
         this.mainMenu = mainMenu;
         this.villagerTrades = villagerTrades;
         this.packetInteractEvent = packetInteractEvent;
         this.convertUtils = convertUtils;
+        this.connectedPlayers = connectedPlayers;
     }
 
     public LiteralCommandNode<CommandSourceStack> createCookieClickerCommand() {
@@ -64,7 +66,17 @@ public class RegisteredCommands {
         return convertedCookieItem.toMinecraftStack().copyWithCount(amount);
     }
 
-    private void convertInList(NonNullList<ItemStack> items) {
+    private void convertInventory(Inventory inventory) {
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack singleItem = inventory.getItem(i);
+            if (singleItem.getItem() == Items.AIR)
+                continue;
+
+            inventory.setItem(i, convertItem(singleItem, singleItem.getCount()));
+        }
+    }
+
+    private void convertInList(List<ItemStack> items) {
         for (int i = 0; i < items.size(); i++) {
             ItemStack singleItem = items.get(i);
             if (singleItem.getItem() == Items.AIR)
@@ -94,10 +106,9 @@ public class RegisteredCommands {
                                 return 0;
 
                             Inventory playerInventory = nmsExecutor.getInventory();
-                            convertInList(playerInventory.armor);
-                            convertInList(playerInventory.items);
-                            convertInList(playerInventory.offhand);
+                            convertInventory(playerInventory);
 
+                            nmsExecutor.displayClientMessage(Component.literal("Предметы в инвентаре обновлены"), false);
                             return Command.SINGLE_SUCCESS;
                         }));
         return convert.build();
@@ -106,7 +117,7 @@ public class RegisteredCommands {
     public LiteralCommandNode<CommandSourceStack> createOpenMenuCommand() {
         LiteralArgumentBuilder<CommandSourceStack> openMenu = Commands.literal("menu")
                 .executes(ctx -> {
-                    ServerCookiePlayer serverCookiePlayer = new ServerCookiePlayer(ctx.getSource().getExecutor().getUniqueId());
+                    ServerCookiePlayer serverCookiePlayer = connectedPlayers.getServerCookiePlayer(ctx.getSource().getExecutor().getUniqueId());
 
                     mainMenu.openMainMenu(serverCookiePlayer);
                     return Command.SINGLE_SUCCESS;

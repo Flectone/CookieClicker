@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
+import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
@@ -16,6 +17,7 @@ import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import net.flectone.cookieclicker.CookieClicker;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.item.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ public class PacketUtils {
         this.converter = converter;
     }
 
-    public void spawnItem(User user, com.github.retrooper.packetevents.protocol.world.Location location, net.minecraft.world.item.ItemStack item) {
+    public void spawnItem(User user, Location location, ItemStack item) {
         //тут наверное есть вероятность, что uuid будет уже существующего моба, но хз чё сделать
         UUID newEntitiUUID = UUID.randomUUID();
         int newEntityId = SpigotReflectionUtil.generateEntityId();
@@ -45,16 +47,18 @@ public class PacketUtils {
                 null);
 
         //данные для предмета, так как пакет на спавн только призывает предмет без данных
-        List<EntityData> entityDataList = new ArrayList<>();
+        List<EntityData<?>> entityDataList = new ArrayList<>();
 
-        entityDataList.add(new EntityData(8, EntityDataTypes.ITEMSTACK, converter.fromMinecraftStack(item, MinecraftServer.getServer().registryAccess())));
+        entityDataList.add(new EntityData<>(8, EntityDataTypes.ITEMSTACK, converter.fromMinecraftStack(item, MinecraftServer.getServer().registryAccess())));
         //пакет на изменение данных предмета
         WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(newEntityId, entityDataList);
+        WrapperPlayServerEntityVelocity velocityPacket = new WrapperPlayServerEntityVelocity(newEntityId, new Vector3d());
         //пакет на уничтожение предмета, позже понадобится
         WrapperPlayServerDestroyEntities destroyPacket = new WrapperPlayServerDestroyEntities(newEntityId);
         WrapperPlayServerCollectItem collectPacket = new WrapperPlayServerCollectItem(newEntityId, user.getEntityId(), item.getCount());
 
         user.sendPacket(spawnPacket);
+        user.sendPacket(velocityPacket);
         user.sendPacket(metadataPacket);
         net.minecraft.world.entity.player.Player player = converter.userToNMS(user);
         //вот тут реализовано подбирание предмета

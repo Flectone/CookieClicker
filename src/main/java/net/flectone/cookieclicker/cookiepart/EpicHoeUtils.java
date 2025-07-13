@@ -1,15 +1,16 @@
-package net.flectone.cookieclicker.cookiePart;
+package net.flectone.cookieclicker.cookiepart;
 
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.CookieClicker;
 import org.bukkit.Bukkit;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Singleton
 public class EpicHoeUtils {
-    public HashMap<UUID, Integer> charge = new HashMap<>();
+    private final Map<UUID, Integer> charge = new HashMap<>();
 
     public void addCharge(UUID uuid, Integer percentage) {
         charge.put(uuid, charge.isEmpty() || !(charge.containsKey(uuid)) ? percentage : charge.get(uuid) + percentage);
@@ -29,6 +30,6 @@ public class EpicHoeUtils {
         int value = getCharge(uuid);
         if (value <= 0)
             return 0;
-        return Math.round((float) value / 33f);
+        return Math.round(value / 33f);
     }
 }
