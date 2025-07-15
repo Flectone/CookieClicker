@@ -9,13 +9,10 @@ import net.flectone.cookieclicker.items.itemstacks.base.CookieItems;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 import java.util.Random;
@@ -24,17 +21,9 @@ import java.util.Random;
 public class StatsUtils {
     private Features getFeatures(ItemStack itemStack) {
         if (itemStack == null)
-            return new Features(new CompoundTag());
+            return Features.EMPTY;
 
-        CustomData customData = itemStack.get(DataComponents.CUSTOM_DATA);
-        if (customData == null)
-            return new Features(new CompoundTag());
-
-        CompoundTag baseTag = (CompoundTag) customData.copyTag().get(CookieItems.PLUGIN_KEY);
-
-        return baseTag != null
-                ? new Features(baseTag)
-                : new Features(new CompoundTag());
+        return new Features(itemStack);
     }
 
     public ItemTag getItemTag(ItemStack itemStack) {

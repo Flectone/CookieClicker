@@ -7,8 +7,10 @@ import net.flectone.cookieclicker.items.attributes.Stat;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItems;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import org.jetbrains.annotations.ApiStatus;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 
 import java.util.*;
 
@@ -23,21 +25,29 @@ public class Features {
     //категория, по сути нужна только для лора
     private final ToolType category;
 
+    public static final Features EMPTY = new Features(ItemTag.EMPTY, ToolType.NONE);
+
     public Features(ItemTag itemTag, ToolType category) {
         this.itemTag = itemTag;
         this.category = category;
     }
 
-    @ApiStatus.Experimental
-    public Features(CompoundTag tag) {
+    public Features(ItemStack itemStack) {
+        CompoundTag compoundTag = itemStack.getComponents()
+                .getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
+                .copyTag();
+
+        Optional<CompoundTag> optionalCompoundTag = compoundTag.getCompound(CookieItems.PLUGIN_KEY)
+                .or(() -> compoundTag.getCompound("cookies"));
+
+        CompoundTag tag = optionalCompoundTag.orElse(new CompoundTag());
         this.category = ToolType.from(tag.getString("category").orElse(ToolType.NONE.getType()));
         this.itemTag = ItemTag.fromString(tag.getString(CookieItems.ITEM_TAG_KEY).orElse("none"));
 
         //способность
         tag.getString(CookieItems.ABILITY_KEY).ifPresent(s -> ability = CookieAbility.from(s));
 
-        //все статы, если есть такие
-        //в списке LOADED_STATS есть статы, которые типо сейчас используются
+        //В списке LOADED_STATS статы, которые используются в предметах
         CookieItems.LOADED_STATS.forEach(stat -> tag.getInt(stat)
                 .ifPresent(integer -> stats.put(StatType.from(stat), new Stat(integer))));
     }

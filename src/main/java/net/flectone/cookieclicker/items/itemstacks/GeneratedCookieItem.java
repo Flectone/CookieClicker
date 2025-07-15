@@ -5,19 +5,17 @@ import io.papermc.paper.adventure.WrapperAwareSerializer;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.itemstacks.base.BaseCookieItem;
-import net.flectone.cookieclicker.items.itemstacks.base.CookieItems;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -25,7 +23,6 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class GeneratedCookieItem extends BaseCookieItem {
     private GeneratedCookieItem(Item originalMaterial, Features features) {
@@ -34,26 +31,17 @@ public class GeneratedCookieItem extends BaseCookieItem {
 
     @ApiStatus.Experimental
     public static GeneratedCookieItem fromItemStack(ItemStack itemStack) {
-        CustomData customData = itemStack.getComponents().get(DataComponents.CUSTOM_DATA);
-        CompoundTag compoundTag = customData != null ? customData.copyTag() : new CompoundTag();
-
-        Optional<CompoundTag> cookieClickerTag = compoundTag.getCompound(CookieItems.PLUGIN_KEY);
-        cookieClickerTag = cookieClickerTag.isEmpty() ? compoundTag.getCompound("cookies") : cookieClickerTag;
-
-        CompoundTag itemStackFeature = cookieClickerTag.orElse(new CompoundTag());
-        //конвертация старых предметов
-        //
-
-        GeneratedCookieItem customItem = new GeneratedCookieItem(itemStack.getItem(), new Features(itemStackFeature));
+        Features feature = new Features(itemStack);
+        GeneratedCookieItem customItem = new GeneratedCookieItem(itemStack.getItem(), feature);
 
         itemStack.getComponents().forEach(customItem::applyComponent);
 
         ItemLore itemLore = itemStack.getComponents().has(DataComponents.LORE) ? itemStack.getComponents().get(DataComponents.LORE) : null;
         if (itemLore != null && !itemLore.lines().isEmpty()) {
-            extractDescription(itemLore, hasTag(itemStackFeature)).forEach(customItem::addLore);
+            extractDescription(itemLore, hasTag(feature)).forEach(customItem::addLore);
         }
 
-        if (compoundTag.contains("cookies")) {
+        if (itemStack.getItem() == Items.LEATHER_HORSE_ARMOR) {
             customItem.fixOldItem();
         }
 
@@ -93,23 +81,19 @@ public class GeneratedCookieItem extends BaseCookieItem {
         return description;
     }
 
-    private static boolean hasTag(CompoundTag customData) {
-        Optional<String> tag = customData.getString(ITEM_TAG_KEY);
-
-        return tag.isPresent() && !tag.get().equals("none");
+    private static boolean hasTag(Features feature) {
+        return feature.getItemTag() != ItemTag.EMPTY;
     }
 
     private void fixOldItem() {
-        if (originalMaterial == Items.LEATHER_HORSE_ARMOR) {
-            removeComponent(DataComponents.EQUIPPABLE);
-            removeComponent(DataComponents.ITEM_NAME);
-            removeComponent(DataComponents.DYED_COLOR);
-            originalMaterial = HIDDEN_ITEM;
+        removeComponent(DataComponents.EQUIPPABLE);
+        removeComponent(DataComponents.ITEM_NAME);
+        removeComponent(DataComponents.DYED_COLOR);
+        originalMaterial = HIDDEN_ITEM;
 
-            //У меня пока что предметы становятся mojang_banner_pattern,
-            //а у него есть редкость
-            removeComponent(DataComponents.RARITY);
-        }
+        //У меня пока что предметы становятся mojang_banner_pattern,
+        //а у него есть редкость
+        removeComponent(DataComponents.RARITY);
     }
 
     public void applyEnchantments(ItemEnchantments enchantments) {
