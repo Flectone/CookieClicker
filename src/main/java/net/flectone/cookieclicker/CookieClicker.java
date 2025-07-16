@@ -7,7 +7,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import net.flectone.cookieclicker.events.PacketInteractEvent;
+import net.flectone.cookieclicker.events.PacketInteractAtEntityEvent;
 import net.flectone.cookieclicker.events.Packets;
 import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.items.Recipes;
@@ -46,7 +46,7 @@ public final class CookieClicker extends JavaPlugin {
         RegisteredEntitiesConfig config = new RegisteredEntitiesConfig(configPath);
         config.reload();
 
-        injector.getInstance(PacketInteractEvent.class).setRegisteredEntitiesConfig(config);
+        injector.getInstance(PacketInteractAtEntityEvent.class).setRegisteredEntitiesConfig(config);
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(injector.getInstance(RegisteredCommands.class).createCookieClickerCommand());
@@ -60,7 +60,7 @@ public final class CookieClicker extends JavaPlugin {
             return;
         }
 
-        injector.getInstance(PacketInteractEvent.class).loadAllEntities();
+        injector.getInstance(PacketInteractAtEntityEvent.class).loadAllEntities();
     }
 
     @Override

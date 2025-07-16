@@ -31,13 +31,13 @@ public class Packets implements PacketListener {
     private final MainMenu mainMenu;
     private final AnvilEvent anvilEvent;
 
-    private final PacketInteractEvent packetInteractEvent;
+    private final PacketInteractAtEntityEvent packetInteractAtEntityEvent;
     private final ConnectedPlayers connectedPlayers;
 
     @Inject
     public Packets(PacketSetSlotEvent setSlotEvent, PacketMoveEvent packetMoveEvent, MainMenu mainMenu, PacketEatingEvent packetEatingEvent,
                    PacketCookieClickEvent packetCookieClickEvent, ContainerManager containerManager,
-                   PacketCraftingEvent packetCraftingEvent, Shops shops, PacketInteractEvent packetInteractEvent,
+                   PacketCraftingEvent packetCraftingEvent, Shops shops, PacketInteractAtEntityEvent packetInteractAtEntityEvent,
                    AnvilEvent anvilEvent, ConnectedPlayers connectedPlayers) {
         this.setSlotEvent = setSlotEvent;
         this.packetMoveEvent = packetMoveEvent;
@@ -82,7 +82,7 @@ public class Packets implements PacketListener {
             case PacketType.Play.Client.ANIMATION -> packetCookieClickEvent.changeLegendaryHoeMode(user);
             case PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT -> packetCookieClickEvent.bookShelfClick(serverCookiePlayer);
             case PacketType.Play.Client.INTERACT_ENTITY -> {
-                if (packetInteractEvent.checkEntity(new WrapperPlayClientInteractEntity(event), serverCookiePlayer)) {
+                if (packetInteractAtEntityEvent.checkEntity(new WrapperPlayClientInteractEntity(event), serverCookiePlayer)) {
                     event.setCancelled(true);
                 }
             }

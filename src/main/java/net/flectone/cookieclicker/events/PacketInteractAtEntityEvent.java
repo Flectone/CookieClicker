@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @Singleton
 @Getter
-public class PacketInteractEvent {
+public class PacketInteractAtEntityEvent {
     private final int clickDelay = 145;
 
     private final Set<Integer> tradingFarm = new HashSet<>();
@@ -33,7 +33,7 @@ public class PacketInteractEvent {
     private final Shops shops;
 
     @Inject
-    public PacketInteractEvent(Shops shops, PacketCookieClickEvent packetCookieClickEvent) {
+    public PacketInteractAtEntityEvent(Shops shops, PacketCookieClickEvent packetCookieClickEvent) {
         this.shops = shops;
         this.cookieClickEvent = packetCookieClickEvent;
     }

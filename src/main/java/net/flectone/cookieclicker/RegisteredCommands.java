@@ -10,7 +10,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySelectorArgumentResolver;
 import net.flectone.cookieclicker.events.ConnectedPlayers;
-import net.flectone.cookieclicker.events.PacketInteractEvent;
+import net.flectone.cookieclicker.events.PacketInteractAtEntityEvent;
 import net.flectone.cookieclicker.inventories.MainMenu;
 import net.flectone.cookieclicker.items.VillagerTrades;
 import net.flectone.cookieclicker.items.itemstacks.GeneratedCookieItem;
@@ -33,16 +33,16 @@ import java.util.Set;
 public class RegisteredCommands {
     private final MainMenu mainMenu;
     private final VillagerTrades villagerTrades;
-    private final PacketInteractEvent packetInteractEvent;
+    private final PacketInteractAtEntityEvent packetInteractAtEntityEvent;
     private final CCConversionUtils convertUtils;
     private final ConnectedPlayers connectedPlayers;
 
     @Inject
-    public RegisteredCommands(MainMenu mainMenu, VillagerTrades villagerTrades, PacketInteractEvent packetInteractEvent,
+    public RegisteredCommands(MainMenu mainMenu, VillagerTrades villagerTrades, PacketInteractAtEntityEvent packetInteractAtEntityEvent,
                               CCConversionUtils convertUtils, ConnectedPlayers connectedPlayers) {
         this.mainMenu = mainMenu;
         this.villagerTrades = villagerTrades;
-        this.packetInteractEvent = packetInteractEvent;
+        this.packetInteractAtEntityEvent = packetInteractAtEntityEvent;
         this.convertUtils = convertUtils;
         this.connectedPlayers = connectedPlayers;
     }
@@ -133,7 +133,7 @@ public class RegisteredCommands {
         ccEntityCommand.then(createAllEntityCommand());
         ccEntityCommand.then(Commands.literal("reload")
                 .executes(ctx -> {
-                    packetInteractEvent.reloadEntitiesFromConfig();
+                    packetInteractAtEntityEvent.reloadEntitiesFromConfig();
                     return Command.SINGLE_SUCCESS;
                 }));
 
@@ -143,16 +143,16 @@ public class RegisteredCommands {
     private LiteralArgumentBuilder<CommandSourceStack> createAllEntityCommand() {
         return Commands.literal("all_entities")
                 .executes(ctx -> {
-                    ctx.getSource().getSender().sendMessage("trading_farm: " + packetInteractEvent.getTradingFarm());
-                    ctx.getSource().getSender().sendMessage("trading_armorer: " + packetInteractEvent.getTradingArmorer());
-                    ctx.getSource().getSender().sendMessage("item_frames: " + packetInteractEvent.getItemFrames());
+                    ctx.getSource().getSender().sendMessage("trading_farm: " + packetInteractAtEntityEvent.getTradingFarm());
+                    ctx.getSource().getSender().sendMessage("trading_armorer: " + packetInteractAtEntityEvent.getTradingArmorer());
+                    ctx.getSource().getSender().sendMessage("item_frames: " + packetInteractAtEntityEvent.getItemFrames());
                     return Command.SINGLE_SUCCESS;
                 });
     }
 
     private LiteralArgumentBuilder<CommandSourceStack> createEntityCommand(String name, boolean register) {
         LiteralArgumentBuilder<CommandSourceStack> villager = Commands.literal("villager");
-        RegisteredEntitiesConfig registeredEntitiesConfig = packetInteractEvent.getRegisteredEntitiesConfig();
+        RegisteredEntitiesConfig registeredEntitiesConfig = packetInteractAtEntityEvent.getRegisteredEntitiesConfig();
 
         villagerTrades.getAllTraders().keySet().forEach(tag -> villager.then(Commands.literal(tag)
                 .then(Commands.argument("villagerArgument", ArgumentTypes.entity())
