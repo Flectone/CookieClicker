@@ -9,10 +9,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.inventories.ClickerContainer;
 import net.flectone.cookieclicker.inventories.ContainerManager;
 import net.flectone.cookieclicker.inventories.MainMenu;
-import net.flectone.cookieclicker.inventories.Shops;
 import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -24,12 +22,10 @@ public class Packets implements PacketListener {
     private final PacketSetSlotEvent setSlotEvent;
     private final PacketMoveEvent packetMoveEvent;
     private final PacketCookieClickEvent packetCookieClickEvent;
-    private final PacketCraftingEvent packetCraftingEvent;
     private final PacketEatingEvent packetEatingEvent;
     private final ContainerManager containerManager;
-    private final Shops shops;
     private final MainMenu mainMenu;
-    private final AnvilEvent anvilEvent;
+    private final PacketClickInventoryEvent inventoryClickEvent;
 
     private final PacketInteractAtEntityEvent packetInteractAtEntityEvent;
     private final ConnectedPlayers connectedPlayers;
@@ -37,19 +33,17 @@ public class Packets implements PacketListener {
     @Inject
     public Packets(PacketSetSlotEvent setSlotEvent, PacketMoveEvent packetMoveEvent, MainMenu mainMenu, PacketEatingEvent packetEatingEvent,
                    PacketCookieClickEvent packetCookieClickEvent, ContainerManager containerManager,
-                   PacketCraftingEvent packetCraftingEvent, Shops shops, PacketInteractAtEntityEvent packetInteractAtEntityEvent,
-                   AnvilEvent anvilEvent, ConnectedPlayers connectedPlayers) {
+                   PacketInteractAtEntityEvent packetInteractAtEntityEvent,
+                   ConnectedPlayers connectedPlayers, PacketClickInventoryEvent inventoryEvent) {
         this.setSlotEvent = setSlotEvent;
         this.packetMoveEvent = packetMoveEvent;
         this.packetCookieClickEvent = packetCookieClickEvent;
         this.packetEatingEvent = packetEatingEvent;
         this.containerManager = containerManager;
-        this.packetCraftingEvent = packetCraftingEvent;
-        this.shops = shops;
         this.mainMenu = mainMenu;
-        this.anvilEvent = anvilEvent;
+        this.inventoryClickEvent = inventoryEvent;
 
-        this.packetInteractEvent = packetInteractEvent;
+        this.packetInteractAtEntityEvent = packetInteractAtEntityEvent;
         this.connectedPlayers = connectedPlayers;
     }
 
@@ -67,8 +61,6 @@ public class Packets implements PacketListener {
     public void onPacketReceive(PacketReceiveEvent event) {
         User user = event.getUser();
         if (user == null) return;
-        CookiePlayer cookiePlayer = new CookiePlayer(user.getUUID());
-        Player player = cookiePlayer.getPlayer();
 
         ServerCookiePlayer serverCookiePlayer = connectedPlayers.getServerCookiePlayer(user.getUUID());
         if (serverCookiePlayer == null) {
@@ -77,7 +69,7 @@ public class Packets implements PacketListener {
 
         switch (event.getPacketType()) {
             case PacketType.Play.Client.PLAYER_POSITION, PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION -> packetMoveEvent.processPlayerMove(serverCookiePlayer);
-            case PacketType.Play.Client.CLICK_WINDOW -> manageWindow(serverCookiePlayer, new WrapperPlayClientClickWindow(event));
+            case PacketType.Play.Client.CLICK_WINDOW -> inventoryClickEvent.manageWindow(serverCookiePlayer, new WrapperPlayClientClickWindow(event));
             case PacketType.Play.Client.CLOSE_WINDOW -> containerManager.closeContainer(serverCookiePlayer.getUuid());
             case PacketType.Play.Client.ANIMATION -> packetCookieClickEvent.changeLegendaryHoeMode(user);
             case PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT -> packetCookieClickEvent.bookShelfClick(serverCookiePlayer);
@@ -85,9 +77,6 @@ public class Packets implements PacketListener {
                 if (packetInteractAtEntityEvent.checkEntity(new WrapperPlayClientInteractEntity(event), serverCookiePlayer)) {
                     event.setCancelled(true);
                 }
-            }
-            case PacketType.Play.Client i when i == PacketType.Play.Client.USE_ITEM && serverCookiePlayer.getPlayer().getItemInHand(InteractionHand.MAIN_HAND).getItem().equals(Items.JIGSAW) -> {
-                mainMenu.openMainMenu(serverCookiePlayer);
             }
             case PacketType.Play.Client.USE_ITEM -> {
                 if (serverCookiePlayer.getPlayer().getItemInHand(InteractionHand.MAIN_HAND).getItem().equals(Items.JIGSAW)) {
@@ -101,54 +90,10 @@ public class Packets implements PacketListener {
 
     }
 
-    private void manageWindow(ServerCookiePlayer serverCookiePlayer, WrapperPlayClientClickWindow clickPacket) {
-        if (clickPacket.getSlot() == -999) return;
-        ClickerContainer container = containerManager.getOpenedContainer(serverCookiePlayer.getUuid());
-
-        switch (container.getWindowType()) {
-            //наковальня
-            case 8 -> anvilEvent.anvilClick(serverCookiePlayer.getPlayer(), clickPacket.getSlot());
-            //инвентари 9 * x
-            case 1, 2, 3, 4, 5 -> manageContainers(serverCookiePlayer, container, clickPacket);
-            //верстак
-            case 12 -> {
-                if (clickPacket.getSlot() == 0) {
-                    packetCraftingEvent.onCraft(serverCookiePlayer, clickPacket.getWindowClickType());
-                }
-            }
-        }
-    }
-
-    private void manageContainers(ServerCookiePlayer serverCookiePlayer, ClickerContainer container, WrapperPlayClientClickWindow clickPacket) {
-        switch (container.getCustomData()) {
-            //покупка предмета
-            case "trading_farm", "trading_armorer" -> shops.buyItem(serverCookiePlayer, clickPacket);
-            //главное меню, выбор
-            case "main_menu" ->  {
-                if (clickPacket.getSlot() == 15) mainMenu.openAllItems(serverCookiePlayer);
-                if (clickPacket.getSlot() == 11) mainMenu.openAllRecipes(serverCookiePlayer);
-                containerManager.cancelClick(serverCookiePlayer, container, clickPacket.getSlot(), clickPacket.getWindowClickType());
-            }
-            //возврат назад в меню выбора рецепта
-            case "recipe" -> {
-                containerManager.cancelClick(serverCookiePlayer, container, clickPacket.getSlot(), clickPacket.getWindowClickType());
-                if (clickPacket.getSlot() == 8) {
-                    mainMenu.openAllRecipes(serverCookiePlayer);
-                }
-            }
-            //выбор рецепта
-            case "all_recipes" -> mainMenu.selectRecipe(serverCookiePlayer, clickPacket.getSlot(), clickPacket.getWindowClickType());
-            //выбор предмета во всех предметах
-            case "all_items" -> mainMenu.getItemInMenu(clickPacket.getSlot(), serverCookiePlayer, clickPacket.getWindowClickType());
-        }
-    }
-
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getUser() == null)
             return;
-        CookiePlayer cookiePlayer = new CookiePlayer(event.getUser().getUUID());
-        Player player = cookiePlayer.getPlayer();
         ServerCookiePlayer serverCookiePlayer = new ServerCookiePlayer(event.getUser().getUUID());
         Player player = serverCookiePlayer.getPlayer();
 
@@ -159,15 +104,12 @@ public class Packets implements PacketListener {
 
         //200iq костыль, ну а хули
         if (event.getPacketType() == PacketType.Play.Server.WINDOW_PROPERTY) {
-            anvilEvent.processUpgrade(serverCookiePlayer);
+            inventoryClickEvent.checkForEquipUpgrade(serverCookiePlayer);
         }
 
-        if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {;
-            WrapperPlayServerSetSlot setSlotPacket = new WrapperPlayServerSetSlot(event);
+        if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
             //&& setSlotPacket.getSlot() != 0
-            if (containerManager.getOpenedContainer(serverCookiePlayer).getWindowType() == 12) {
-                packetCraftingEvent.prepareCraft(serverCookiePlayer);
-            }
+            inventoryClickEvent.checkAndPrepareCraft(serverCookiePlayer);
 
             setSlotEvent.compactItems(serverCookiePlayer);
             return;
@@ -176,7 +118,5 @@ public class Packets implements PacketListener {
         if (event.getPacketType() == PacketType.Play.Server.ENTITY_STATUS) {
             packetEatingEvent.onEat(new WrapperPlayServerEntityStatus(event), serverCookiePlayer);
         }
-
-
     }
 }
