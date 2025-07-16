@@ -1,8 +1,5 @@
 package net.flectone.cookieclicker.utility;
 
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
-import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
-import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.sound.Sound;
@@ -11,18 +8,17 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
-import com.github.retrooper.packetevents.wrapper.play.server.*;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSoundEffect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
-import net.flectone.cookieclicker.CookieClicker;
+import net.flectone.cookieclicker.Position;
+import net.flectone.cookieclicker.entities.CookieItemEntity;
+import net.flectone.cookieclicker.entities.CookieItemEntityData;
+import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Singleton
 public class PacketUtils {
@@ -33,55 +29,24 @@ public class PacketUtils {
         this.converter = converter;
     }
 
-    public void spawnItem(User user, Location location, ItemStack item) {
-        //тут наверное есть вероятность, что uuid будет уже существующего моба, но хз чё сделать
-        UUID newEntitiUUID = UUID.randomUUID();
-        int newEntityId = SpigotReflectionUtil.generateEntityId();
-        //пакет на спавн предмета
-        WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity(newEntityId,
-                newEntitiUUID,
-                EntityTypes.ITEM,
-                location,
-                1f, //бесполезно по сути
-                1, //не знаю, что это и зачем
-                null);
+    public void spawnItem(ServerCookiePlayer serverCookiePlayer, Location itemLocation, ItemStack itemStack) {
+        CookieItemEntity itemEntity = new CookieItemEntity(itemStack);
+        CookieItemEntityData data = itemEntity.getData();
 
-        //данные для предмета, так как пакет на спавн только призывает предмет без данных
-        List<EntityData<?>> entityDataList = new ArrayList<>();
+        itemEntity.setVisual(converter.fromMinecraftStack(itemStack, MinecraftServer.getServer().registryAccess()));
 
-        entityDataList.add(new EntityData<>(8, EntityDataTypes.ITEMSTACK, converter.fromMinecraftStack(item, MinecraftServer.getServer().registryAccess())));
-        //пакет на изменение данных предмета
-        WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(newEntityId, entityDataList);
-        WrapperPlayServerEntityVelocity velocityPacket = new WrapperPlayServerEntityVelocity(newEntityId, new Vector3d());
-        //пакет на уничтожение предмета, позже понадобится
-        WrapperPlayServerDestroyEntities destroyPacket = new WrapperPlayServerDestroyEntities(newEntityId);
-        WrapperPlayServerCollectItem collectPacket = new WrapperPlayServerCollectItem(newEntityId, user.getEntityId(), item.getCount());
+        itemEntity.setLocation(itemLocation);
+        itemEntity.spawn(serverCookiePlayer);
 
-        user.sendPacket(spawnPacket);
-        user.sendPacket(velocityPacket);
-        user.sendPacket(metadataPacket);
-        net.minecraft.world.entity.player.Player player = converter.userToNMS(user);
-        //вот тут реализовано подбирание предмета
-        new BukkitRunnable() {
+        serverCookiePlayer.addSpawnedItem(data);
 
-            @Override
-            public void run() {
+        Player player = serverCookiePlayer.getPlayer();
+        Position playerPosition = new Position(player.position());
 
-                //расстояние от игрока до предмета
-                double distance = Math.sqrt(Math.pow(location.getX() - player.getX(), 2)
-                        + 0 //Math.pow(location.getY() - player.getY(), 2)
-                        + Math.pow(location.getZ() - player.getZ(), 2));
-                //Если расстояние меньше 2
-                if (distance < 2d) {
-                    //уничтожение предмета
-                    user.sendPacket(collectPacket);
-                    user.sendPacket(destroyPacket);
-                    //добавление предмета в инвентарь
-                    player.getInventory().add(item.copy());
-                    cancel();
-                }
-            }
-        }.runTaskTimer(CookieClicker.getPlugin(CookieClicker.class), 0L, 2L);
+        if (playerPosition.distance(itemLocation) < 2d) {
+            serverCookiePlayer.pickUpItem(itemEntity.getData());
+            player.getInventory().add(itemStack);
+        }
     }
 
     public void playSound(User user, Sound sound, Float volume, Float pitch) {

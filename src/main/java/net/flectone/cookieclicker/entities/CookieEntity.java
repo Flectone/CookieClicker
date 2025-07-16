@@ -11,6 +11,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import lombok.Getter;
 import lombok.Setter;
+import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,8 @@ public class CookieEntity {
         this.entityType = entityType;
     }
 
-    public void spawn(User user) {
+    public void spawn(ServerCookiePlayer serverCookiePlayer) {
+        User user = serverCookiePlayer.getUser();
         WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity(
                 entityId,
                 uuid,
@@ -56,12 +58,12 @@ public class CookieEntity {
         location = new Location(x, y, z, 0, 0);
     }
 
-    public void remove(User user) {
-        removeById(entityId, user);
+    public void remove(ServerCookiePlayer serverCookiePlayer) {
+        removeById(entityId, serverCookiePlayer);
     }
 
-    public static void removeById(Integer id, User user) {
+    public static void removeById(Integer id, ServerCookiePlayer serverCookiePlayer) {
         WrapperPlayServerDestroyEntities destroyPacket = new WrapperPlayServerDestroyEntities(id);
-        user.sendPacket(destroyPacket);
+        serverCookiePlayer.sendPEpacket(destroyPacket);
     }
 }

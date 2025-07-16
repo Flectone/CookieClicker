@@ -24,6 +24,10 @@ import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.utility.PacketUtils;
 import net.flectone.cookieclicker.utility.Pair;
 import net.flectone.cookieclicker.utility.StatsUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -88,7 +92,7 @@ public class PacketCookieClickEvent {
         //Проверка на легендарную мотыгу
         legendaryHoeUpgrade.tryUpdateHoe(user, itemFrameVector3d);
 
-        displayActionBar(user, maxAmount, droppedAmount);
+        displayActionBar(serverCookiePlayer, maxAmount, droppedAmount);
 
         spawnItems(serverCookiePlayer, droppedAmount,
                 location);
@@ -197,9 +201,9 @@ public class PacketCookieClickEvent {
         List<Pair<ItemTag, Integer>> dropItems = chooseItemDrops(serverCookiePlayer, droppedAmount, altItem);
 
         for (Pair<ItemTag, Integer> singleDrop : dropItems)
-            packetUtils.spawnItem(user, loca, loadedItems.get(singleDrop.left(), singleDrop.right()));
+            packetUtils.spawnItem(serverCookiePlayer, loca, loadedItems.get(singleDrop.left(), singleDrop.right()));
 
-        createBonus(user, loca);
+        createBonus(serverCookiePlayer, loca);
     }
 
     public void changeLegendaryHoeMode(User user) {
@@ -246,21 +250,40 @@ public class PacketCookieClickEvent {
         Location bookLocation = new Location(x, y, z, 1, 1);
         //spawning item
         user.sendMessage(MiniMessage.miniMessage().deserialize("<#f4a91c>\uD83C\uDF6A <#f7f4b5>Вы купили книгу!"));
-        packetUtils.spawnItem(user, bookLocation, loadedItems.get(ItemTag.BOOK_COOKIE_BOOST));
+        packetUtils.spawnItem(serverCookiePlayer, bookLocation, loadedItems.get(ItemTag.BOOK_COOKIE_BOOST));
         enchantedCookiesInHand.setCount(enchantedCookiesInHand.getCount() - 15);
+
+        connectedPlayers.save(serverCookiePlayer, true);
     }
 
-    private void displayActionBar(User user, Integer maxAmount, Integer droppedAmount) {
+    private void displayActionBar(ServerCookiePlayer serverCookiePlayer, Integer maxAmount, Integer droppedAmount) {
         // Показ статистики
+        Component line = Component.text("| ").style(Style.style(TextDecoration.BOLD));
         // Первое число - общее количество удачи
         // Второе число - число выпавших предметов
-        // В скобках первое - заряд от эпической мотыги
-        // В скобках второе - уровень заряда, который увеличивает количество выпавших предметов (не удачу)
-        WrapperPlayServerActionBar bar = new WrapperPlayServerActionBar(
-                MiniMessage.miniMessage().deserialize("<#eb6514>" + maxAmount + "⯫ "
-                + "<#e4a814>" + droppedAmount +"★ "
-                + "<#b014eb>[" + epicHoeUtils.getCharge(user.getUUID()) + "% " +  epicHoeUtils.getTier(user.getUUID()) + "☄]"));
-        user.sendPacketSilently(bar);
+        Component fortune = Component.text("+" + droppedAmount).color(TextColor.color(15426836))
+                .append(Component.text(" (" + maxAmount + "★) ")).color(TextColor.color(14985236));
+
+        // В скобках первое - уровень заряда, который увеличивает количество выпавших предметов (не удачу)
+        // В скобках второе - заряд от эпической мотыги
+        Component epicStat = Component.text(String.format("[x%d (%d%%)] ", epicHoeUtils.getTier(serverCookiePlayer.getUuid()), epicHoeUtils.getCharge(serverCookiePlayer.getUuid())))
+                .color(TextColor.color(11539691));
+
+        // После скобок первое - кол-во предметов на земле
+        Component droppedItems = Component.text(String.format("%d/10 ", serverCookiePlayer.getItems().size()))
+                .color(TextColor.color(13299385));
+
+        // Временные штуки, пока не используются
+        Component miningStats = Component.text("0⛏").color(TextColor.color(11800078));
+
+        Component actionBar = Component.empty()
+                .append(droppedItems)
+                .append(line)
+                .append(fortune)
+                .append(epicStat)
+                .append(miningStats);
+
+        serverCookiePlayer.sendPEpacket(new WrapperPlayServerActionBar(actionBar));
     }
 
     public void onClickWithHoe(User user, Vector3d vector3d) {
@@ -281,8 +304,8 @@ public class PacketCookieClickEvent {
         if (bonusEntities.isEmpty() || !bonusEntities.contains(entityId))
             return;
         //удаляем существ
-        CookieEntity.removeById(entityId, serverCookiePlayer.getUser());
-        CookieEntity.removeById(entityId + 10000, serverCookiePlayer.getUser());
+        CookieEntity.removeById(entityId, serverCookiePlayer);
+        CookieEntity.removeById(entityId + 10000, serverCookiePlayer);
         bonusEntities.remove(entityId);
         packetUtils.playSound(
                 serverCookiePlayer.getUser(), Sounds.BLOCK_NOTE_BLOCK_BIT,
@@ -298,7 +321,7 @@ public class PacketCookieClickEvent {
         }
     }
 
-    public void createBonus(User user, Location location) {
+    public void createBonus(ServerCookiePlayer serverCookiePlayer, Location location) {
         int chance = 3;
         if (random.nextInt(1, 100 + 1) <= (100 - chance))
             return;
@@ -308,15 +331,15 @@ public class PacketCookieClickEvent {
 
         CookieEntity interactEntity = new CookieEntity(EntityTypes.INTERACTION);
         interactEntity.setLocation(randomLocation);
-        interactEntity.spawn(user);
+        interactEntity.spawn(serverCookiePlayer);
 
         //200iq, тупо к айдишнику interaction прибавить 10000 и норм
         CookieTextDisplay textDisplay = new CookieTextDisplay(EntityTypes.TEXT_DISPLAY, interactEntity.getEntityId() + 10000);
         textDisplay.setText("клик");
         textDisplay.setLocation(randomLocation.getX(), randomLocation.getY() + 0.5, randomLocation.getZ());
-        textDisplay.spawn(user);
+        textDisplay.spawn(serverCookiePlayer);
 
-        packetUtils.spawnParticle(user,
+        packetUtils.spawnParticle(serverCookiePlayer.getUser(),
                 new Particle<>(ParticleTypes.SONIC_BOOM), 1,
                 new Vector3d(randomLocation.getX(), randomLocation.getY() + 0.5, randomLocation.getZ()), 0f);
 

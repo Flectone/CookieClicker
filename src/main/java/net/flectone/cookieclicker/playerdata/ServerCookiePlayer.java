@@ -3,15 +3,18 @@ package net.flectone.cookieclicker.playerdata;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCollectItem;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityAnimation;
+import net.flectone.cookieclicker.entities.CookieItemEntityData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
 public class ServerCookiePlayer extends CookiePlayer {
-    public ServerCookiePlayer(UUID uuid, int iFrameClicks, int remainXp, int lvl) {
-        super(uuid, iFrameClicks, remainXp, lvl);
+    public ServerCookiePlayer(CookiePlayer cookiePlayer) {
+        super(cookiePlayer);
     }
 
     public ServerCookiePlayer(UUID uuid) {
@@ -82,5 +85,23 @@ public class ServerCookiePlayer extends CookiePlayer {
                 WrapperPlayServerEntityAnimation.EntityAnimationType.SWING_MAIN_ARM
         );
         sendPEpacket(animation);
+    }
+
+    public void addSpawnedItem(CookieItemEntityData itemEntityData) {
+        if (items.size() >= 10) {
+            sendPEpacket(new WrapperPlayServerDestroyEntities(items.getFirst().getId()));
+            items.removeFirst();
+        }
+        items.add(itemEntityData);
+    }
+
+    public void pickUpItem(CookieItemEntityData itemData) {
+        WrapperPlayServerDestroyEntities destroyPacket = new WrapperPlayServerDestroyEntities(itemData.getId());
+        WrapperPlayServerCollectItem collectPacket = new WrapperPlayServerCollectItem(itemData.getId(), getId(), itemData.getCount());
+
+        sendPEpacket(collectPacket);
+        sendPEpacket(destroyPacket);
+
+        items.remove(itemData);
     }
 }

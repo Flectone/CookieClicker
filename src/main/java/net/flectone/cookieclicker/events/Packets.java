@@ -7,14 +7,12 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCl
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityStatus;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.inventories.ClickerContainer;
 import net.flectone.cookieclicker.inventories.ContainerManager;
 import net.flectone.cookieclicker.inventories.MainMenu;
 import net.flectone.cookieclicker.inventories.Shops;
-import net.flectone.cookieclicker.items.ItemManager;
 import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +22,7 @@ import net.minecraft.world.item.Items;
 public class Packets implements PacketListener {
 
     private final PacketSetSlotEvent setSlotEvent;
-    private final ItemManager manager;
+    private final PacketMoveEvent packetMoveEvent;
     private final PacketCookieClickEvent packetCookieClickEvent;
     private final PacketCraftingEvent packetCraftingEvent;
     private final PacketEatingEvent packetEatingEvent;
@@ -37,12 +35,12 @@ public class Packets implements PacketListener {
     private final ConnectedPlayers connectedPlayers;
 
     @Inject
-    public Packets(PacketSetSlotEvent setSlotEvent, ItemManager manager, MainMenu mainMenu, PacketEatingEvent packetEatingEvent,
+    public Packets(PacketSetSlotEvent setSlotEvent, PacketMoveEvent packetMoveEvent, MainMenu mainMenu, PacketEatingEvent packetEatingEvent,
                    PacketCookieClickEvent packetCookieClickEvent, ContainerManager containerManager,
                    PacketCraftingEvent packetCraftingEvent, Shops shops, PacketInteractEvent packetInteractEvent,
                    AnvilEvent anvilEvent, ConnectedPlayers connectedPlayers) {
         this.setSlotEvent = setSlotEvent;
-        this.manager = manager;
+        this.packetMoveEvent = packetMoveEvent;
         this.packetCookieClickEvent = packetCookieClickEvent;
         this.packetEatingEvent = packetEatingEvent;
         this.containerManager = containerManager;
@@ -78,24 +76,18 @@ public class Packets implements PacketListener {
         }
 
         switch (event.getPacketType()) {
-            case PacketType.Play.Client.CLICK_WINDOW -> {
-                manageWindow(serverCookiePlayer, new WrapperPlayClientClickWindow(event));
-            }
-            case PacketType.Play.Client.CLOSE_WINDOW -> {
-                containerManager.closeContainer(serverCookiePlayer.getUuid());
-            }
-            case PacketType.Play.Client.ANIMATION -> {
-                packetCookieClickEvent.changeLegendaryHoeMode(user);
-            }
+            case PacketType.Play.Client.PLAYER_POSITION, PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION -> packetMoveEvent.processPlayerMove(serverCookiePlayer);
+            case PacketType.Play.Client.CLICK_WINDOW -> manageWindow(serverCookiePlayer, new WrapperPlayClientClickWindow(event));
+            case PacketType.Play.Client.CLOSE_WINDOW -> containerManager.closeContainer(serverCookiePlayer.getUuid());
+            case PacketType.Play.Client.ANIMATION -> packetCookieClickEvent.changeLegendaryHoeMode(user);
+            case PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT -> packetCookieClickEvent.bookShelfClick(serverCookiePlayer);
             case PacketType.Play.Client.INTERACT_ENTITY -> {
                 if (packetInteractEvent.checkEntity(new WrapperPlayClientInteractEntity(event), serverCookiePlayer)) {
                     event.setCancelled(true);
                 }
-//                if (packetInteractEvent.manageInteract(cookiePlayer, new WrapperPlayClientInteractEntity(event)))
-//                    event.setCancelled(true);
             }
-            case PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT -> {
-                packetCookieClickEvent.bookShelfClick(serverCookiePlayer);
+            case PacketType.Play.Client i when i == PacketType.Play.Client.USE_ITEM && serverCookiePlayer.getPlayer().getItemInHand(InteractionHand.MAIN_HAND).getItem().equals(Items.JIGSAW) -> {
+                mainMenu.openMainMenu(serverCookiePlayer);
             }
             case PacketType.Play.Client.USE_ITEM -> {
                 if (serverCookiePlayer.getPlayer().getItemInHand(InteractionHand.MAIN_HAND).getItem().equals(Items.JIGSAW)) {

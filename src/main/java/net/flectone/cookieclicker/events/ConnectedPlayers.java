@@ -59,19 +59,16 @@ public class ConnectedPlayers {
     }
 
     public CookiePlayer getCookiePlayer(UUID uuid) {
-        if (playersOnServer.isEmpty() || !playersOnServer.containsKey(uuid)) {
+        if (playersOnServer.isEmpty() || !playersOnServer.containsKey(uuid))
             return null;
-        }
 
         return playersOnServer.get(uuid);
     }
 
     public ServerCookiePlayer getServerCookiePlayer(UUID uuid) {
         CookiePlayer cookiePlayer = getCookiePlayer(uuid);
-        if (cookiePlayer == null)
-            return null;
 
-        return new ServerCookiePlayer(uuid, cookiePlayer.getIFrameClicks(), cookiePlayer.getRemainingXp(), cookiePlayer.getLvl());
+        return cookiePlayer != null ? new ServerCookiePlayer(cookiePlayer) : null;
     }
 
     private void update(CookiePlayer cookiePlayer) {
@@ -89,7 +86,7 @@ public class ConnectedPlayers {
     }
 
     public void save(CookiePlayer cookiePlayer, boolean localSave) {
-        playersOnServer.put(cookiePlayer.getUuid(), new CookiePlayer(cookiePlayer.getUuid(), cookiePlayer.getIFrameClicks(), cookiePlayer.getRemainingXp(), cookiePlayer.getLvl()));
+        playersOnServer.put(cookiePlayer.getUuid(), cookiePlayer);
         if (!localSave) {
             update(cookiePlayer);
         }
