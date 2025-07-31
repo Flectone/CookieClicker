@@ -18,6 +18,7 @@ import net.minecraft.world.item.equipment.EquipmentAssets;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.logging.Logger;
 
 @Singleton
 public class ItemManager {
@@ -33,7 +34,7 @@ public class ItemManager {
         itemsToLoad.put(item.getItemTag().getRealTag(), item);
     }
 
-    public void load() {
+    public void load(Logger logger) {
         //cookie
         CommonCookieItem cookie = new CommonCookieItem(
                 Items.COOKIE, ItemTag.COOKIE,
@@ -301,7 +302,7 @@ public class ItemManager {
                 "<gray> Альтернатива пшенице и какао-бобам");
         registerItem(pumpkin);
 
-        MinecraftServer.getServer().sendSystemMessage(Component.literal("[CookieClicker] loaded items: " + itemsToLoad.size()));
+        logger.info("loaded items: " + itemsToLoad.size());
     }
 
     public ItemStack get(ItemTag tag) {

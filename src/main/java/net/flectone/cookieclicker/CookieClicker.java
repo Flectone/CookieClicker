@@ -36,7 +36,7 @@ public final class CookieClicker extends JavaPlugin {
         Injector injector = Guice.createInjector(new CookieClickerInject(this));
 
         PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(Packets.class), PacketListenerPriority.NORMAL);
-        injector.getInstance(ItemManager.class).load();
+        injector.getInstance(ItemManager.class).load(getLogger());
         injector.getInstance(VillagerTrades.class).loadSellingItems(this.getLogger());
         injector.getInstance(Recipes.class).addRecipes();
 
