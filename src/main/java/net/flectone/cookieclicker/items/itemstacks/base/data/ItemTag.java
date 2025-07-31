@@ -37,6 +37,8 @@ public enum ItemTag {
     GLOW_BERRIES ("glow_berries", ToolType.NONE),
     PUMPKIN_PIE ("pie", ToolType.NONE),
     PUMPKIN ("pumpkin", ToolType.NONE),
+    BAG_18 ("common_bag", ToolType.BACKPACK),
+    BAG_45 ("rare_bag", ToolType.BACKPACK),
 
     HEALING_MELON ("heal_melon", ToolType.NONE),
     PICKAXE ("pickaxe", ToolType.NONE);

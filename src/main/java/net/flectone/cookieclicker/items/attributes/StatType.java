@@ -8,6 +8,7 @@ public enum StatType {
 
     UNUSED ("none", "чего-то"),
     EQUIPMENT_TIER (CookieItems.EQUIPMENT_TIER, "Уровень предмета"),
+    ADDITIONAL_SLOT(CookieItems.ADDITIONAL_SLOTS_KEY, "Слоты хранения"),
     FARMING_FORTUNE (CookieItems.FORTUNE_KEY, "Удача фермера"),
     MINING_FORTUNE (CookieItems.MINING_FORTUNE_KEY, "Удача шахтёра");
 
@@ -24,6 +25,7 @@ public enum StatType {
             case CookieItems.FORTUNE_KEY, CookieItems.OLD_FORTUNE_KEY -> FARMING_FORTUNE;
             case CookieItems.MINING_FORTUNE_KEY -> MINING_FORTUNE;
             case CookieItems.EQUIPMENT_TIER -> EQUIPMENT_TIER;
+            case CookieItems.ADDITIONAL_SLOTS_KEY -> ADDITIONAL_SLOT;
             default -> UNUSED;
         };
     }

@@ -45,7 +45,7 @@ public class Shops {
 
         ClickerContainer container = containerManager.getOpenedContainer(serverCookiePlayer.getUser());
 
-        containerManager.cancelClick(serverCookiePlayer, container, slot, packet.getWindowClickType());
+        containerManager.cancelClick(serverCookiePlayer);
 
         if (container.getContainerItems().size() - 1 < slot) return;
 

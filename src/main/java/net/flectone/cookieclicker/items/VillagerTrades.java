@@ -38,6 +38,10 @@ public class VillagerTrades {
                 .withPrice(ItemTag.BAGUETTE, 150));
         armorer.addTrade(new TradeItem(ItemTag.FARMER_BOOTS)
                 .withPrice(ItemTag.ENCHANTED_COCOA_BEANS, 250));
+        armorer.addTrade(new TradeItem(ItemTag.BAG_18)
+                .withPrice(ItemTag.ENCHANTED_COOKIE, 192));
+        armorer.addTrade(new TradeItem(ItemTag.BAG_45)
+                .withPrice(ItemTag.GLOW_BERRIES, 64));
 
         registerTrader(armorer);
 

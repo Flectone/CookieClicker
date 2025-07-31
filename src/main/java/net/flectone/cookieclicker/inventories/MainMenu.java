@@ -104,7 +104,7 @@ public class MainMenu {
         Player player = serverCookiePlayer.getPlayer();
         ClickerContainer container = containerManager.getOpenedContainer(player);
 
-        containerManager.cancelClick(serverCookiePlayer, container, slot, clickType);
+        containerManager.cancelClick(serverCookiePlayer);
         if (!player.isCreative())
             return;
         if (slot > loadedItems.allItemsRaw().size() - 1)
@@ -159,7 +159,7 @@ public class MainMenu {
     }
 
     public void selectRecipe(ServerCookiePlayer serverCookiePlayer, Integer id, WrapperPlayClientClickWindow.WindowClickType clickType) {
-        containerManager.cancelClick(serverCookiePlayer, containerManager.getOpenedContainer(serverCookiePlayer), id, clickType);
+        containerManager.cancelClick(serverCookiePlayer);
 
         Collection<CustomRecipe> allRecipes = recipes.getAllRecipes().values();
         if (id >= allRecipes.size() || id > containerManager.getOpenedContainer(serverCookiePlayer).getContainerItems().size())

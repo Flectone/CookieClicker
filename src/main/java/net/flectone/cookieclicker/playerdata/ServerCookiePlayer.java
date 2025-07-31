@@ -7,7 +7,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCo
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityAnimation;
 import net.flectone.cookieclicker.entities.CookieItemEntityData;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
@@ -27,7 +30,7 @@ public class ServerCookiePlayer extends CookiePlayer {
 
         while (currentXP <= 0) {
             lvl++;
-            newXp = (int) ((Math.log(lvl)/Math.log(1.1d)) + 50 * lvl + 150000);
+            newXp = (int) ((Math.log(lvl)/Math.log(1.1d)) + 50 * lvl + 90000);
             currentXP = newXp - Math.abs(currentXP);
         }
         remainingXp = currentXP;
@@ -62,21 +65,33 @@ public class ServerCookiePlayer extends CookiePlayer {
         return getUser().getEntityId();
     }
 
+    private Object getChannel() {
+        return PacketEvents.getAPI().getProtocolManager().getChannel(uuid);
+    }
+
+    public void receivePacket(PacketWrapper<?> packetWrapper) {
+        PacketEvents.getAPI().getProtocolManager().receivePacketSilently(getChannel(), packetWrapper);
+    }
+
     public void sendPEpacket(PacketWrapper<?> packetWrapper, boolean silent) {
-        if (silent)
+        if (silent) {
             PacketEvents.getAPI().getProtocolManager().sendPacketSilently(
-                    PacketEvents.getAPI().getProtocolManager().getChannel(uuid),
-                    packetWrapper
-            );
-        else
+                    getChannel(), packetWrapper);
+        } else {
             PacketEvents.getAPI().getProtocolManager().sendPacket(
-                    PacketEvents.getAPI().getProtocolManager().getChannel(uuid),
-                    packetWrapper
-            );
+                    getChannel(), packetWrapper);
+        }
     }
 
     public void sendPEpacket(PacketWrapper<?> packetWrapper) {
         sendPEpacket(packetWrapper, false);
+    }
+
+    public void sendMinecraftPacket(Packet<?> packet) {
+        ServerPlayer serverPlayer = MinecraftServer.getServer().getPlayerList().getPlayer(uuid);
+        if (serverPlayer == null) return;
+
+        serverPlayer.connection.send(packet);
     }
 
     public void swingArm() {
@@ -103,5 +118,20 @@ public class ServerCookiePlayer extends CookiePlayer {
         sendPEpacket(destroyPacket);
 
         items.remove(itemData);
+    }
+
+    //обычный getFreeSlot() возвращает неправильный слот.
+    //Точнее он правильный, но для шифт клика вычисляется другой слот
+    public int getFreeSlot() {
+        Inventory inventory = getPlayer().getInventory();
+
+        for (int i = 8; i >= 0; i--) {
+            if (inventory.getItem(i).isEmpty()) return i;
+        }
+
+        for (int i = 35; i >= 9; i--) {
+            if (inventory.getItem(i).isEmpty()) return i;
+        }
+        return -1;
     }
 }

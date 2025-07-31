@@ -9,7 +9,8 @@ public enum ToolType {
     HOE ("hoe", "в ведущей руке"),
     PICKAXE ("pickaxe", "в ведущей руке"),
     EQUIPMENT ("equipment", "экипировано"),
-    ENCHANTMENT ("book", "зачаровано на предмет");
+    ENCHANTMENT ("book", "зачаровано на предмет"),
+    BACKPACK ("backpack", "открыто");
 
     private final String type;
     private final String view;
@@ -26,6 +27,7 @@ public enum ToolType {
             case "book" -> ENCHANTMENT;
             case "basic", "item" -> NONE;
             case "pickaxe" -> PICKAXE;
+            case "backpack" -> BACKPACK;
             default -> NONE;
         };
     }

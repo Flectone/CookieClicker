@@ -6,11 +6,10 @@ import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.CookieEnchantmentBook;
 import net.flectone.cookieclicker.items.itemstacks.EquipmentCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.HoeCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.base.BackpackCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItemStack;
 import net.flectone.cookieclicker.items.itemstacks.base.data.EquipmentData;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -301,6 +300,18 @@ public class ItemManager {
         pumpkin.addLore("<gray> Создано эпической мотыгой",
                 "<gray> Альтернатива пшенице и какао-бобам");
         registerItem(pumpkin);
+
+        //Backpack 18 slots
+        BackpackCookieItem bag18 = new BackpackCookieItem(Items.GREEN_BUNDLE, ItemTag.BAG_18, 18,
+                "<gradient:#32a208:#46d610><italic:false>Обычный мешок");
+        bag18.hideItem();
+        registerItem(bag18);
+
+        //Backpack 45 slots
+        BackpackCookieItem bag45 = new BackpackCookieItem(Items.PURPLE_BUNDLE, ItemTag.BAG_45, 45,
+                "<gradient:#8315b6:#c21fe7><italic:false>Редкий мешок");
+        bag45.hideItem();
+        registerItem(bag45);
 
         logger.info("loaded items: " + itemsToLoad.size());
     }

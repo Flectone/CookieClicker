@@ -13,10 +13,12 @@ import java.util.Random;
 
 @Getter
 public class ClickerContainer {
+    public static final ClickerContainer EMPTY = new ClickerContainer(0, 0, "empty");
+
     private final int windowId;
     private final int windowType;
     private final String customData;
-    private final NonNullList<ItemStack> containerItems = NonNullList.create();
+    protected final NonNullList<ItemStack> containerItems = NonNullList.create();
     @Setter
     private String title = "новый инвентарь";
 

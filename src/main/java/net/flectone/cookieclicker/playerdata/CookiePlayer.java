@@ -14,7 +14,7 @@ public class CookiePlayer {
     @Setter
     protected int iFrameClicks = 0;
     @Setter
-    protected int remainingXp = 150000;
+    protected int remainingXp = 90000;
     @Setter
     protected int lvl = 0;
 
