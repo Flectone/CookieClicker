@@ -2,9 +2,9 @@ package net.flectone.cookieclicker.events;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.entities.CookieItemEntityData;
-import net.flectone.cookieclicker.items.ItemManager;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.entities.objects.item.CookieItemEntityData;
+import net.flectone.cookieclicker.items.ItemsRegistry;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
@@ -12,11 +12,11 @@ import java.util.List;
 
 @Singleton
 public class PacketMoveEvent {
-    private final ItemManager loadedItems;
+    private final ItemsRegistry loadedItems;
     private final ConnectedPlayers connectedPlayers;
 
     @Inject
-    public PacketMoveEvent(ItemManager loadedItems, ConnectedPlayers connectedPlayers) {
+    public PacketMoveEvent(ItemsRegistry loadedItems, ConnectedPlayers connectedPlayers) {
         this.loadedItems = loadedItems;
         this.connectedPlayers = connectedPlayers;
     }

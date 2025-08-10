@@ -4,7 +4,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.utility.StatsUtils;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.InteractionHand;

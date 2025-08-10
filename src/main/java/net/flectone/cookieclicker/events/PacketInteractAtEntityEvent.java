@@ -6,9 +6,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.cookieclicker.RegisteredEntitiesConfig;
+import net.flectone.cookieclicker.utility.config.RegisteredEntitiesConfig;
 import net.flectone.cookieclicker.inventories.Shops;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 

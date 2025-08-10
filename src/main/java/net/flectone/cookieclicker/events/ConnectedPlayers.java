@@ -2,12 +2,13 @@ package net.flectone.cookieclicker.events;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.playerdata.CookiePlayer;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
-import net.flectone.cookieclicker.utility.Database;
+import net.flectone.cookieclicker.entities.playerdata.CookiePlayer;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.utility.database.Database;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 
+import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -65,6 +66,7 @@ public class ConnectedPlayers {
         return playersOnServer.get(uuid);
     }
 
+    @Nullable
     public ServerCookiePlayer getServerCookiePlayer(UUID uuid) {
         CookiePlayer cookiePlayer = getCookiePlayer(uuid);
 

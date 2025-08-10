@@ -9,13 +9,14 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySelectorArgumentResolver;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.events.ConnectedPlayers;
 import net.flectone.cookieclicker.events.PacketInteractAtEntityEvent;
 import net.flectone.cookieclicker.inventories.MainMenu;
-import net.flectone.cookieclicker.items.VillagerTrades;
+import net.flectone.cookieclicker.items.VillagerTradesRegistry;
 import net.flectone.cookieclicker.items.itemstacks.GeneratedCookieItem;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
-import net.flectone.cookieclicker.utility.CCConversionUtils;
+import net.flectone.cookieclicker.utility.ConversionUtils;
+import net.flectone.cookieclicker.utility.config.RegisteredEntitiesConfig;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -32,23 +33,21 @@ import java.util.Set;
 @Singleton
 public class RegisteredCommands {
     private final MainMenu mainMenu;
-    private final VillagerTrades villagerTrades;
+    private final VillagerTradesRegistry villagerTrades;
     private final PacketInteractAtEntityEvent packetInteractAtEntityEvent;
-    private final CCConversionUtils convertUtils;
     private final ConnectedPlayers connectedPlayers;
 
     @Inject
-    public RegisteredCommands(MainMenu mainMenu, VillagerTrades villagerTrades, PacketInteractAtEntityEvent packetInteractAtEntityEvent,
-                              CCConversionUtils convertUtils, ConnectedPlayers connectedPlayers) {
+    public RegisteredCommands(MainMenu mainMenu, VillagerTradesRegistry villagerTrades, PacketInteractAtEntityEvent packetInteractAtEntityEvent,
+                              ConnectedPlayers connectedPlayers) {
         this.mainMenu = mainMenu;
         this.villagerTrades = villagerTrades;
         this.packetInteractAtEntityEvent = packetInteractAtEntityEvent;
-        this.convertUtils = convertUtils;
         this.connectedPlayers = connectedPlayers;
     }
 
     public LiteralCommandNode<CommandSourceStack> createCookieClickerCommand() {
-        LiteralArgumentBuilder<CommandSourceStack> cookieClicker = Commands.literal("cookieclicker2")
+        LiteralArgumentBuilder<CommandSourceStack> cookieClicker = Commands.literal("cookieclicker")
                 .then(createCookieClickerConvert())
                 .then(createCookieEntityCommand());
         return cookieClicker.build();
@@ -58,7 +57,7 @@ public class RegisteredCommands {
         if (bukkitExecutor == null)
             return null;
 
-        return convertUtils.getNMSplayerByUUID(bukkitExecutor.getUniqueId());
+        return ConversionUtils.getNMSplayerByUUID(bukkitExecutor.getUniqueId());
     }
 
     private ItemStack convertItem(ItemStack originalItem, Integer amount) {

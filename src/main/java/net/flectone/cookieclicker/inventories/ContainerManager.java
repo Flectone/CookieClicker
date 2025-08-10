@@ -5,10 +5,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOp
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetCursorItem;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPlayerInventory;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
-import net.flectone.cookieclicker.utility.CCConversionUtils;
+import net.flectone.cookieclicker.inventories.containers.ClickerContainer;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.utility.ConversionUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
 import net.minecraft.server.MinecraftServer;
@@ -22,14 +22,8 @@ import java.util.UUID;
 
 @Singleton
 public class ContainerManager {
+
     private final HashMap<UUID, ClickerContainer> openedContainers = new HashMap<>();
-
-    private final CCConversionUtils converter;
-
-    @Inject
-    public ContainerManager(CCConversionUtils converter) {
-        this.converter = converter;
-    }
 
     public void setOpenedContainer(UUID uuid, ClickerContainer container) {
         openedContainers.put(uuid, container);
@@ -83,7 +77,7 @@ public class ContainerManager {
     }
 
     private com.github.retrooper.packetevents.protocol.item.ItemStack getPacketEventsStack(ItemStack itemStackMinecraft) {
-        return converter.fromMinecraftStack(itemStackMinecraft, MinecraftServer.getServer().registryAccess());
+        return ConversionUtils.fromMinecraftStack(itemStackMinecraft, MinecraftServer.getServer().registryAccess());
     }
 
     public void setContainerItem(ServerCookiePlayer serverCookiePlayer, int slot, ItemStack itemStack) {

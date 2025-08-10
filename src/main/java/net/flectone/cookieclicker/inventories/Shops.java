@@ -3,13 +3,14 @@ package net.flectone.cookieclicker.inventories;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.CompactItems;
-import net.flectone.cookieclicker.items.ItemManager;
-import net.flectone.cookieclicker.items.VillagerTrades;
+import net.flectone.cookieclicker.utility.ItemsCompactor;
+import net.flectone.cookieclicker.inventories.containers.ClickerContainer;
+import net.flectone.cookieclicker.items.ItemsRegistry;
+import net.flectone.cookieclicker.items.VillagerTradesRegistry;
 import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
-import net.flectone.cookieclicker.items.trades.TradeItem;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.items.trade.TradeItem;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -23,16 +24,16 @@ import java.util.List;
 @Singleton
 public class Shops {
     private final ContainerManager containerManager;
-    private final VillagerTrades villagerTrades;
-    private final CompactItems compactItems;
-    private final ItemManager loadedItems;
+    private final VillagerTradesRegistry villagerTrades;
+    private final ItemsCompactor itemsCompactor;
+    private final ItemsRegistry loadedItems;
 
     @Inject
-    public Shops(ContainerManager containerManager, VillagerTrades villagerTrades,
-                 CompactItems compactItems, ItemManager loadedItems) {
+    public Shops(ContainerManager containerManager, VillagerTradesRegistry villagerTrades,
+                 ItemsCompactor itemsCompactor, ItemsRegistry loadedItems) {
         this.containerManager = containerManager;
         this.villagerTrades = villagerTrades;
-        this.compactItems = compactItems;
+        this.itemsCompactor = itemsCompactor;
         this.loadedItems = loadedItems;
     }
 
@@ -54,7 +55,7 @@ public class Shops {
         if (slot < 9 || villagerTrades.itemsLength(traderType) <= slot - 9)
             return;
 
-        compactItems.compact(
+        itemsCompactor.compact(
                 serverCookiePlayer.getPlayer().getInventory(),
                 villagerTrades.getPriceItem(traderType, slot - 9),
                 loadedItems.get(villagerTrades.getItem(traderType, slot - 9)),

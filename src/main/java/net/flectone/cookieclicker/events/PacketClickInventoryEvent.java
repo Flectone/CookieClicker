@@ -4,9 +4,11 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCl
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.inventories.*;
+import net.flectone.cookieclicker.inventories.containers.ClickerContainer;
+import net.flectone.cookieclicker.inventories.containers.ItemStorage;
 import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;

@@ -2,7 +2,6 @@ package net.flectone.cookieclicker.items.itemstacks;
 
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.attributes.ToolType;
-import net.flectone.cookieclicker.items.itemstacks.base.BaseCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.data.EquipmentData;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;

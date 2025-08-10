@@ -3,12 +3,12 @@ package net.flectone.cookieclicker.events;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.items.CustomRecipe;
-import net.flectone.cookieclicker.items.ItemManager;
-import net.flectone.cookieclicker.items.Recipes;
+import net.flectone.cookieclicker.items.recipe.CustomRecipe;
+import net.flectone.cookieclicker.items.ItemsRegistry;
+import net.flectone.cookieclicker.items.RecipesRegistry;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
-import net.flectone.cookieclicker.utility.Pair;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.utility.data.Pair;
 import net.flectone.cookieclicker.utility.StatsUtils;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -20,11 +20,11 @@ import java.util.List;
 @Singleton
 public class PacketCraftingEvent {
     private final StatsUtils statsUtils;
-    private final Recipes recipes;
-    private final ItemManager loadedItems;
+    private final RecipesRegistry recipes;
+    private final ItemsRegistry loadedItems;
 
     @Inject
-    public PacketCraftingEvent(Recipes recipes, StatsUtils statsUtils, ItemManager loadedItems) {
+    public PacketCraftingEvent(RecipesRegistry recipes, StatsUtils statsUtils, ItemsRegistry loadedItems) {
         this.recipes = recipes;
         this.statsUtils = statsUtils;
         this.loadedItems = loadedItems;

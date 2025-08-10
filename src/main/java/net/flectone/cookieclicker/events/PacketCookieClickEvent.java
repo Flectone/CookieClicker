@@ -1,7 +1,6 @@
 package net.flectone.cookieclicker.events;
 
 import com.github.retrooper.packetevents.protocol.color.Color;
-import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.data.ParticleTrailData;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
@@ -12,18 +11,19 @@ import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerActionBar;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.cookiepart.EpicHoeUtils;
-import net.flectone.cookieclicker.cookiepart.LegendaryHoeUpgrade;
-import net.flectone.cookieclicker.entities.CookieEntity;
-import net.flectone.cookieclicker.entities.CookieTextDisplay;
-import net.flectone.cookieclicker.items.ItemManager;
+import net.flectone.cookieclicker.entities.objects.CookieEntity;
+import net.flectone.cookieclicker.entities.objects.display.CookieTextDisplay;
+import net.flectone.cookieclicker.entities.objects.display.InteractionEntity;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.attributes.CookieAbility;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.utility.PacketUtils;
-import net.flectone.cookieclicker.utility.Pair;
 import net.flectone.cookieclicker.utility.StatsUtils;
+import net.flectone.cookieclicker.utility.data.Pair;
+import net.flectone.cookieclicker.utility.hoes.EpicHoeUtils;
+import net.flectone.cookieclicker.utility.hoes.LegendaryHoeUpgrade;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
@@ -48,7 +48,7 @@ import java.util.Random;
 @Singleton
 public class PacketCookieClickEvent {
     //это жесть
-    private final ItemManager loadedItems;
+    private final ItemsRegistry loadedItems;
     private final StatsUtils statsUtils;
     private final PacketUtils packetUtils;
     private final EpicHoeUtils epicHoeUtils;
@@ -60,7 +60,7 @@ public class PacketCookieClickEvent {
     private final List<Integer> bonusEntities = new ArrayList<>();
 
     @Inject
-    public PacketCookieClickEvent(StatsUtils statsUtils, ItemManager loadedItems,
+    public PacketCookieClickEvent(StatsUtils statsUtils, ItemsRegistry loadedItems,
                                   PacketUtils packetUtils, EpicHoeUtils epicHoeUtils, LegendaryHoeUpgrade legendaryHoeUpgrade,
                                   ConnectedPlayers connectedPlayers) {
         this.loadedItems = loadedItems;
@@ -211,12 +211,14 @@ public class PacketCookieClickEvent {
     }
 
     public void bookShelfClick(ServerCookiePlayer serverCookiePlayer) {
+        int requiredCount = 30;
+
         Player player = serverCookiePlayer.getPlayer();
         User user = serverCookiePlayer.getUser();
 
         ItemStack enchantedCookiesInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
         if (!statsUtils.hasTag(enchantedCookiesInHand, ItemTag.ENCHANTED_COOKIE)) return;
-        if (enchantedCookiesInHand.getCount() < 15) return;
+        if (enchantedCookiesInHand.getCount() < requiredCount) return;
 
         HitResult hitResult = player.getRayTrace(5, ClipContext.Fluid.NONE);
         if (!hitResult.getType().equals(HitResult.Type.BLOCK)) return;
@@ -251,7 +253,7 @@ public class PacketCookieClickEvent {
         //spawning item
         user.sendMessage(MiniMessage.miniMessage().deserialize("<#f4a91c>\uD83C\uDF6A <#f7f4b5>Вы купили книгу!"));
         packetUtils.spawnItem(serverCookiePlayer, bookLocation, loadedItems.get(ItemTag.BOOK_COOKIE_BOOST));
-        enchantedCookiesInHand.setCount(enchantedCookiesInHand.getCount() - 15);
+        enchantedCookiesInHand.setCount(enchantedCookiesInHand.getCount() - requiredCount);
 
         connectedPlayers.save(serverCookiePlayer, true);
     }
@@ -312,7 +314,7 @@ public class PacketCookieClickEvent {
                 1f, (random.nextInt(9, 15) / 10f)
         );
 
-        int amount = statsUtils.convertFortuneToAmount(statsUtils.extractStat(serverCookiePlayer.getPlayer(), StatType.FARMING_FORTUNE)) * 50;
+        int amount = statsUtils.convertFortuneToAmount(statsUtils.extractStat(serverCookiePlayer.getPlayer(), StatType.FARMING_FORTUNE)) * 25;
 
         serverCookiePlayer.swingArm();
 
@@ -329,12 +331,12 @@ public class PacketCookieClickEvent {
         Location randomLocation = new Location(location.getX() + random.nextInt(-2, 3),
                 location.getY(), location.getZ() + random.nextInt(-2, 3), 0f, 0f);
 
-        CookieEntity interactEntity = new CookieEntity(EntityTypes.INTERACTION);
-        interactEntity.setLocation(randomLocation);
-        interactEntity.spawn(serverCookiePlayer);
+        InteractionEntity interactionEntity = new InteractionEntity();
+        interactionEntity.setLocation(randomLocation);
+        interactionEntity.spawn(serverCookiePlayer);
 
         //200iq, тупо к айдишнику interaction прибавить 10000 и норм
-        CookieTextDisplay textDisplay = new CookieTextDisplay(EntityTypes.TEXT_DISPLAY, interactEntity.getEntityId() + 10000);
+        CookieTextDisplay textDisplay = new CookieTextDisplay(interactionEntity.getEntityId() + 10000);
         textDisplay.setText("клик");
         textDisplay.setLocation(randomLocation.getX(), randomLocation.getY() + 0.5, randomLocation.getZ());
         textDisplay.spawn(serverCookiePlayer);
@@ -343,6 +345,6 @@ public class PacketCookieClickEvent {
                 new Particle<>(ParticleTypes.SONIC_BOOM), 1,
                 new Vector3d(randomLocation.getX(), randomLocation.getY() + 0.5, randomLocation.getZ()), 0f);
 
-        bonusEntities.add(interactEntity.getEntityId());
+        bonusEntities.add(interactionEntity.getEntityId());
     }
 }

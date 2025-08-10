@@ -3,17 +3,18 @@ package net.flectone.cookieclicker.inventories;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.cookiepart.EpicHoeUtils;
-import net.flectone.cookieclicker.items.CustomRecipe;
-import net.flectone.cookieclicker.items.ItemManager;
-import net.flectone.cookieclicker.items.Recipes;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.inventories.containers.ClickerContainer;
+import net.flectone.cookieclicker.items.ItemsRegistry;
+import net.flectone.cookieclicker.items.RecipesRegistry;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItemStack;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
-import net.flectone.cookieclicker.utility.Pair;
+import net.flectone.cookieclicker.items.recipe.CustomRecipe;
 import net.flectone.cookieclicker.utility.StatsUtils;
+import net.flectone.cookieclicker.utility.data.Pair;
+import net.flectone.cookieclicker.utility.hoes.EpicHoeUtils;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -26,14 +27,14 @@ import java.util.List;
 
 @Singleton
 public class MainMenu {
-    private final ItemManager loadedItems;
+    private final ItemsRegistry loadedItems;
     private final ContainerManager containerManager;
     private final StatsUtils statsUtils;
-    private final Recipes recipes;
+    private final RecipesRegistry recipes;
     private final EpicHoeUtils epicHoeUtils;
 
     @Inject
-    public MainMenu(ContainerManager containerManager, ItemManager loadedItems, StatsUtils statsUtils, Recipes recipes,
+    public MainMenu(ContainerManager containerManager, ItemsRegistry loadedItems, StatsUtils statsUtils, RecipesRegistry recipes,
                     EpicHoeUtils epicHoeUtils) {
         this.containerManager = containerManager;
         this.loadedItems = loadedItems;

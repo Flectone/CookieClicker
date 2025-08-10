@@ -2,21 +2,21 @@ package net.flectone.cookieclicker.events;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.CompactItems;
-import net.flectone.cookieclicker.items.ItemManager;
+import net.flectone.cookieclicker.utility.ItemsCompactor;
+import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
-import net.flectone.cookieclicker.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.utility.StatsUtils;
 import net.minecraft.world.entity.player.Player;
 
 @Singleton
 public class PacketSetSlotEvent {
-    private final CompactItems compact;
+    private final ItemsCompactor compact;
     private final StatsUtils statsUtils;
-    private final ItemManager loadedItems;
+    private final ItemsRegistry loadedItems;
 
     @Inject
-    public PacketSetSlotEvent(CompactItems compact, StatsUtils statsUtils, ItemManager loadedItems) {
+    public PacketSetSlotEvent(ItemsCompactor compact, StatsUtils statsUtils, ItemsRegistry loadedItems) {
         this.compact = compact;
         this.statsUtils = statsUtils;
         this.loadedItems = loadedItems;
