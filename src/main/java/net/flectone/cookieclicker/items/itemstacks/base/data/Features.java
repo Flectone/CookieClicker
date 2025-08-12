@@ -18,6 +18,7 @@ import java.util.*;
 public class Features {
     //тег предмета
     private final ItemTag itemTag;
+    private CompoundTag additionalData;
     @Setter //способность
     public CookieAbility ability;
     //статы
@@ -50,6 +51,11 @@ public class Features {
         //В списке LOADED_STATS статы, которые используются в предметах
         CookieItems.LOADED_STATS.forEach(stat -> tag.getInt(stat)
                 .ifPresent(integer -> stats.put(StatType.from(stat), new Stat(integer))));
+
+        compoundTag.remove(CookieItems.PLUGIN_KEY);
+        if (!compoundTag.isEmpty()) {
+            additionalData = compoundTag;
+        }
     }
 
     public void applyStat(StatType statType, Integer value) {
@@ -85,7 +91,7 @@ public class Features {
             stats.forEach((key, value) -> compoundTag.putInt(key.getTag(), value.getBaseValue()));
         }
 
-        CompoundTag createdTag = new CompoundTag();
+        CompoundTag createdTag = additionalData != null ? additionalData : new CompoundTag();
         createdTag.put(CookieItems.PLUGIN_KEY, compoundTag);
 
         return createdTag;
