@@ -19,13 +19,13 @@ public class VillagerTradesRegistry {
     public void loadSellingItems(Logger information) {
         CookieTrader farmer = new CookieTrader("trading_farm");
         farmer.addTrade(new TradeItem(ItemTag.WOODEN_HOE)
-                .withPrice(ItemTag.ENCHANTED_COOKIE, 10));
+                .withPrice(ItemTag.ENCHANTED_COOKIE, 20));
         farmer.addTrade(new TradeItem(ItemTag.STONE_HOE)
-                .withPrice(ItemTag.ENCHANTED_COOKIE, 100));
-        farmer.addTrade(new TradeItem(ItemTag.STONE_HOE)
-                .withPrice(ItemTag.ENCHANTED_COOKIE, 30));
+                .withPrice(ItemTag.ENCHANTED_COOKIE, 50));
+        farmer.addTrade(new TradeItem(ItemTag.COOKIE_DESTROYER_HOE)
+                .withPrice(ItemTag.ENCHANTED_COOKIE, 150));
         farmer.addTrade(new TradeItem(ItemTag.ROSE_BUSH_HOE)
-                .withPrice(ItemTag.BAGUETTE, 60));
+                .withPrice(ItemTag.BAGUETTE, 45));
 
         registerTrader(farmer);
 
