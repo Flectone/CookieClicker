@@ -86,8 +86,12 @@ public class StatsUtils {
     //работает и ладно
     public Integer convertFortuneToAmount(Integer fortune) {
         Random random = new Random(System.currentTimeMillis());
-        Integer baseAmount = fortune <= 1 ? 1 : random.nextInt(Math.max(1, fortune - 3), fortune + 1);
-        Integer additionalAmount = fortune < 10 ? 0 : Math.round((float) random.nextInt(fortune - 10, fortune - 2) / 3);
-        return baseAmount + additionalAmount;
+
+        int x = random.nextInt(Math.max(fortune - 3, 1), fortune + 3);
+
+        double first = Math.log(x) / Math.log(25);
+        double second = Math.pow(9, first);
+
+        return (int) (x - second + 1);
     }
 }
