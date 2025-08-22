@@ -45,6 +45,7 @@ public class GeneratedCookieItem extends BaseCookieItem {
         }
 
         customItem.applyEnchantments(itemStack.getEnchantments());
+        customItem.removeComponent(DataComponents.REPAIR_COST);
 
         return customItem;
     }
