@@ -4,128 +4,111 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCl
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.gameplay.cookiepart.StatisticDisplay;
 import net.flectone.cookieclicker.inventories.containers.ClickerContainer;
+import net.flectone.cookieclicker.inventories.containers.MenuContainer;
 import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.RecipesRegistry;
-import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItemStack;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.items.recipe.CustomRecipe;
-import net.flectone.cookieclicker.utility.StatsUtils;
 import net.flectone.cookieclicker.utility.data.Pair;
-import net.flectone.cookieclicker.utility.hoes.EpicHoeUtils;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.TooltipDisplay;
 
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
 @Singleton
 public class MainMenu {
+
     private final ItemsRegistry loadedItems;
     private final ContainerManager containerManager;
-    private final StatsUtils statsUtils;
     private final RecipesRegistry recipes;
-    private final EpicHoeUtils epicHoeUtils;
+    private final StatisticDisplay statisticDisplay;
 
     @Inject
-    public MainMenu(ContainerManager containerManager, ItemsRegistry loadedItems, StatsUtils statsUtils, RecipesRegistry recipes,
-                    EpicHoeUtils epicHoeUtils) {
+    public MainMenu(ContainerManager containerManager, ItemsRegistry loadedItems, RecipesRegistry recipes,
+                    StatisticDisplay statisticDisplay) {
         this.containerManager = containerManager;
         this.loadedItems = loadedItems;
-        this.statsUtils = statsUtils;
         this.recipes = recipes;
-        this.epicHoeUtils = epicHoeUtils;
+        this.statisticDisplay = statisticDisplay;
     }
 
-    public void openMainMenu(ServerCookiePlayer serverCookiePlayer) {
-        ClickerContainer menu = new ClickerContainer(ClickerContainer.generateId(), 2,
-                "main_menu");
-
+    private ItemStack getRecipeButton() {
         CommonCookieItem recipe = new CommonCookieItem(Items.KNOWLEDGE_BOOK, ItemTag.EMPTY,
                 "<gradient:#01e14f:#30a257><italic:false>Посмотреть все рецепты");
-        CommonCookieItem stats = new CommonCookieItem(Items.WRITABLE_BOOK, ItemTag.EMPTY,
-                "<gradient:#e5fffe:#e7f0ef><italic:false>Статистика игрока");
-        stats.addLore(String.format("<#eee2d2><italic:false>   Уровень: <#f28423>%d", serverCookiePlayer.getLvl()));
-        stats.addLore(String.format("<#e7f0ef><italic:false>(До %d-го: <#f7bb86>%d<#e7f0ef>)", serverCookiePlayer.getLvl() + 1, serverCookiePlayer.getRemainingXp()));
-        stats.addLore("<#e7f0ef><italic:false>Удача фермера: <#ffc40a>" + statsUtils.extractStat(serverCookiePlayer.getPlayer(), StatType.FARMING_FORTUNE).toString());
-        stats.addLore("<#e7f0ef><italic:false>Шанс на бонус: <#ffb652>наверное 3%");
-        stats.addLore("<#e7f0ef><italic:false>Уровень заряда: <#7524f1>" + epicHoeUtils.getCharge(serverCookiePlayer.getUuid()));
-        stats.addLore(String.format("<#e7f0ef><italic:false>Множитель от заряда: <#9631e1>x%.1f", 1f + (0.5f * epicHoeUtils.getTier(serverCookiePlayer.getUuid()))));
-        stats.addLore(String.format("<#e7f0ef><italic:false>Кликов по рамке: <#bd702d>%d", serverCookiePlayer.getIFrameClicks()));
+
+        return recipe.toMinecraftStack();
+    }
+
+    private ItemStack getCreativeButton() {
         CommonCookieItem allItems = new CommonCookieItem(Items.BOOK, ItemTag.EMPTY,
                 "<gradient:#ffc900:#f3e736:#f7d760:#e1b926:#f3e736:#ffc900><italic:false>Посмотреть все предметы");
 
-        //beta version item
-        CommonCookieItem info = new CommonCookieItem(Items.LECTERN, ItemTag.EMPTY,
-                "<gradient:#a50404:#f34b4b><italic:false>v2.0-beta3.1");
-        info.addLore("<#e7f0ef><italic:false> Это третья тестовая версия плагина!",
-                " ",
-                "<#e7f0ef><italic:false> -Предметы на земле теперь отображаются нормально",
-                "<#e7f0ef><italic:false> -Добавлена статистика: кликов по рамке",
-                "<#e7f0ef><italic:false> -Добавлен уровень",
-                "<#e7f0ef><italic:false> -Полностью переписаны предметы",
-                "",
-                "<gray><italic:false> Предметы, созданные до этой версии, теперь не работают.",
-                "<gray><italic:false> Но их можно переделать в предмет нового формата",
-                "<gray><italic:false> с помощью команды /cookieclicker2 convert",
-                "<gray><italic:false> А также теперь некоторые предметы и механики работают",
-                "<gray><italic:false> немного иначе."
-        );
-        menu.setItem(0, info.toMinecraftStack());
-        //
+        return allItems.toMinecraftStack();
+    }
 
+    private ItemStack getStatButton(ServerCookiePlayer serverCookiePlayer) {
+        CommonCookieItem stats = new CommonCookieItem(Items.WRITABLE_BOOK, ItemTag.EMPTY,
+                "<gradient:#e5fffe:#e7f0ef><italic:false>Статистика игрока");
 
-        menu.setItem(11, recipe.toMinecraftStack());
-        menu.setItem(13, stats.toMinecraftStack());
-        menu.setItem(15, allItems.toMinecraftStack());
+        statisticDisplay.getStatsAsList(serverCookiePlayer).forEach(stats::addLore);
+        return stats.toMinecraftStack();
+    }
+
+    public void openMainMenu(ServerCookiePlayer serverCookiePlayer) {
+        MenuContainer menu = new MenuContainer(ClickerContainer.generateId(), 2,
+                "main");
+
+        menu.setItem(11, getRecipeButton());
+        menu.setItem(13, getStatButton(serverCookiePlayer));
+        menu.setItem(15, getCreativeButton());
+
+        menu.setAction(11, (player, clickType) -> openAllRecipes(player));
+        menu.setDefaultAction(containerManager::cancelClick);
+        menu.setAction(15, (player, type) -> openAllItems(player));
 
         containerManager.openContainer(serverCookiePlayer, menu);
     }
 
     public void openAllItems(ServerCookiePlayer serverCookiePlayer) {
-        ClickerContainer allItemsScreen = new ClickerContainer(ClickerContainer.generateId(), 4,
+        MenuContainer allItemsScreen = new MenuContainer(ClickerContainer.generateId(), 4,
                 "all_items");
 
         int slot = 0;
         for (CookieItemStack cookieItem : loadedItems.allItemsRaw()) {
-            allItemsScreen.setItem(slot, cookieItem.toMinecraftStack());
+            ItemStack item = cookieItem.toMinecraftStack();
+
+            allItemsScreen.setItem(slot, item);
+            allItemsScreen.setAction(slot, (player, clickType) -> {
+                containerManager.cancelClick(serverCookiePlayer);
+                if (player.getPlayer().isCreative()) {
+                    int amount = (clickType == WrapperPlayClientClickWindow.WindowClickType.QUICK_MOVE) && item.getMaxStackSize() > 1
+                            ? item.getMaxStackSize()
+                            : 1;
+                    player.getPlayer().addItem(item.copyWithCount(amount));
+                }
+            });
+
             slot++;
         }
 
         containerManager.openContainer(serverCookiePlayer, allItemsScreen);
     }
 
-    public void getItemInMenu(Integer slot, ServerCookiePlayer serverCookiePlayer, WrapperPlayClientClickWindow.WindowClickType clickType) {
-        Player player = serverCookiePlayer.getPlayer();
-        ClickerContainer container = containerManager.getOpenedContainer(player);
-
-        containerManager.cancelClick(serverCookiePlayer);
-        if (!player.isCreative())
-            return;
-        if (slot > loadedItems.allItemsRaw().size() - 1)
-            return;
-
-        ItemStack itemToAdd = container.getContainerItems().get(slot).copy();
-        itemToAdd.setCount(clickType.equals(WrapperPlayClientClickWindow.WindowClickType.QUICK_MOVE) && itemToAdd.getMaxStackSize() > 1
-                ? itemToAdd.getMaxStackSize()
-                : 1);
-
-        player.getInventory().add(itemToAdd);
-    }
-
     public void openAllRecipes(ServerCookiePlayer serverCookiePlayer) {
-        ClickerContainer recipesWindow = new ClickerContainer(ClickerContainer.generateId(), 4,
+        MenuContainer recipesWindow = new MenuContainer(ClickerContainer.generateId(), 4,
                 "all_recipes");
 
         int slot = 0;
         for (CustomRecipe recipe : recipes.getAllRecipes().values()) {
             recipesWindow.setItem(slot, loadedItems.get(recipe.getResultTag()));
+            recipesWindow.setAction(slot, (player, clickType) -> openRecipe(player, recipe));
             slot++;
         }
 
@@ -133,7 +116,7 @@ public class MainMenu {
     }
 
     public void openRecipe(ServerCookiePlayer serverCookiePlayer, CustomRecipe recipe) {
-        ClickerContainer singleRecipe = new ClickerContainer(ClickerContainer.generateId(), 2, "recipe");
+        MenuContainer singleRecipe = new MenuContainer(ClickerContainer.generateId(), 2, "recipe");
 
         int slot = 0;
         for (Pair<ItemTag, Integer> ingredient : recipe.getAllIngredients()) {
@@ -155,16 +138,10 @@ public class MainMenu {
         }
         singleRecipe.setItem(13, loadedItems.get(recipe.getResultTag()));
         singleRecipe.setItem(8, closeWindowItem);
+        singleRecipe.setAction(8, (player, clickType) -> openAllRecipes(player));
+
+        singleRecipe.setDefaultAction(containerManager::cancelClick);
 
         containerManager.openContainer(serverCookiePlayer, singleRecipe);
-    }
-
-    public void selectRecipe(ServerCookiePlayer serverCookiePlayer, Integer id, WrapperPlayClientClickWindow.WindowClickType clickType) {
-        containerManager.cancelClick(serverCookiePlayer);
-
-        Collection<CustomRecipe> allRecipes = recipes.getAllRecipes().values();
-        if (id >= allRecipes.size() || id > containerManager.getOpenedContainer(serverCookiePlayer).getContainerItems().size())
-            return;
-        openRecipe(serverCookiePlayer, (CustomRecipe) allRecipes.toArray()[id]);
     }
 }

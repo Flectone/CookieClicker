@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.events;
+package net.flectone.cookieclicker.gameplay.crafting.anvil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -31,8 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-public class AnvilEvent {
-    private final StatsUtils statsUtils;
+public class AnvilItemUpgrade {
 
     private final List<Pair<ItemTag, String>> stages = List.of(
             new Pair<>(ItemTag.CAKE_UPGRADE_ITEM, "quartz"),
@@ -43,8 +42,10 @@ public class AnvilEvent {
             new Pair<>(ItemTag.COOKIE, "netherite")
     );
 
+    private final StatsUtils statsUtils;
+
     @Inject
-    public AnvilEvent(StatsUtils statsUtils) {
+    public AnvilItemUpgrade(StatsUtils statsUtils) {
         this.statsUtils = statsUtils;
     }
 
@@ -62,9 +63,15 @@ public class AnvilEvent {
         player.containerMenu.setItem(2, player.containerMenu.getStateId(), cookieAnvilItem.toMinecraftStack());
     }
 
-    public void processUpgrade(ServerCookiePlayer serverCookiePlayer) {
+    @Deprecated
+    public void checkForUpgrade(ServerCookiePlayer serverCookiePlayer) {
         if (!(serverCookiePlayer.getPlayer().containerMenu instanceof AnvilMenu anvilMenu))
             return;
+
+        checkForUpgrade(anvilMenu);
+    }
+
+    public void checkForUpgrade(AnvilMenu anvilMenu) {
         ItemStack firstItem = anvilMenu.getItems().getFirst();
         ItemStack secondItem = anvilMenu.getItems().get(1);
 

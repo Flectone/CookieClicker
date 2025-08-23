@@ -3,6 +3,7 @@ package net.flectone.cookieclicker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -10,11 +11,13 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySelectorArgumentResolver;
 import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
-import net.flectone.cookieclicker.events.ConnectedPlayers;
-import net.flectone.cookieclicker.events.PacketInteractAtEntityEvent;
+import net.flectone.cookieclicker.entities.ConnectedPlayers;
+import net.flectone.cookieclicker.gameplay.cookiepart.InteractionController;
 import net.flectone.cookieclicker.inventories.MainMenu;
+import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.VillagerTradesRegistry;
 import net.flectone.cookieclicker.items.itemstacks.GeneratedCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.utility.ConversionUtils;
 import net.flectone.cookieclicker.utility.config.RegisteredEntitiesConfig;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -26,30 +29,35 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.bukkit.entity.Entity;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Singleton
 public class RegisteredCommands {
+
+    private final ItemsRegistry itemsRegistry;
     private final MainMenu mainMenu;
     private final VillagerTradesRegistry villagerTrades;
-    private final PacketInteractAtEntityEvent packetInteractAtEntityEvent;
+    private final InteractionController packetInteractAtEntityEvent;
     private final ConnectedPlayers connectedPlayers;
 
     @Inject
-    public RegisteredCommands(MainMenu mainMenu, VillagerTradesRegistry villagerTrades, PacketInteractAtEntityEvent packetInteractAtEntityEvent,
-                              ConnectedPlayers connectedPlayers) {
+    public RegisteredCommands(MainMenu mainMenu, VillagerTradesRegistry villagerTrades, InteractionController packetInteractAtEntityEvent,
+                              ConnectedPlayers connectedPlayers, ItemsRegistry itemsRegistry) {
         this.mainMenu = mainMenu;
         this.villagerTrades = villagerTrades;
         this.packetInteractAtEntityEvent = packetInteractAtEntityEvent;
         this.connectedPlayers = connectedPlayers;
+        this.itemsRegistry = itemsRegistry;
     }
 
     public LiteralCommandNode<CommandSourceStack> createCookieClickerCommand() {
         LiteralArgumentBuilder<CommandSourceStack> cookieClicker = Commands.literal("cookieclicker")
                 .then(createCookieClickerConvert())
-                .then(createCookieEntityCommand());
+                .then(createCookieEntityCommand())
+                .then(createGiveCommand());
         return cookieClicker.build();
     }
 
@@ -113,6 +121,25 @@ public class RegisteredCommands {
         return convert.build();
     }
 
+    public LiteralCommandNode<CommandSourceStack> createGiveCommand() {
+        LiteralArgumentBuilder<CommandSourceStack> giveCommand = Commands.literal("give")
+                .requires(sender -> sender.getSender().isOp())
+                .then(Commands.argument("item_tag", StringArgumentType.word())
+                        .suggests((ctx, builder) -> {
+                            Arrays.asList(ItemTag.values()).forEach(tag -> builder.suggest(tag.getRealTag()));
+                            return builder.buildFuture();
+                        })
+                        .executes(ctx -> {
+                            Player nmsExecutor = getPlayerExecutor(ctx.getSource().getExecutor());
+                            if (nmsExecutor == null)
+                                return 0;
+
+                            nmsExecutor.addItem(itemsRegistry.get(ItemTag.fromString(ctx.getArgument("item_tag", String.class))));
+                            return Command.SINGLE_SUCCESS;
+                        }));
+        return giveCommand.build();
+    }
+
     public LiteralCommandNode<CommandSourceStack> createOpenMenuCommand() {
         LiteralArgumentBuilder<CommandSourceStack> openMenu = Commands.literal("menu")
                 .executes(ctx -> {
@@ -142,8 +169,8 @@ public class RegisteredCommands {
     private LiteralArgumentBuilder<CommandSourceStack> createAllEntityCommand() {
         return Commands.literal("all_entities")
                 .executes(ctx -> {
-                    ctx.getSource().getSender().sendMessage("trading_farm: " + packetInteractAtEntityEvent.getTradingFarm());
-                    ctx.getSource().getSender().sendMessage("trading_armorer: " + packetInteractAtEntityEvent.getTradingArmorer());
+                    ctx.getSource().getSender().sendMessage("trading_farm: " + packetInteractAtEntityEvent.getTradersFarmers());
+                    ctx.getSource().getSender().sendMessage("trading_armorer: " + packetInteractAtEntityEvent.getTradersArmorers());
                     ctx.getSource().getSender().sendMessage("item_frames: " + packetInteractAtEntityEvent.getItemFrames());
                     return Command.SINGLE_SUCCESS;
                 });
@@ -151,7 +178,7 @@ public class RegisteredCommands {
 
     private LiteralArgumentBuilder<CommandSourceStack> createEntityCommand(String name, boolean register) {
         LiteralArgumentBuilder<CommandSourceStack> villager = Commands.literal("villager");
-        RegisteredEntitiesConfig registeredEntitiesConfig = packetInteractAtEntityEvent.getRegisteredEntitiesConfig();
+        RegisteredEntitiesConfig registeredEntitiesConfig = packetInteractAtEntityEvent.getRegisteredEntities();
 
         villagerTrades.getAllTraders().keySet().forEach(tag -> villager.then(Commands.literal(tag)
                 .then(Commands.argument("villagerArgument", ArgumentTypes.entity())

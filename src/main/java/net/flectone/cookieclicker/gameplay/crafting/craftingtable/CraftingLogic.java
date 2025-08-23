@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.events;
+package net.flectone.cookieclicker.gameplay.crafting.craftingtable;
 
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
@@ -18,13 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-public class PacketCraftingEvent {
+public class CraftingLogic {
     private final StatsUtils statsUtils;
     private final RecipesRegistry recipes;
     private final ItemsRegistry loadedItems;
 
     @Inject
-    public PacketCraftingEvent(RecipesRegistry recipes, StatsUtils statsUtils, ItemsRegistry loadedItems) {
+    public CraftingLogic(RecipesRegistry recipes, StatsUtils statsUtils, ItemsRegistry loadedItems) {
         this.recipes = recipes;
         this.statsUtils = statsUtils;
         this.loadedItems = loadedItems;
@@ -109,10 +109,15 @@ public class PacketCraftingEvent {
         return amount;
     }
 
+    @Deprecated
     public void prepareCraft(ServerCookiePlayer serverCookiePlayer) {
-        AbstractContainerMenu craftingContainer = serverCookiePlayer.getPlayer().containerMenu;
+        prepareCraft(serverCookiePlayer.getPlayer().containerMenu);
+    }
+
+    public void prepareCraft(AbstractContainerMenu craftingContainer) {
         if (!craftingContainer.getSlot(0).getItem().getItem().equals(Items.AIR))
             return;
+
         CustomRecipe recipe = findRecipe(craftingContainer);
         if (recipe == null) return;
 

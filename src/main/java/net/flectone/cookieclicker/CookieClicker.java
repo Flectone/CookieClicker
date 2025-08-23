@@ -7,11 +7,15 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import net.flectone.cookieclicker.events.PacketInteractAtEntityEvent;
-import net.flectone.cookieclicker.events.Packets;
-import net.flectone.cookieclicker.events.core.CookieEventManager;
-import net.flectone.cookieclicker.events.test.PacketEventsImpl;
-import net.flectone.cookieclicker.events.test.PacketInteractListener;
+import net.flectone.cookieclicker.eventdata.CookieEventManager;
+import net.flectone.cookieclicker.eventdata.listener.PacketDispatcher;
+import net.flectone.cookieclicker.gameplay.cookiepart.InteractionController;
+import net.flectone.cookieclicker.gameplay.cookiepart.listeners.*;
+import net.flectone.cookieclicker.gameplay.crafting.anvil.listeners.AnvilListener;
+import net.flectone.cookieclicker.gameplay.crafting.craftingtable.listeners.CraftingListener;
+import net.flectone.cookieclicker.gameplay.itempickup.listeners.ItemPickupListener;
+import net.flectone.cookieclicker.gameplay.itempickup.listeners.PlayerMoveListener;
+import net.flectone.cookieclicker.gameplay.window.listeners.WindowListener;
 import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.RecipesRegistry;
 import net.flectone.cookieclicker.items.VillagerTradesRegistry;
@@ -33,23 +37,35 @@ public final class CookieClicker extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        Path projectPath = this.getDataFolder().toPath();
+
         PacketEvents.getAPI().init();
 
-        injector = Guice.createInjector(new CookieClickerInject(this, getLogger()));
-
-
-        PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(Packets.class), PacketListenerPriority.NORMAL);
-        injector.getInstance(ItemsRegistry.class).load(getLogger());
-        injector.getInstance(VillagerTradesRegistry.class).loadSellingItems(this.getLogger());
-        injector.getInstance(RecipesRegistry.class).addRecipes();
-
-        Path projectPath = this.getDataFolder().toPath();
         Path configPath = projectPath.resolve("config.yml");
-
         RegisteredEntitiesConfig config = new RegisteredEntitiesConfig(configPath);
         config.reload();
 
-        injector.getInstance(PacketInteractAtEntityEvent.class).setRegisteredEntitiesConfig(config);
+        injector = Guice.createInjector(new CookieClickerInject(this, getLogger(), config));
+
+        CookieEventManager cookieEventManager = injector.getInstance(CookieEventManager.class);
+
+        cookieEventManager.register(injector.getInstance(PlayerInteractEntityListener.class));
+        cookieEventManager.register(injector.getInstance(PlayerEatListener.class));
+        cookieEventManager.register(injector.getInstance(PlayerMoveListener.class));
+        cookieEventManager.register(injector.getInstance(ItemPickupListener.class));
+        cookieEventManager.register(injector.getInstance(AnvilListener.class));
+        cookieEventManager.register(injector.getInstance(InventoryClickListener.class));
+        cookieEventManager.register(injector.getInstance(PlayerInteractItemListener.class));
+        cookieEventManager.register(injector.getInstance(PlayerInteractBlockListener.class));
+
+        cookieEventManager.register(injector.getInstance(WindowListener.class));
+        cookieEventManager.register(injector.getInstance(CraftingListener.class));
+
+        PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(PacketDispatcher.class), PacketListenerPriority.NORMAL);
+
+        injector.getInstance(ItemsRegistry.class).load(getLogger());
+        injector.getInstance(VillagerTradesRegistry.class).loadSellingItems(this.getLogger());
+        injector.getInstance(RecipesRegistry.class).addRecipes();
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(injector.getInstance(RegisteredCommands.class).createCookieClickerCommand());
@@ -63,7 +79,7 @@ public final class CookieClicker extends JavaPlugin {
             return;
         }
 
-        injector.getInstance(PacketInteractAtEntityEvent.class).loadAllEntities();
+        injector.getInstance(InteractionController.class).loadAllEntities();
     }
 
     @Override

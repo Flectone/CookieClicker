@@ -3,11 +3,14 @@ package net.flectone.cookieclicker.utility;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
+import net.flectone.cookieclicker.utility.data.Pair;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Singleton
@@ -65,4 +68,30 @@ public class ItemsCompactor {
             times--;
         }
     }
+
+    public List<Pair<ItemTag, Integer>> compactFromValue(ItemTag from, ItemTag to, Integer amount, Integer amountToFind) {
+        List<Pair<ItemTag, Integer>> items = new ArrayList<>();
+        int compacted = amount / amountToFind;
+        int remaining = amount - (compacted * amountToFind);
+
+        if (compacted > 0) {
+            items.add(new Pair<>(to, compacted));
+        }
+
+        items.add(new Pair<>(from, remaining));
+        return items;
+    }
+
+    public List<Pair<ItemTag, Integer>> doubleCompactFromValue(ItemTag from, ItemTag toFirst, ItemTag toSecond,
+                                                               Integer amount, Integer amountToFind1, Integer amountToFind2) {
+        List<Pair<ItemTag, Integer>> items = compactFromValue(from, toFirst, amount, amountToFind1);
+
+        if (items.getFirst().left() == toFirst) {
+            items.addAll(compactFromValue(toFirst, toSecond, items.getFirst().right(),amountToFind2));
+            items.removeFirst();
+        }
+
+        return items;
+    }
+
 }

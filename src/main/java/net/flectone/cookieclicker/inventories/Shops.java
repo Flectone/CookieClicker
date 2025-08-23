@@ -3,14 +3,15 @@ package net.flectone.cookieclicker.inventories;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.utility.ItemsCompactor;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.inventories.containers.ClickerContainer;
+import net.flectone.cookieclicker.inventories.containers.MenuContainer;
 import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.VillagerTradesRegistry;
 import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
-import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.items.trade.TradeItem;
+import net.flectone.cookieclicker.utility.ItemsCompactor;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -64,6 +65,43 @@ public class Shops {
         );
     }
 
+    private void buyItem(ServerCookiePlayer serverCookiePlayer, TradeItem tradeItem) {
+        containerManager.cancelClick(serverCookiePlayer);
+
+        itemsCompactor.compact(
+                serverCookiePlayer.getPlayer().getInventory(),
+                tradeItem.getPrice().getKey(),
+                loadedItems.get(tradeItem.getSellingItemTag()),
+                tradeItem.getPrice().getValue(),
+                1
+        );
+    }
+
+    private MenuContainer createShopContainer(int windowType, String customData) {
+        MenuContainer shopContainer = new MenuContainer(ClickerContainer.generateId(), windowType, customData);
+
+        CommonCookieItem upperItem = new CommonCookieItem(Items.WHITE_STAINED_GLASS_PANE, ItemTag.EMPTY,
+                "<gradient:#ffffff:#cccccc><italic:false>Здесь вы можете купить");
+        upperItem.addLore("<gradient:#ffffff:#cccccc><italic:false>различные вещи");
+
+        shopContainer.setTitle("торговля жесть в шоке все");
+
+        for (int i = 0; i < 9; i++) {
+            shopContainer.setItem(i, upperItem.toMinecraftStack());
+        }
+
+        int slot = 9;
+        for (TradeItem tradeItem : villagerTrades.getShopItems(customData)) {
+            shopContainer.setItem(slot, addPriceToSellItem(tradeItem));
+            shopContainer.setAction(slot, (player, clickType) -> buyItem(player, tradeItem));
+            slot++;
+        }
+
+        shopContainer.setDefaultAction(containerManager::cancelClick);
+
+        return shopContainer;
+    }
+
     private ClickerContainer createBasicShop(Integer windowType, String customData) {
         ClickerContainer basicContainer = new ClickerContainer(ClickerContainer.generateId(),
                 windowType, customData);
@@ -106,7 +144,7 @@ public class Shops {
     }
 
     public ClickerContainer createAnyShop(String type) {
-        return createBasicShop(3, type);
+        return createShopContainer(3, type);
     }
     public ClickerContainer createCookieShop() {
         return createBasicShop(3, "trading_farm");

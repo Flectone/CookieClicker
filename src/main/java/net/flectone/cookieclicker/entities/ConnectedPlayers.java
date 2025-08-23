@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.events;
+package net.flectone.cookieclicker.entities;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

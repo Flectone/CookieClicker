@@ -10,11 +10,10 @@ import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.items.attributes.CookieAbility;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.items.itemstacks.GeneratedCookieItem;
-import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
-import net.flectone.cookieclicker.utility.ConversionUtils;
 import net.flectone.cookieclicker.utility.PacketUtils;
 import net.flectone.cookieclicker.utility.StatsUtils;
 import net.minecraft.core.component.DataComponentPatch;
@@ -24,8 +23,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.phys.HitResult;
 
 @Singleton
 public class LegendaryHoeUpgrade {
@@ -41,33 +38,25 @@ public class LegendaryHoeUpgrade {
         this.statsUtils = statsUtils;
     }
 
-    public void tryUpdateHoe(User user, Vector3d itemFrameLocation) {
-        Player player = ConversionUtils.userToNMS(user);
-        ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-
-        if (itemInHand.getItem().equals(Items.AIR)) return;
-
-        CookieAbility ability = statsUtils.getAbility(itemInHand);
-        if (ability != CookieAbility.INFINITY_UPGRADE) return;
+    public void tryUpdateHoe(ServerCookiePlayer serverCookiePlayer, ItemStack legendaryHoe) {
+        Player player = serverCookiePlayer.getPlayer();
+        User user = serverCookiePlayer.getUser();
 
         //получаем текущую прочность
-        Object currentDamage = itemInHand.getComponents().get(DataComponents.DAMAGE);
+        Object currentDamage = legendaryHoe.getComponents().get(DataComponents.DAMAGE);
         int damage = currentDamage == null ? 0 : (int) currentDamage;
 
-        setDamage(itemInHand, damage - 1);
+        setDamage(legendaryHoe, damage - 1);
         //Если "прочность" заполнилась, то добавляется одна удача и сбрасывается прочность
         if (damage <= 1) {
-            setDamage(itemInHand, 99);
+            setDamage(legendaryHoe, 99);
 
-            GeneratedCookieItem upgradeableItem = GeneratedCookieItem.fromItemStack(itemInHand);
+            GeneratedCookieItem upgradeableItem = GeneratedCookieItem.fromItemStack(legendaryHoe);
             upgradeableItem.addStat(StatType.FARMING_FORTUNE, 1);
             player.setItemInHand(InteractionHand.MAIN_HAND, upgradeableItem.toMinecraftStack());
         }
 
         packetUtils.playSound(user, Sounds.BLOCK_NETHERITE_BLOCK_BREAK, 1f, 1.8f);
-        packetUtils.spawnParticle(user, new Particle<>(ParticleTypes.TRIAL_SPAWNER_DETECTION_OMINOUS), 1,
-                itemFrameLocation, 0.2f);
-
     }
 
     public void setDamage(net.minecraft.world.item.ItemStack item, Integer value) {
@@ -78,16 +67,10 @@ public class LegendaryHoeUpgrade {
         );
     }
 
-    public void legHoeChange (User user) {
-        Player player = ConversionUtils.userToNMS(user);
-
-        //проверка, клик в воздух или нет
-        HitResult hitResult = player.getRayTrace(7, ClipContext.Fluid.NONE);
-        if (!hitResult.getType().equals(HitResult.Type.MISS)) return;
-
-        //предмет в руке
-        ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-        if (statsUtils.getItemTag(itemInHand) != ItemTag.LEGENDARY_HOE) return;
+    public void legHoeChange (ServerCookiePlayer serverCookiePlayer) {
+        Player player = serverCookiePlayer.getPlayer();
+        User user = serverCookiePlayer.getUser();
+        ItemStack itemInHand = player.getMainHandItem();
 
         GeneratedCookieItem legendaryHoe = GeneratedCookieItem.fromItemStack(itemInHand);
 

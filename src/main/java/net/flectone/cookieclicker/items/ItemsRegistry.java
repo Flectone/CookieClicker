@@ -46,6 +46,7 @@ public class ItemsRegistry {
                 Items.COOKIE, ItemTag.ENCHANTED_COOKIE,
                 "<gradient:#992e7a:#ff8009:#992e7a><italic:false>Зачарованное печенье"
         );
+        enchantedCookie.addLore("<gray> Съешьте, чтобы получить опыт");
         enchantedCookie.setAmount(64);
         enchantedCookie.setEnchantmentGlint();
         enchantedCookie.hideItem();
@@ -182,6 +183,7 @@ public class ItemsRegistry {
                 ItemTag.SWEET_BERRIES,
                 "<gradient:#c80b47:#ff286c><italic:false>Сладкие ягоды"
         );
+        berries.addLore("<gray> Можно получить с помощью Розового куста</gray>", "<gray> (см. жителя фермера)</gray>");
         registerItem(berries);
 
         //Farmer Armor base

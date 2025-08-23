@@ -37,8 +37,8 @@ public class PacketUtils {
         Position playerPosition = new Position(player.position());
 
         if (playerPosition.distance(itemLocation) < 2d) {
-            serverCookiePlayer.pickUpItem(itemEntity.getData());
             player.getInventory().add(itemStack);
+            serverCookiePlayer.pickUpItem(itemEntity.getData());
         }
     }
 

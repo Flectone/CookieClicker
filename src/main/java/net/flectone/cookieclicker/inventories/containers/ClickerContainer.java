@@ -13,7 +13,10 @@ import java.util.Random;
 
 @Getter
 public class ClickerContainer {
+
     public static final ClickerContainer EMPTY = new ClickerContainer(0, 0, "empty");
+    public static final int ANVIL_TYPE = 8;
+    public static final int CRAFTING_TABLE_TYPE = 12;
 
     private final int windowId;
     private final int windowType;
@@ -26,16 +29,16 @@ public class ClickerContainer {
         this.windowId = windowId;
         this.windowType = windowType;
         this.customData = customData;
+
         int listSize;
-        if (!customData.equals("default")) {
-            switch (windowType) {
-                // 9 * x инвентари
-                case 0, 1, 2, 3, 4, 5 -> listSize = 9 * (windowType + 1);
-                case 6 ->  listSize = 9;
-                default -> listSize = 0;
-            }
-            containerItems.addAll(new ArrayList<>(Collections.nCopies(listSize, new ItemStack(Items.AIR))));
+
+        switch (windowType) {
+            // 9 * x инвентари
+            case 0, 1, 2, 3, 4, 5 -> listSize = 9 * (windowType + 1);
+            case 6 ->  listSize = 9;
+            default -> listSize = 0;
         }
+        containerItems.addAll(new ArrayList<>(Collections.nCopies(listSize, new ItemStack(Items.AIR))));
     }
     public ClickerContainer(WrapperPlayServerOpenWindow packet) {
         windowId = packet.getContainerId();

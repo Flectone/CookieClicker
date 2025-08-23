@@ -71,7 +71,7 @@ public class Database {
         hikariConfig.addDataSourceProperty("journal_size_limit", "6144000");
 
         hikariConfig.setJdbcUrl(connectionURL);
-        hikariConfig.setPoolName("CookieClickerDataBase");
+        hikariConfig.setPoolName("CookieClickerDatabase");
 
         return hikariConfig;
     }
