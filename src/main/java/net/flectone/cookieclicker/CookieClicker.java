@@ -41,7 +41,7 @@ public final class CookieClicker extends JavaPlugin {
 
         PacketEvents.getAPI().init();
 
-        Path configPath = projectPath.resolve("config.yml");
+        Path configPath = projectPath.resolve("entities.yml");
         RegisteredEntitiesConfig config = new RegisteredEntitiesConfig(configPath);
         config.reload();
 
