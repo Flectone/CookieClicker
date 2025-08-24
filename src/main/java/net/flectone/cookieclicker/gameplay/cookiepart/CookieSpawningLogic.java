@@ -142,12 +142,11 @@ public class CookieSpawningLogic {
     }
 
     private void spawnItems(ServerCookiePlayer serverCookiePlayer, DropType dropType, Integer amount, Location location) {
-        //int stackSize = 64 * Math.min((amount / 100) + 1, 35);
         boolean isCookieCrafter = new Features(serverCookiePlayer.getPlayer().getOffhandItem()).getItemTag() == ItemTag.COOKIE_CRAFTER;
+        int lvlScaling = serverCookiePlayer.getLvlScaling();
 
-        compactItems(dropType.getTags(), amount, isCookieCrafter).forEach(drop -> {
-            packetUtils.spawnItem(serverCookiePlayer, location, itemsRegistry.get(drop.getKey(), drop.getValue()));
-        });
+        compactItems(dropType.getTags(), amount, lvlScaling, isCookieCrafter).forEach(drop ->
+                packetUtils.spawnItem(serverCookiePlayer, location, itemsRegistry.get(drop.getKey(), drop.getValue())));
     }
 
     private void spawnChocolate(ServerCookiePlayer serverCookiePlayer, Location location) {
@@ -219,18 +218,18 @@ public class CookieSpawningLogic {
         epicHoeUtils.addCharge(user.getUUID(), 1);
     }
 
-    public List<Pair<ItemTag, Integer>> compactItems(List<ItemTag> tags, Integer amount, boolean isCookieCrafter) {
+    public List<Pair<ItemTag, Integer>> compactItems(List<ItemTag> tags, Integer amount, Integer lvlScaling, boolean isCookieCrafter) {
         List<Pair<ItemTag, Integer>> compacted = new ArrayList<>();
 
         tags.forEach(itemTag -> compacted.addAll(switch (itemTag) {
             case ItemTag t when t == ItemTag.COOKIE && isCookieCrafter -> itemsCompactor.doubleCompactFromValue(
                     ItemTag.COOKIE, ItemTag.ENCHANTED_COOKIE, ItemTag.BLOCK_OF_COOKIE,
-                    amount, 160, 512
+                    amount, 160 + lvlScaling, 512
             );
             case ItemTag t when t == ItemTag.COOKIE -> itemsCompactor.compactFromValue(ItemTag.COOKIE, ItemTag.ENCHANTED_COOKIE,
-                                                                                        amount, 160);
-            case WHEAT -> itemsCompactor.compactFromValue(ItemTag.WHEAT, ItemTag.ENCHANTED_WHEAT, amount, 160);
-            case COCOA_BEANS -> itemsCompactor.compactFromValue(ItemTag.COCOA_BEANS, ItemTag.ENCHANTED_COCOA_BEANS, amount, 320);
+                                                                                        amount, 160 + lvlScaling);
+            case WHEAT -> itemsCompactor.compactFromValue(ItemTag.WHEAT, ItemTag.ENCHANTED_WHEAT, amount, 160 + lvlScaling);
+            case COCOA_BEANS -> itemsCompactor.compactFromValue(ItemTag.COCOA_BEANS, ItemTag.ENCHANTED_COCOA_BEANS, amount, 320 + lvlScaling);
             default -> new ArrayList<>();
         }));
 

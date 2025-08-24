@@ -52,13 +52,14 @@ public class ItemPickupLogic {
     public void compactItems(ServerCookiePlayer serverCookiePlayer) {
         Player player = serverCookiePlayer.getPlayer();
         Inventory inventory = player.getInventory();
+        int lvl = serverCookiePlayer.getLvlScaling();
 
         if ((new Features(player.getOffhandItem())).getItemTag() == ItemTag.COOKIE_CRAFTER) {
             compactor.compact(inventory, ItemTag.ENCHANTED_COOKIE, loadedItems.get(ItemTag.BLOCK_OF_COOKIE), 512);
         }
 
-        compactor.compact(inventory, ItemTag.COOKIE, loadedItems.get(ItemTag.ENCHANTED_COOKIE), 160);
-        compactor.compact(inventory, ItemTag.COCOA_BEANS, loadedItems.get(ItemTag.ENCHANTED_COCOA_BEANS), 320);
-        compactor.compact(inventory, ItemTag.WHEAT, loadedItems.get(ItemTag.ENCHANTED_WHEAT), 160);
+        compactor.compact(inventory, ItemTag.COOKIE, loadedItems.get(ItemTag.ENCHANTED_COOKIE), 160 + lvl);
+        compactor.compact(inventory, ItemTag.COCOA_BEANS, loadedItems.get(ItemTag.ENCHANTED_COCOA_BEANS), 320 + lvl);
+        compactor.compact(inventory, ItemTag.WHEAT, loadedItems.get(ItemTag.ENCHANTED_WHEAT), 160 + lvl);
     }
 }

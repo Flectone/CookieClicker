@@ -76,9 +76,10 @@ public class StatsUtils {
         }
 
         ItemStack itemInHand = player.getMainHandItem();
-        if (getFeatures(itemInHand).getCategory() == ToolType.HOE) {
-            fortune += getFarmingFortune(itemInHand);
-        }
+        fortune += getFarmingFortune(itemInHand);
+//        if (getFeatures(itemInHand).getCategory() == ToolType.HOE) {
+//            fortune += getFarmingFortune(itemInHand);
+//        }
         return fortune;
     }
 

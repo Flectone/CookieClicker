@@ -4,6 +4,7 @@ import com.mojang.serialization.JavaOps;
 import io.papermc.paper.adventure.WrapperAwareSerializer;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.flectone.cookieclicker.items.attributes.StatType;
+import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.kyori.adventure.text.Component;
@@ -110,11 +111,24 @@ public class GeneratedCookieItem extends BaseCookieItem {
         }
     }
 
+    @Override
+    public void setStat(StatType statType, Integer value) {
+        if (value == 0) {
+            features.removeStat(statType);
+        } else {
+            features.applyStat(statType, value);
+        }
+    }
+
     public void addStat(StatType statType, Integer valueToAdd) {
         features.applyStat(statType, features.getStat(statType) + valueToAdd);
     }
 
     public <T> void setComponent(DataComponentType<T> type, T value) {
         applyComponent(type, value);
+    }
+
+    public void setToolType(ToolType toolType) {
+        features.setCategory(toolType);
     }
 }

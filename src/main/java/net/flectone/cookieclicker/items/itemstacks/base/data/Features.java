@@ -24,7 +24,8 @@ public class Features {
     //статы
     private final Map<StatType, Stat> stats = new EnumMap<>(StatType.class);
     //категория, по сути нужна только для лора
-    private final ToolType category;
+    @Setter
+    private ToolType category;
 
     public static final Features EMPTY = new Features(ItemTag.EMPTY, ToolType.NONE);
 
@@ -62,6 +63,10 @@ public class Features {
         Stat stat = stats.getOrDefault(statType, new Stat());
         stat.setBaseValue(value);
         stats.put(statType, stat);
+    }
+
+    public void removeStat(StatType statType) {
+        stats.remove(statType);
     }
 
     public Integer getStat(StatType statType) {

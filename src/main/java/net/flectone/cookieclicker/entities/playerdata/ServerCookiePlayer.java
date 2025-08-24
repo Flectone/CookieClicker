@@ -134,4 +134,8 @@ public class ServerCookiePlayer extends CookiePlayer {
         }
         return -1;
     }
+
+    public int getLvlScaling() {
+        return Math.min(getLvl() * 2, 200);
+    }
 }

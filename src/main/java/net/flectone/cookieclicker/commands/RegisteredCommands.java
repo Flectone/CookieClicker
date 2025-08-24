@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker;
+package net.flectone.cookieclicker.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -42,22 +42,25 @@ public class RegisteredCommands {
     private final VillagerTradesRegistry villagerTrades;
     private final InteractionController packetInteractAtEntityEvent;
     private final ConnectedPlayers connectedPlayers;
+    private final ModifyCommands modifyCommands;
 
     @Inject
     public RegisteredCommands(MainMenu mainMenu, VillagerTradesRegistry villagerTrades, InteractionController packetInteractAtEntityEvent,
-                              ConnectedPlayers connectedPlayers, ItemsRegistry itemsRegistry) {
+                              ConnectedPlayers connectedPlayers, ItemsRegistry itemsRegistry, ModifyCommands modifyCommands) {
         this.mainMenu = mainMenu;
         this.villagerTrades = villagerTrades;
         this.packetInteractAtEntityEvent = packetInteractAtEntityEvent;
         this.connectedPlayers = connectedPlayers;
         this.itemsRegistry = itemsRegistry;
+        this.modifyCommands = modifyCommands;
     }
 
     public LiteralCommandNode<CommandSourceStack> createCookieClickerCommand() {
         LiteralArgumentBuilder<CommandSourceStack> cookieClicker = Commands.literal("cookieclicker")
                 .then(createCookieClickerConvert())
                 .then(createCookieEntityCommand())
-                .then(createGiveCommand());
+                .then(createGiveCommand())
+                .then(modifyCommands.createModifyCommand());
         return cookieClicker.build();
     }
 

@@ -62,7 +62,7 @@ public class CookieBonusSpawn {
         DropType drops = cookieSpawningLogic.chooseItemDrops(serverCookiePlayer, false, false);
         boolean isCookieCrafter = new Features(player.getOffhandItem()).getItemTag() == ItemTag.COOKIE_CRAFTER;
 
-        for (Pair<ItemTag, Integer> singleDrop : cookieSpawningLogic.compactItems(drops.getTags(), amount, isCookieCrafter)) {
+        for (Pair<ItemTag, Integer> singleDrop : cookieSpawningLogic.compactItems(drops.getTags(), amount, serverCookiePlayer.getLvlScaling(), isCookieCrafter)) {
             player.getInventory().add(itemsRegistry.get(singleDrop.getKey(), singleDrop.getValue()));
         }
     }

@@ -7,6 +7,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import net.flectone.cookieclicker.commands.RegisteredCommands;
 import net.flectone.cookieclicker.eventdata.CookieEventManager;
 import net.flectone.cookieclicker.eventdata.listener.PacketDispatcher;
 import net.flectone.cookieclicker.gameplay.cookiepart.InteractionController;
