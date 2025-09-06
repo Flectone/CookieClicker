@@ -1,5 +1,5 @@
 name: CookieClicker
-version: '2.0.0-beta'
+version: '${version}'
 main: net.flectone.cookieclicker.CookieClicker
 api-version: '1.21'
 load: POSTWORLD
