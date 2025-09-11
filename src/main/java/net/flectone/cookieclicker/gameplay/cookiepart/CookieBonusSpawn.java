@@ -14,6 +14,7 @@ import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.utility.PacketUtils;
 import net.flectone.cookieclicker.utility.StatsUtils;
+import net.flectone.cookieclicker.utility.config.CookieClickerConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +29,15 @@ public class CookieBonusSpawn {
     private final PacketUtils packetUtils;
     private final StatsUtils statsUtils;
     private final CustomItemSpawner itemSpawner;
+    private final CookieClickerConfig config;
 
     @Inject
     public CookieBonusSpawn(PacketUtils packetUtils, StatsUtils statsUtils,
-                            CustomItemSpawner itemSpawner) {
+                            CustomItemSpawner itemSpawner, CookieClickerConfig config) {
         this.packetUtils = packetUtils;
         this.statsUtils = statsUtils;
         this.itemSpawner = itemSpawner;
+        this.config = config;
 
     }
 
@@ -45,7 +48,8 @@ public class CookieBonusSpawn {
         // удаляем существ
         removeBonus(serverCookiePlayer, entityId);
 
-        int amount = statsUtils.convertFortuneToAmount(statsUtils.extractStat(serverCookiePlayer.getPlayer(), StatType.FARMING_FORTUNE)) * 10;
+        int amount = statsUtils.convertFortuneToAmount(statsUtils.extractStat(serverCookiePlayer.getPlayer(), StatType.FARMING_FORTUNE));
+        amount *= config.getBonusMultiplier();
 
         serverCookiePlayer.swingArm();
 

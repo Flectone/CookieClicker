@@ -35,13 +35,13 @@ public class StatisticDisplay {
         Component fortune = Component.text("+" + droppedAmount).color(TextColor.color(15426836))
                 .append(Component.text(" (" + maxAmount + "★) ")).color(TextColor.color(14985236));
 
-        // В скобках первое - уровень заряда, который увеличивает количество выпавших предметов (не удачу)
+        // В скобках первое - бонус от уровня заряда, который увеличивает количество выпавших предметов (не удачу)
         // В скобках второе - заряд от эпической мотыги
-        Component epicStat = Component.text(String.format("[x%d (%d%%)] ", epicHoeUtils.getTier(serverCookiePlayer.getUuid()), epicHoeUtils.getCharge(serverCookiePlayer.getUuid())))
+        Component epicStat = Component.text(String.format("[+%.1f (%d%%)] ", epicHoeUtils.getMultiplierFromTier(serverCookiePlayer), epicHoeUtils.getCharge(serverCookiePlayer.getUuid())))
                 .color(TextColor.color(11539691));
 
         // После скобок первое - кол-во предметов на земле
-        Component droppedItems = Component.text(String.format("%d/10 ", serverCookiePlayer.getItems().size()))
+        Component droppedItems = Component.text(String.format("%d/%d ", serverCookiePlayer.getItems().size(), ServerCookiePlayer.MAX_ITEMS_CAPACITY))
                 .color(TextColor.color(13299385));
 
         // Временные штуки, пока не используются

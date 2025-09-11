@@ -24,7 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 @Singleton
-public class ItemFrameLogic {
+public class ItemFrameClickLogic {
 
     private final PacketUtils packetUtils;
     private final LegendaryHoeUpgrade legendaryHoeUpgrade;
@@ -35,10 +35,10 @@ public class ItemFrameLogic {
     private final CustomItemSpawner itemSpawner;
 
     @Inject
-    public ItemFrameLogic(PacketUtils packetUtils, CustomItemSpawner itemSpawner,
-                          StatsUtils statsUtils, LegendaryHoeUpgrade legendaryHoeUpgrade,
-                          EpicHoeUtils epicHoeUtils, ConnectedPlayers connectedPlayers,
-                          StatisticDisplay statisticDisplay) {
+    public ItemFrameClickLogic(PacketUtils packetUtils, CustomItemSpawner itemSpawner,
+                               StatsUtils statsUtils, LegendaryHoeUpgrade legendaryHoeUpgrade,
+                               EpicHoeUtils epicHoeUtils, ConnectedPlayers connectedPlayers,
+                               StatisticDisplay statisticDisplay) {
         this.packetUtils = packetUtils;
         this.statsUtils = statsUtils;
         this.legendaryHoeUpgrade = legendaryHoeUpgrade;
@@ -59,7 +59,7 @@ public class ItemFrameLogic {
         maxAmount += statsUtils.extractStat(player, StatType.FARMING_FORTUNE);
         int droppedAmount = statsUtils.convertFortuneToAmount(maxAmount);
 
-        droppedAmount += Math.round(droppedAmount * (0.5f * epicHoeUtils.getTier(serverCookiePlayer.getUuid())));
+        droppedAmount += Math.round(droppedAmount * (epicHoeUtils.getMultiplierFromTier(serverCookiePlayer)));
 
         // проверка на уникальную мотыгу (легендарная или эпическая)
         checkUniqueHoe(serverCookiePlayer, location);

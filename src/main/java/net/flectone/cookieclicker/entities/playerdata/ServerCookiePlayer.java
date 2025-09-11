@@ -20,6 +20,11 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 
 public class ServerCookiePlayer extends CookiePlayer {
+
+    public static int MAX_ITEMS_CAPACITY = 10;
+    public static int SCALING = 2;
+    public static int NEXT_LEVEL_COST = 90000;
+
     public ServerCookiePlayer(CookiePlayer cookiePlayer) {
         super(cookiePlayer);
     }
@@ -34,7 +39,7 @@ public class ServerCookiePlayer extends CookiePlayer {
 
         while (currentXP <= 0) {
             lvl++;
-            newXp = (int) ((Math.log(lvl)/Math.log(1.1d)) + 50 * lvl + 90000);
+            newXp = (int) ((Math.log(lvl)/Math.log(1.1d)) + 50 * lvl + NEXT_LEVEL_COST);
             currentXP = newXp - Math.abs(currentXP);
         }
         remainingXp = currentXP;
@@ -107,7 +112,7 @@ public class ServerCookiePlayer extends CookiePlayer {
     }
 
     public void addSpawnedItem(CookieItemEntityData itemEntityData) {
-        if (items.size() >= 10) {
+        if (items.size() >= MAX_ITEMS_CAPACITY) {
             sendPEpacket(new WrapperPlayServerDestroyEntities(items.getFirst().getId()));
             items.removeFirst();
         }
@@ -140,7 +145,7 @@ public class ServerCookiePlayer extends CookiePlayer {
     }
 
     public int getLvlScaling() {
-        return Math.min(getLvl() * 2, 200);
+        return Math.min(getLvl() * SCALING, 100 * SCALING);
     }
 
     private Pair<CookieAbility, CookieAbility> obtainAbilities() {

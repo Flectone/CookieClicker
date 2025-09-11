@@ -29,14 +29,14 @@ public class InteractionController {
 
     private final RegisteredEntitiesConfig registeredEntities;
     private final CookieBonusSpawn cookieBonusSpawn;
-    private final ItemFrameLogic itemFrameLogic;
+    private final ItemFrameClickLogic itemFrameLogic;
     private final Shops shops;
     private final Logger logger;
 
     @Inject
     public InteractionController(Shops shops, CookieBonusSpawn cookieBonusSpawn,
                                  RegisteredEntitiesConfig registeredEntities, Logger logger,
-                                 ItemFrameLogic itemFrameLogic) {
+                                 ItemFrameClickLogic itemFrameLogic) {
         this.shops = shops;
         this.logger = logger;
         this.cookieBonusSpawn = cookieBonusSpawn;
