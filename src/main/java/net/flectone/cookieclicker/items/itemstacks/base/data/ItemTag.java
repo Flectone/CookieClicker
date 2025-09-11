@@ -8,8 +8,8 @@ import java.util.Arrays;
 @Getter
 public enum ItemTag {
 
-    AIR ("air", ToolType.NONE),
-    EMPTY ("none", ToolType.NONE),
+    AIR ("air", ToolType.HIDDEN),
+    EMPTY ("none", ToolType.HIDDEN),
     COOKIE ("cookie", ToolType.NONE),
     ENCHANTED_COOKIE ("ench_cookie", ToolType.NONE),
     BOOK_COOKIE_BOOST ("ench_book", ToolType.ENCHANTMENT),
@@ -41,7 +41,7 @@ public enum ItemTag {
     BAG_45 ("rare_bag", ToolType.BACKPACK),
 
     HEALING_MELON ("heal_melon", ToolType.NONE),
-    PICKAXE ("pickaxe", ToolType.NONE);
+    PICKAXE ("pickaxe", ToolType.PICKAXE);
 
     private final String realTag;
     private final ToolType category;

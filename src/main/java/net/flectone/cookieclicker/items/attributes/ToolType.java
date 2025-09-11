@@ -5,19 +5,21 @@ import lombok.Getter;
 @Getter
 public enum ToolType {
 
-    NONE ("basic", "используется"),
+    HIDDEN ("hidden", "используется?"),
+    NONE ("common", "используется"),
     HOE ("hoe", "в ведущей руке"),
     PICKAXE ("pickaxe", "в ведущей руке"),
     EQUIPMENT ("equipment", "экипировано"),
     ENCHANTMENT ("book", "зачаровано на предмет"),
-    BACKPACK ("backpack", "открыто");
+    BACKPACK ("backpack", "открыто"),
+    MINING_COMMON ("mining_common", "используется");
 
     private final String type;
     private final String view;
 
-    ToolType(String name, String statView) {
+    ToolType(String name, String display) {
         this.type = name;
-        this.view = statView;
+        this.view = display;
     }
 
     public static ToolType from(String name) {
@@ -25,10 +27,10 @@ public enum ToolType {
             case "tool", "hoe" -> HOE;
             case "armor", "equipment" -> EQUIPMENT;
             case "book" -> ENCHANTMENT;
-            case "basic", "item" -> NONE;
             case "pickaxe" -> PICKAXE;
             case "backpack" -> BACKPACK;
-            default -> NONE;
+            case "mining_common" -> MINING_COMMON;
+            default -> NONE; // также basic, common и item
         };
     }
 }

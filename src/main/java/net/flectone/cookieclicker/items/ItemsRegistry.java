@@ -6,7 +6,7 @@ import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.CookieEnchantmentBook;
 import net.flectone.cookieclicker.items.itemstacks.EquipmentCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.HoeCookieItem;
-import net.flectone.cookieclicker.items.itemstacks.base.BackpackCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.BackpackCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItemStack;
 import net.flectone.cookieclicker.items.itemstacks.base.data.EquipmentData;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
