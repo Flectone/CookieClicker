@@ -29,19 +29,19 @@ public class InteractionController {
 
     private final RegisteredEntitiesConfig registeredEntities;
     private final CookieBonusSpawn cookieBonusSpawn;
-    private final CookieSpawningLogic cookieSpawningLogic;
+    private final ItemFrameLogic itemFrameLogic;
     private final Shops shops;
     private final Logger logger;
 
     @Inject
     public InteractionController(Shops shops, CookieBonusSpawn cookieBonusSpawn,
                                  RegisteredEntitiesConfig registeredEntities, Logger logger,
-                                 CookieSpawningLogic cookieSpawningLogic) {
+                                 ItemFrameLogic itemFrameLogic) {
         this.shops = shops;
         this.logger = logger;
         this.cookieBonusSpawn = cookieBonusSpawn;
         this.registeredEntities = registeredEntities;
-        this.cookieSpawningLogic = cookieSpawningLogic;
+        this.itemFrameLogic = itemFrameLogic;
     }
 
     public void loadAllEntities() {
@@ -109,7 +109,7 @@ public class InteractionController {
 
             Location itemFrameLocation = itemFrames.get(entityId);
 
-            cookieSpawningLogic.onCookieClick(serverCookiePlayer, itemFrameLocation);
+            itemFrameLogic.onCookieClick(serverCookiePlayer, itemFrameLocation);
             cookieBonusSpawn.checkBonusChance(serverCookiePlayer, itemFrameLocation);
             return true;
         }

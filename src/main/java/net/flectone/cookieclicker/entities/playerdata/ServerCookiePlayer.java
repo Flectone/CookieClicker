@@ -7,9 +7,13 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCo
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityAnimation;
 import net.flectone.cookieclicker.entities.objects.item.CookieItemEntityData;
+import net.flectone.cookieclicker.items.attributes.CookieAbility;
+import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
+import net.flectone.cookieclicker.utility.data.Pair;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 
@@ -137,5 +141,27 @@ public class ServerCookiePlayer extends CookiePlayer {
 
     public int getLvlScaling() {
         return Math.min(getLvl() * 2, 200);
+    }
+
+    private Pair<CookieAbility, CookieAbility> obtainAbilities() {
+        Player player = getPlayer();
+
+        CookieAbility first = new Features(player.getItemInHand(InteractionHand.MAIN_HAND)).getAbility();
+        CookieAbility second = new Features(player.getItemInHand(InteractionHand.OFF_HAND)).getAbility();
+
+        //Главная способность не может быть Transform
+        //Поэтому их надо менять местами
+
+        return first == CookieAbility.TRANSFORM
+                ? new Pair<>(second, first)
+                : new Pair<>(first, second);
+    }
+
+    public CookieAbility getMainAbility() {
+        return obtainAbilities().getKey();
+    }
+
+    public CookieAbility getSecondAbility() {
+        return obtainAbilities().getValue();
     }
 }

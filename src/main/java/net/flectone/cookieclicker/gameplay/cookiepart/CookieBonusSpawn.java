@@ -11,15 +11,9 @@ import net.flectone.cookieclicker.entities.objects.CookieEntity;
 import net.flectone.cookieclicker.entities.objects.display.CookieTextDisplay;
 import net.flectone.cookieclicker.entities.objects.display.InteractionEntity;
 import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
-import net.flectone.cookieclicker.gameplay.cookiepart.data.DropType;
-import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.attributes.StatType;
-import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
-import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.utility.PacketUtils;
 import net.flectone.cookieclicker.utility.StatsUtils;
-import net.flectone.cookieclicker.utility.data.Pair;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,24 +27,20 @@ public class CookieBonusSpawn {
 
     private final PacketUtils packetUtils;
     private final StatsUtils statsUtils;
-    private final ItemsRegistry itemsRegistry;
-    private final CookieSpawningLogic cookieSpawningLogic;
+    private final CustomItemSpawner itemSpawner;
 
     @Inject
     public CookieBonusSpawn(PacketUtils packetUtils, StatsUtils statsUtils,
-                            ItemsRegistry itemsRegistry, CookieSpawningLogic cookieSpawningLogic) {
+                            CustomItemSpawner itemSpawner) {
         this.packetUtils = packetUtils;
         this.statsUtils = statsUtils;
-        this.itemsRegistry = itemsRegistry;
-        this.cookieSpawningLogic = cookieSpawningLogic;
+        this.itemSpawner = itemSpawner;
 
     }
 
     public void checkForBonusClick(ServerCookiePlayer serverCookiePlayer, Integer entityId) {
         if (bonusEntities.isEmpty() || !bonusEntities.contains(entityId))
             return;
-
-        Player player = serverCookiePlayer.getPlayer();
 
         // удаляем существ
         removeBonus(serverCookiePlayer, entityId);
@@ -59,12 +49,7 @@ public class CookieBonusSpawn {
 
         serverCookiePlayer.swingArm();
 
-        DropType drops = cookieSpawningLogic.chooseItemDrops(serverCookiePlayer, false, false);
-        boolean isCookieCrafter = new Features(player.getOffhandItem()).getItemTag() == ItemTag.COOKIE_CRAFTER;
-
-        for (Pair<ItemTag, Integer> singleDrop : cookieSpawningLogic.compactItems(drops.getTags(), amount, serverCookiePlayer.getLvlScaling(), isCookieCrafter)) {
-            player.getInventory().add(itemsRegistry.get(singleDrop.getKey(), singleDrop.getValue()));
-        }
+        itemSpawner.addItemsToInventory(serverCookiePlayer, amount);
     }
 
     public void checkBonusChance(ServerCookiePlayer serverCookiePlayer, Location location) {
