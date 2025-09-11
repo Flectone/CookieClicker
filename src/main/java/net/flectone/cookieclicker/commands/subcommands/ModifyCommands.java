@@ -1,4 +1,4 @@
-package net.flectone.cookieclicker.commands;
+package net.flectone.cookieclicker.commands.subcommands;
 
 import com.google.inject.Singleton;
 import com.mojang.brigadier.Command;

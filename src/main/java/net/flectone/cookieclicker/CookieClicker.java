@@ -69,8 +69,8 @@ public final class CookieClicker extends JavaPlugin {
         injector.getInstance(RecipesRegistry.class).addRecipes();
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
-            commands.registrar().register(injector.getInstance(RegisteredCommands.class).createCookieClickerCommand());
-            commands.registrar().register(injector.getInstance(RegisteredCommands.class).createOpenMenuCommand());
+            commands.registrar().register(injector.getInstance(CookieCommands.class).createCookieClickerCommand());
+            commands.registrar().register(injector.getInstance(UtilityCommands.class).createOpenMenuCommand());
         });
 
         try {
