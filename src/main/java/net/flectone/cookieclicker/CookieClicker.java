@@ -23,6 +23,7 @@ import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.RecipesRegistry;
 import net.flectone.cookieclicker.items.VillagerTradesRegistry;
 import net.flectone.cookieclicker.utility.config.CookieClickerConfig;
+import net.flectone.cookieclicker.utility.config.ItemsDescription;
 import net.flectone.cookieclicker.utility.config.RegisteredEntitiesConfig;
 import net.flectone.cookieclicker.utility.database.Database;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -53,10 +54,15 @@ public final class CookieClicker extends JavaPlugin {
         Path configPath = projectPath.resolve("config.yml");
         CookieClickerConfig config = new CookieClickerConfig(configPath);
 
+        // guides for items
+        Path guidesPath = projectPath.resolve("guides.yml");
+        ItemsDescription guides = new ItemsDescription(guidesPath);
+
         config.reload();
         entities.reload();
+        guides.reload();
 
-        injector = Guice.createInjector(new CookieClickerInject(this, getLogger(), entities, config));
+        injector = Guice.createInjector(new CookieClickerInject(this, getLogger(), entities, config, guides));
 
         registerEvents();
         PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(PacketDispatcher.class), PacketListenerPriority.NORMAL);

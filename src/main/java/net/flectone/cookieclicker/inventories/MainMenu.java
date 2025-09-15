@@ -13,17 +13,23 @@ import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.items.recipe.CustomRecipe;
+import net.flectone.cookieclicker.utility.config.ItemsDescription;
 import net.flectone.cookieclicker.utility.data.Pair;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.ClientboundShowDialogPacket;
+import net.minecraft.server.dialog.*;
+import net.minecraft.server.dialog.body.DialogBody;
+import net.minecraft.server.dialog.body.ItemBody;
+import net.minecraft.server.dialog.body.PlainMessage;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.TooltipDisplay;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 @Singleton
@@ -34,13 +40,16 @@ public class MainMenu {
     private final RecipesRegistry recipes;
     private final StatisticDisplay statisticDisplay;
 
+    private final ItemsDescription itemsDescription;
+
     @Inject
     public MainMenu(ContainerManager containerManager, ItemsRegistry loadedItems, RecipesRegistry recipes,
-                    StatisticDisplay statisticDisplay) {
+                    StatisticDisplay statisticDisplay, ItemsDescription itemsDescription) {
         this.containerManager = containerManager;
         this.loadedItems = loadedItems;
         this.recipes = recipes;
         this.statisticDisplay = statisticDisplay;
+        this.itemsDescription = itemsDescription;
     }
 
     public void openMainMenu(ServerCookiePlayer serverCookiePlayer) {
@@ -103,6 +112,8 @@ public class MainMenu {
                 containerManager.cancelClick(serverCookiePlayer);
                 if (player.getPlayer().isCreative()) {
                     giveItem(serverCookiePlayer, itemStack, clickType);
+                } else {
+                    openGuide(serverCookiePlayer, tag, itemStack);
                 }
             });
             slot++;
@@ -161,6 +172,33 @@ public class MainMenu {
 
     }
 
+    private void openGuide(ServerCookiePlayer serverCookiePlayer, ItemTag itemTag, ItemStack itemStack) {
+
+        List<DialogBody> lines = new ArrayList<>();
+
+        // Добавление предмета перед описанием, чтобы было понятнее
+        lines.add(new ItemBody(itemStack, Optional.empty(),
+                true, true, 16, 16));
+
+        itemsDescription.getText(itemTag).forEach(line ->
+                lines.add(new PlainMessage(Component.literal(line), 300)));
+
+        CommonDialogData commonDialogData = new CommonDialogData(
+                Component.literal("Описание предмета"),
+                Optional.empty(), true, false,
+                DialogAction.CLOSE,
+                lines, List.of()
+        );
+
+        NoticeDialog noticeDialog = new NoticeDialog(
+                commonDialogData,
+                new ActionButton(new CommonButtonData(Component.literal("Ok"), 100), Optional.empty())
+        );
+
+        // NMS пакет, потому что Packet Events нормально не отображает предмет
+        serverCookiePlayer.sendMinecraftPacket(new ClientboundShowDialogPacket(Holder.direct(noticeDialog)));
+    }
+
     private MenuContainer createMenuWindow(Integer windowType, String customData, BiConsumer<ServerCookiePlayer, WrapperPlayClientClickWindow.WindowClickType> closeAction) {
         MenuContainer menuContainer = new MenuContainer(ClickerContainer.generateId(), windowType, customData);
 
@@ -189,6 +227,8 @@ public class MainMenu {
     private ItemStack getCreativeButton() {
         CommonCookieItem allItems = new CommonCookieItem(Items.BOOK, ItemTag.EMPTY,
                 "<gradient:#ffc900:#f3e736:#f7d760:#e1b926:#f3e736:#ffc900><italic:false>Посмотреть все предметы");
+
+        allItems.addLore("<#e7f0ef><italic:false>Кликни на предмет, чтобы узнать больше");
 
         return allItems.toMinecraftStack();
     }

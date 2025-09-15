@@ -12,24 +12,29 @@ import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.gameplay.cookiepart.InteractionController;
 import net.flectone.cookieclicker.inventories.MainMenu;
 import net.flectone.cookieclicker.utility.config.CookieClickerConfig;
+import net.flectone.cookieclicker.utility.config.ItemsDescription;
 
 @Singleton
 public class UtilityCommands {
 
     private final MainMenu mainMenu;
     private final ConnectedPlayers connectedPlayers;
+
     private final InteractionController interactionController;
     private final CookieClickerConfig config;
+    private final ItemsDescription itemsDescription;
 
     @Inject
     public UtilityCommands(InteractionController interactionController,
                            CookieClickerConfig config,
                            ConnectedPlayers connectedPlayers,
-                           MainMenu mainMenu) {
+                           MainMenu mainMenu,
+                           ItemsDescription itemsDescription) {
         this.interactionController = interactionController;
         this.mainMenu = mainMenu;
         this.connectedPlayers = connectedPlayers;
         this.config = config;
+        this.itemsDescription = itemsDescription;
     }
 
     public LiteralCommandNode<CommandSourceStack> createReloadCommand() {
@@ -37,6 +42,7 @@ public class UtilityCommands {
                 .requires(sender -> sender.getSender().isOp())
                 .executes(ctx -> {
                     interactionController.reloadEntitiesFromConfig();
+                    itemsDescription.reload();
                     config.reload();
 
                     ServerCookiePlayer.MAX_ITEMS_CAPACITY = config.getItemsCapacity();
