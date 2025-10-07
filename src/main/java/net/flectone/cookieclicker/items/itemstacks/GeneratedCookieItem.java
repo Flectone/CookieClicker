@@ -124,6 +124,12 @@ public class GeneratedCookieItem extends BaseCookieItem {
         features.applyStat(statType, features.getStat(statType) + valueToAdd);
     }
 
+    public void multiplyAllStats(float value) {
+        features.getStats().forEach((statType, stat) -> {
+            stat.setBaseValue((int) (stat.getBaseValue() * value));
+        });
+    }
+
     public <T> void setComponent(DataComponentType<T> type, T value) {
         applyComponent(type, value);
     }
