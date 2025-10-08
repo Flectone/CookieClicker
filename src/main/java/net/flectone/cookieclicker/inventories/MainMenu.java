@@ -179,12 +179,14 @@ public class MainMenu {
         // Добавление предмета перед описанием, чтобы было понятнее
         lines.add(new ItemBody(itemStack, Optional.empty(),
                 true, true, 16, 16));
+        Component titleComponent = itemStack.getComponents()
+                                .getOrDefault(DataComponents.CUSTOM_NAME, Component.literal("Описание предмета"));
 
         itemsDescription.getText(itemTag).forEach(line ->
                 lines.add(new PlainMessage(Component.literal(line), 300)));
 
         CommonDialogData commonDialogData = new CommonDialogData(
-                Component.literal("Описание предмета"),
+                titleComponent,
                 Optional.empty(), true, false,
                 DialogAction.CLOSE,
                 lines, List.of()
