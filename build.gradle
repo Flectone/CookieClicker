@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id("io.github.goooler.shadow") version "8.1.8"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
 }
 group = 'net.flectone'
 version = '2.1.0-snapshot'
@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     pluginRemapper "net.fabricmc:tiny-remapper:0.10.4:fat"
-    paperweight.paperDevBundle "1.21.7-R0.1-SNAPSHOT"
+    paperweight.paperDevBundle "1.21.9-R0.1-SNAPSHOT"
 
     //compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly "org.projectlombok:lombok:1.18.34"
@@ -32,7 +32,7 @@ dependencies {
     implementation "com.google.inject:guice:7.0.0"
     implementation "com.zaxxer:HikariCP:4.0.3"
     implementation "net.elytrium:serializer:1.1.1"
-    implementation "com.github.retrooper:packetevents-spigot:2.9.4"
+    implementation "com.github.retrooper:packetevents-spigot:2.10.0-SNAPSHOT"
 }
 
 
