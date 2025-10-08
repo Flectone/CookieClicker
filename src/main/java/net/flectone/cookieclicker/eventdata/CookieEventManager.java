@@ -3,7 +3,9 @@ package net.flectone.cookieclicker.eventdata;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.ProtocolPacketEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import com.google.inject.Inject;
@@ -18,7 +20,6 @@ import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.MenuType;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.logging.Level;
@@ -65,8 +66,11 @@ public class CookieEventManager {
     }
 
     public void processPacketEvent(ProtocolPacketEvent event, UUID uuid) {
-        Object packetWrapper = getWrapper(event);
-
+        PacketWrapper<?> packetWrapper = switch (event) {
+            case PacketReceiveEvent receiveEvent -> getPacketWrapper(receiveEvent);
+            case PacketSendEvent sendEvent -> getPacketWrapper(sendEvent);
+            default -> null;
+        };
         if (packetWrapper == null) return;
 
         ServerCookiePlayer serverCookiePlayer = connectedPlayers.getServerCookiePlayer(uuid);
@@ -143,25 +147,31 @@ public class CookieEventManager {
     }
 
     @Nullable
-    private Object getWrapper(ProtocolPacketEvent event) {
-        if (event.getPacketType() == null) return null;
-        Class<?> clazz = event.getPacketType().getWrapperClass();
-        if (clazz == null) return null;
-
-        return switch (event) {
-            case PacketReceiveEvent receiveEvent -> createInstance(clazz, PacketReceiveEvent.class, receiveEvent);
-            case PacketSendEvent sendEvent -> createInstance(clazz, PacketSendEvent.class, sendEvent);
+    private PacketWrapper<?> getPacketWrapper(PacketReceiveEvent receiveEvent) {
+        return switch (receiveEvent.getPacketType()) {
+            case PacketType.Play.Client.INTERACT_ENTITY -> new WrapperPlayClientInteractEntity(receiveEvent);
+            case PacketType.Play.Client.USE_ITEM -> new WrapperPlayClientUseItem(receiveEvent);
+            case PacketType.Play.Client.PLAYER_POSITION -> new WrapperPlayClientPlayerPosition(receiveEvent);
+            case PacketType.Play.Client.PLAYER_POSITION_AND_ROTATION -> new WrapperPlayClientPlayerPositionAndRotation(receiveEvent);
+            case PacketType.Play.Client.CLICK_WINDOW -> new WrapperPlayClientClickWindow(receiveEvent);
+            case PacketType.Play.Client.CLOSE_WINDOW -> new WrapperPlayClientCloseWindow(receiveEvent);
+            case PacketType.Play.Client.PLAYER_DIGGING -> new WrapperPlayClientPlayerDigging(receiveEvent);
+            case PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT -> new WrapperPlayClientPlayerBlockPlacement(receiveEvent);
+            case PacketType.Play.Client.ANIMATION -> new WrapperPlayClientAnimation(receiveEvent);
             default -> null;
         };
     }
 
     @Nullable
-    private <T> Object createInstance(Class<?> clazz, Class<T> parameter, T value) {
-        try {
-            return clazz.getConstructor(parameter).newInstance(value);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
-            return null;
-        }
+    private PacketWrapper<?> getPacketWrapper(PacketSendEvent sendEvent) {
+        return switch (sendEvent.getPacketType()) {
+            case PacketType.Play.Server.ENTITY_STATUS -> new WrapperPlayServerEntityStatus(sendEvent);
+            case PacketType.Play.Server.OPEN_WINDOW -> new WrapperPlayServerOpenWindow(sendEvent);
+            case PacketType.Play.Server.SET_SLOT -> new WrapperPlayServerSetSlot(sendEvent);
+            case PacketType.Play.Server.COLLECT_ITEM -> new WrapperPlayServerCollectItem(sendEvent);
+            case PacketType.Play.Server.WINDOW_PROPERTY -> new WrapperPlayServerWindowProperty(sendEvent);
+
+            default -> null;
+        };
     }
 }
