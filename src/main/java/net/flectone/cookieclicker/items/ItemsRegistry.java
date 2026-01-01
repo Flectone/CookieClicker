@@ -174,6 +174,7 @@ public class ItemsRegistry {
                 "<gradient:#884e0a:#b36810><italic:false>Шоколад"
         );
         chocolate.hideItem();
+        chocolate.setAmount(64);
         chocolate.addLore("<gray> Используется для создания</gray>", "<gray>предмета <black>???</black>.");
         registerItem(chocolate);
 

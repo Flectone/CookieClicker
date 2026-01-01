@@ -3,13 +3,13 @@ package net.flectone.cookieclicker.gameplay.crafting.craftingtable;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.cookieclicker.items.recipe.CustomRecipe;
+import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.RecipesRegistry;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
-import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
-import net.flectone.cookieclicker.utility.data.Pair;
+import net.flectone.cookieclicker.items.recipe.CustomRecipe;
 import net.flectone.cookieclicker.utility.StatsUtils;
+import net.flectone.cookieclicker.utility.data.Pair;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -107,11 +107,6 @@ public class CraftingLogic {
             amount += carriedItemStack.getCount();
         }
         return amount;
-    }
-
-    @Deprecated
-    public void prepareCraft(ServerCookiePlayer serverCookiePlayer) {
-        prepareCraft(serverCookiePlayer.getPlayer().containerMenu);
     }
 
     public void prepareCraft(AbstractContainerMenu craftingContainer) {
