@@ -1,14 +1,15 @@
 package net.flectone.cookieclicker.gameplay.cookiepart;
 
 import com.github.retrooper.packetevents.protocol.world.Location;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.Getter;
 import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.inventories.Shops;
 import net.flectone.cookieclicker.utility.config.RegisteredEntitiesConfig;
 import net.minecraft.server.MinecraftServer;
+import org.bukkit.entity.Entity;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,10 +62,6 @@ public class InteractionController {
                 }
             });
         });
-
-        logger.info("loaded " + tradersFarmers.size() + " farmers");
-        logger.info("loaded " + tradersArmorers.size() + " armorers");
-        logger.info("loaded " + itemFrames.size() + " item frames with cookie");
     }
 
     public void reloadEntitiesFromConfig() {
@@ -86,34 +83,32 @@ public class InteractionController {
         return false;
     }
 
-    @Deprecated
-    public boolean checkEntity(WrapperPlayClientInteractEntity interactPacket, ServerCookiePlayer serverCookiePlayer) {
-        if (interactPacket.getAction() != WrapperPlayClientInteractEntity.InteractAction.INTERACT) return false;
-        return checkEntity(interactPacket.getEntityId(), serverCookiePlayer);
-    }
+    public boolean checkEntity(Entity entity, ServerCookiePlayer serverCookiePlayer) {
+        String uuid = entity.getUniqueId().toString();
 
-    public boolean checkEntity(int entityId, ServerCookiePlayer serverCookiePlayer) {
-        cookieBonusSpawn.checkForBonusClick(serverCookiePlayer, entityId);
-
-        if (tradersFarmers.contains(entityId)) {
-            shops.openAnyShop(serverCookiePlayer, "trading_farm");
-            return true;
-        }
-        if (tradersArmorers.contains(entityId)) {
-            shops.openAnyShop(serverCookiePlayer, "trading_armorer");
-            return true;
-        }
-        if (itemFrames.containsKey(entityId)) {
+        if (registeredEntities.getItemFrames().contains(uuid)) {
             if (!checkCooldown(serverCookiePlayer))
                 return true;
 
-            Location itemFrameLocation = itemFrames.get(entityId);
+            Location itemFrameLocation = SpigotConversionUtil.fromBukkitLocation(entity.getLocation());
 
             itemFrameLogic.onCookieClick(serverCookiePlayer, itemFrameLocation);
             cookieBonusSpawn.checkBonusChance(serverCookiePlayer, itemFrameLocation);
             return true;
         }
+        if (registeredEntities.getVillagers().getFarmers().contains(uuid)) {
+            shops.openAnyShop(serverCookiePlayer, "trading_farm");
+            return true;
+        }
+        if (registeredEntities.getVillagers().getArmorers().contains(uuid)) {
+            shops.openAnyShop(serverCookiePlayer, "trading_armorer");
+            return true;
+        }
         return false;
+    }
+
+    public void isBonusClick(int entityId, ServerCookiePlayer serverCookiePlayer) {
+        cookieBonusSpawn.checkForBonusClick(serverCookiePlayer, entityId);
     }
 
 }

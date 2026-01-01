@@ -22,7 +22,9 @@ public class PlayerInteractEntityListener implements CookieListener {
     public void onInteract(ClickerInteractAtEntity event) {
         if (event.getInteractAction() != WrapperPlayClientInteractEntity.InteractAction.INTERACT) return;
 
-        boolean cancel = interactionController.checkEntity(event.getInteractedEntityId(), event.getCookiePlayer());
-        event.setCancelled(cancel);
+        interactionController.isBonusClick(event.getInteractedEntityId(), event.getCookiePlayer());
+
+//        boolean cancel = interactionController.checkEntity(event.getInteractedEntityId(), event.getCookiePlayer());
+//        event.setCancelled(cancel);
     }
 }

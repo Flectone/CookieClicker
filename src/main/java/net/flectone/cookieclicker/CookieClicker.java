@@ -27,6 +27,7 @@ import net.flectone.cookieclicker.utility.config.EquipmentUpgradeConfig;
 import net.flectone.cookieclicker.utility.config.ItemsDescription;
 import net.flectone.cookieclicker.utility.config.RegisteredEntitiesConfig;
 import net.flectone.cookieclicker.utility.database.Database;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.file.Path;
@@ -108,6 +109,7 @@ public final class CookieClicker extends JavaPlugin {
     private void registerEvents() {
         CookieEventManager cookieEventManager = injector.getInstance(CookieEventManager.class);
 
+        Bukkit.getPluginManager().registerEvents(injector.getInstance(BukkitPlayerInteractListener.class), this);
         cookieEventManager.register(injector.getInstance(PlayerInteractEntityListener.class));
         cookieEventManager.register(injector.getInstance(PlayerEatListener.class));
         cookieEventManager.register(injector.getInstance(PlayerMoveListener.class));
