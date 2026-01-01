@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     pluginRemapper "net.fabricmc:tiny-remapper:0.10.4:fat"
-    paperweight.paperDevBundle "1.21.9-R0.1-SNAPSHOT"
+    paperweight.paperDevBundle "1.21.10-R0.1-SNAPSHOT"
 
     //compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly "org.projectlombok:lombok:1.18.34"
