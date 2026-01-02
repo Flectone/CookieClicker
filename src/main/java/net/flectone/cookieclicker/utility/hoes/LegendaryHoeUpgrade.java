@@ -18,7 +18,7 @@ import net.flectone.cookieclicker.utility.PacketUtils;
 import net.flectone.cookieclicker.utility.StatsUtils;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -77,9 +77,9 @@ public class LegendaryHoeUpgrade {
         //Текущий режим предмета
         //Мне лень делать это как-то по-другому,
         //поэтому я просто беру из nms предмета модель
-        ResourceLocation resourceLocation = itemInHand.getComponents().get(DataComponents.ITEM_MODEL);
-        String currentMode = resourceLocation != null
-                ? resourceLocation.toString()
+        Identifier identifier = itemInHand.getComponents().get(DataComponents.ITEM_MODEL);
+        String currentMode = identifier != null
+                ? identifier.toString()
                 : "none";
 
 

@@ -5,7 +5,7 @@ import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItemStack;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 
 import java.util.Arrays;
@@ -23,9 +23,11 @@ public class BaseCookieItem extends CookieItemStack {
     public void setItemModel(Item itemModel) {
         StringBuilder stringBuilder = new StringBuilder(itemModel.toString().toLowerCase());
         stringBuilder.delete(0, 10);
+        Identifier identifier = Identifier.tryBuild(Identifier.DEFAULT_NAMESPACE, stringBuilder.toString());
+        if (identifier == null) return;
         applyComponent(
                 DataComponents.ITEM_MODEL,
-                ResourceLocation.tryBuild(ResourceLocation.DEFAULT_NAMESPACE, stringBuilder.toString())
+                identifier
         );
     }
 
