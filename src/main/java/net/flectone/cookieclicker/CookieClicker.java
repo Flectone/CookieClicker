@@ -21,7 +21,7 @@ import net.flectone.cookieclicker.gameplay.itempickup.listeners.PlayerMoveListen
 import net.flectone.cookieclicker.gameplay.window.listeners.WindowListener;
 import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.RecipesRegistry;
-import net.flectone.cookieclicker.items.VillagerTradesRegistry;
+import net.flectone.cookieclicker.items.TradesRegistry;
 import net.flectone.cookieclicker.utility.config.CookieClickerConfig;
 import net.flectone.cookieclicker.utility.config.EquipmentUpgradeConfig;
 import net.flectone.cookieclicker.utility.config.ItemsDescription;
@@ -76,7 +76,7 @@ public final class CookieClicker extends JavaPlugin {
         PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(PacketDispatcher.class), PacketListenerPriority.NORMAL);
 
         injector.getInstance(ItemsRegistry.class).load(getLogger());
-        injector.getInstance(VillagerTradesRegistry.class).loadSellingItems(this.getLogger());
+        injector.getInstance(TradesRegistry.class).loadSellingItems(this.getLogger());
         injector.getInstance(RecipesRegistry.class).addRecipes();
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {

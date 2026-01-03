@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 @Getter
 @Singleton
-public class VillagerTradesRegistry {
+public class TradesRegistry {
     private final HashMap<String, CookieTrader> allTraders = new HashMap<>();
 
     public void loadSellingItems(Logger information) {
@@ -46,7 +46,6 @@ public class VillagerTradesRegistry {
         registerTrader(armorer);
 
         getAllTraders().forEach((type, cookieTrader) -> information.info(String.format("+%s (%d)", type, cookieTrader.getTraderShop().size())));
-
     }
 
     public void registerTrader(CookieTrader cookieTrader) {

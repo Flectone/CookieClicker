@@ -7,6 +7,9 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.component.TooltipDisplay;
+
+import java.util.LinkedHashSet;
 
 public class CommonCookieItem extends BaseCookieItem {
     public CommonCookieItem(Item originalMaterial, ItemTag tag, String name) {
@@ -27,5 +30,10 @@ public class CommonCookieItem extends BaseCookieItem {
                 .build();
 
         applyComponent(DataComponents.CONSUMABLE, consumable);
+    }
+
+    public CommonCookieItem withoutTooltip() {
+        applyComponent(DataComponents.TOOLTIP_DISPLAY, new TooltipDisplay(true, new LinkedHashSet<>()));
+        return this;
     }
 }

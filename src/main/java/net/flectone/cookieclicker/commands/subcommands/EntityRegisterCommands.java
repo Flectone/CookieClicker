@@ -10,7 +10,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySelectorArgumentResolver;
 import net.flectone.cookieclicker.gameplay.cookiepart.InteractionController;
-import net.flectone.cookieclicker.items.VillagerTradesRegistry;
+import net.flectone.cookieclicker.items.TradesRegistry;
 import net.flectone.cookieclicker.utility.config.RegisteredEntitiesConfig;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Entity;
@@ -22,11 +22,11 @@ import java.util.Set;
 @Singleton
 public class EntityRegisterCommands {
 
-    private final VillagerTradesRegistry villagerTrades;
+    private final TradesRegistry villagerTrades;
     private final InteractionController interactionController;
 
     @Inject
-    public EntityRegisterCommands(VillagerTradesRegistry villagerTrades,
+    public EntityRegisterCommands(TradesRegistry villagerTrades,
                                   InteractionController interactionController) {
         this.interactionController = interactionController;
         this.villagerTrades = villagerTrades;
