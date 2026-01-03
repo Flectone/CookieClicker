@@ -12,7 +12,6 @@ public enum ItemTag {
     EMPTY ("none", ToolType.HIDDEN),
     COOKIE ("cookie", ToolType.NONE),
     ENCHANTED_COOKIE ("ench_cookie", ToolType.NONE),
-    BOOK_COOKIE_BOOST ("ench_book", ToolType.ENCHANTMENT),
     WOODEN_HOE ("wood_hoe", ToolType.HOE),
     STONE_HOE ("stone_hoe", ToolType.HOE),
     COOKIE_DESTROYER_HOE ("destroyer", ToolType.HOE),
@@ -40,8 +39,36 @@ public enum ItemTag {
     BAG_18 ("common_bag", ToolType.BACKPACK),
     BAG_45 ("rare_bag", ToolType.BACKPACK),
 
+    BOOK_COOKIE_BOOST ("ench_book", ToolType.ENCHANTMENT),
+    BOOK_MINING_BOOST ("ench_book_mining", ToolType.ENCHANTMENT),
+    BOOK_ELEMENTAL_SHARPNESS("ench_book_elemental", ToolType.ENCHANTMENT),
+
     HEALING_MELON ("heal_melon", ToolType.NONE),
-    PICKAXE ("pickaxe", ToolType.PICKAXE);
+
+    PICKAXE ("unused_remove_pls", ToolType.PICKAXE),
+    STONE_PICKAXE ("stone_pickaxe", ToolType.PICKAXE),
+    COPPER_PICKAXE ("copper_pickaxe", ToolType.PICKAXE),
+    STARMETAL_PICKAXE ("starmetal_pickaxe", ToolType.PICKAXE),
+    WIND_PICKAXE ("wind_pickaxe", ToolType.PICKAXE),
+    EPIC_PICKAXE ("epic_pickaxe", ToolType.PICKAXE),
+    LEGENDARY_PICKAXE ("legendary_pickaxe", ToolType.PICKAXE),
+    SUNMETAL_PICKAXE ("sunmetal_pickaxe", ToolType.PICKAXE),
+
+    AMBER ("amber", ToolType.MINING_COMMON),
+    AMETHYST ("amethyst", ToolType.MINING_COMMON),
+    STARMETAL ("starmetal", ToolType.MINING_COMMON),
+    WINDMETAL ("wind", ToolType.MINING_COMMON),
+    FLAME_METAL ("flame", ToolType.MINING_COMMON),
+    SUNMETAL ("sunmetal", ToolType.MINING_COMMON),
+
+    RUNE_BAG ("rune_bag", ToolType.MINING_COMMON),
+    AMETHYST_RUNE ("amethyst_rune", ToolType.MINING_COMMON),
+    AMBER_RUNE ("amber_rune", ToolType.MINING_COMMON),
+    WIND_RUNE ("wind_rune", ToolType.MINING_COMMON),
+    STAR_RUNE ("star_rune", ToolType.MINING_COMMON),
+
+    STAR_SHARD ("star_shard", ToolType.MINING_COMMON),
+    WIND_ROD ("wind_rod", ToolType.MINING_COMMON);
 
     private final String realTag;
     private final ToolType category;

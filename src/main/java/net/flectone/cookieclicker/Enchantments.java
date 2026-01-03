@@ -40,6 +40,17 @@ public class Enchantments implements PluginBootstrap {
                             .maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(0, 0))
                             .activeSlots(EquipmentSlotGroup.ANY)
             );
+            event.registry().register(
+                    EnchantmentKeys.create(Key.key(CookieItems.ELEMENTAL_ENCHANTMENT)),
+                    b -> b.description(miniMessage.deserialize("<gradient:#C3C45A:#B2CD52>Elemental Sharpness</gradient>"))
+                            .supportedItems(event.getOrCreateTag(ItemTypeTagKeys.SWORDS))
+                            .anvilCost(1)
+                            .maxLevel(10)
+                            .weight(10)
+                            .minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(0, 0))
+                            .maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(0, 0))
+                            .activeSlots(EquipmentSlotGroup.ANY)
+            );
         }));
     }
 

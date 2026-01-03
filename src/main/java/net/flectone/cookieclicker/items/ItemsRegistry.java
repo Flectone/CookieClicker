@@ -53,10 +53,20 @@ public class ItemsRegistry {
         enchantedCookie.setEatable();
         registerItem(enchantedCookie);
 
-        //Enchanted book
+        //Enchantment Cookie Boost
         CookieEnchantmentBook cookieEnchantmentBook = new CookieEnchantmentBook(ItemTag.BOOK_COOKIE_BOOST);
         cookieEnchantmentBook.setStoredEnchantment("Cookie Boost");
         registerItem(cookieEnchantmentBook);
+
+        //Enchantment Mining Boost
+        CookieEnchantmentBook miningBoostBook = new CookieEnchantmentBook(ItemTag.BOOK_MINING_BOOST);
+        miningBoostBook.setStoredEnchantment("Mining Boost");
+        registerItem(miningBoostBook);
+
+        //Enchantment Elemental Sharpness
+        CookieEnchantmentBook elementalBook = new CookieEnchantmentBook(ItemTag.BOOK_ELEMENTAL_SHARPNESS);
+        elementalBook.setStoredEnchantment("Elemental Sharpness");
+        registerItem(elementalBook);
 
         //Wood hoe
         HoeCookieItem woodenHoe = new HoeCookieItem(
