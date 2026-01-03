@@ -1,10 +1,12 @@
 package net.flectone.cookieclicker.items;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.items.trade.CookieTrader;
 import net.flectone.cookieclicker.items.trade.TradeItem;
+import net.flectone.cookieclicker.utility.config.CookieClickerConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +16,14 @@ import java.util.logging.Logger;
 @Getter
 @Singleton
 public class TradesRegistry {
+
+    private final CookieClickerConfig config;
+
+    @Inject
+    public TradesRegistry(CookieClickerConfig config) {
+        this.config = config;
+    }
+
     private final HashMap<String, CookieTrader> allTraders = new HashMap<>();
 
     public void loadSellingItems(Logger information) {
@@ -44,6 +54,16 @@ public class TradesRegistry {
                 .withPrice(ItemTag.GLOW_BERRIES, 64));
 
         registerTrader(armorer);
+
+        CookieTrader bookshelf = new CookieTrader("bookshelf");
+        bookshelf.addTrade(new TradeItem(ItemTag.BOOK_COOKIE_BOOST)
+                .withPrice(ItemTag.ENCHANTED_COOKIE, config.getCookieBoostCost()));
+        bookshelf.addTrade(new TradeItem(ItemTag.BOOK_MINING_BOOST)
+                .withPrice(ItemTag.EMPTY, 999));
+        bookshelf.addTrade(new TradeItem(ItemTag.BOOK_ELEMENTAL_SHARPNESS)
+                .withPrice(ItemTag.EMPTY, 999));
+
+        registerTrader(bookshelf);
 
         getAllTraders().forEach((type, cookieTrader) -> information.info(String.format("+%s (%d)", type, cookieTrader.getTraderShop().size())));
     }
