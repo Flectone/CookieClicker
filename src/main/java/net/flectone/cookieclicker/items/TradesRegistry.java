@@ -60,8 +60,8 @@ public class TradesRegistry {
                 .withPrice(ItemTag.ENCHANTED_COOKIE, config.getCookieBoostCost()));
         bookshelf.addTrade(new TradeItem(ItemTag.BOOK_MINING_BOOST)
                 .withPrice(ItemTag.EMPTY, 999));
-        bookshelf.addTrade(new TradeItem(ItemTag.BOOK_ELEMENTAL_SHARPNESS)
-                .withPrice(ItemTag.EMPTY, 999));
+        bookshelf.addTrade(new TradeItem(ItemTag.BOOK_BLOCK_DAMAGE)
+                .withPrice(ItemTag.ENCHANTED_MELON, 20));
 
         registerTrader(bookshelf);
 

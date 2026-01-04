@@ -41,7 +41,12 @@ public enum ItemTag {
 
     BOOK_COOKIE_BOOST ("ench_book", ToolType.ENCHANTMENT),
     BOOK_MINING_BOOST ("ench_book_mining", ToolType.ENCHANTMENT),
-    BOOK_ELEMENTAL_SHARPNESS("ench_book_elemental", ToolType.ENCHANTMENT),
+    BOOK_BLOCK_DAMAGE("ench_book_block_dmg", ToolType.ENCHANTMENT),
+
+    MELON_DICER ("melon_axe", ToolType.AXE),
+    MELON ("melon", ToolType.NONE),
+    ENCHANTED_MELON ("ench_melon", ToolType.NONE),
+    MELON_BLOCK ("melon_block", ToolType.NONE),
 
     HEALING_MELON ("heal_melon", ToolType.NONE),
 

@@ -80,7 +80,7 @@ public class MainMenu {
 
         // Hoes
         categorySelector.setItem(20, getCategoryButton(Items.DIAMOND_HOE, "Мотыги"));
-        categorySelector.setAction(20, (player, click) -> openAllItems(player, ToolType.HOE));
+        categorySelector.setAction(20, (player, click) -> openAllItems(player, ToolType.HOE, ToolType.AXE));
 
         // Equipment (Armor)
         categorySelector.setItem(21, getCategoryButton(Items.NETHERITE_CHESTPLATE, "Экипировка"));

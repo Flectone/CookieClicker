@@ -4,9 +4,10 @@ import com.google.inject.Singleton;
 import net.flectone.cookieclicker.items.attributes.CookieAbility;
 import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.CookieEnchantmentBook;
-import net.flectone.cookieclicker.items.itemstacks.EquipmentCookieItem;
-import net.flectone.cookieclicker.items.itemstacks.HoeCookieItem;
-import net.flectone.cookieclicker.items.itemstacks.BackpackCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.equipment.EquipmentCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.tools.AxeCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.tools.HoeCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.equipment.BackpackCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItemStack;
 import net.flectone.cookieclicker.items.itemstacks.base.data.EquipmentData;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
@@ -325,6 +326,35 @@ public class ItemsRegistry {
                 "<gradient:#8315b6:#c21fe7><italic:false>Редкий мешок");
         bag45.hideItem();
         registerItem(bag45);
+
+        // Axe
+        AxeCookieItem melonBreaker = new AxeCookieItem(Items.DIAMOND_AXE, ItemTag.MELON_DICER,
+                "<italic:false><gradient:#6AB848:#12A503>Разрушитель арбузов</gradient>");
+        melonBreaker.addBlocks(Items.MELON);
+        melonBreaker.addLore("<gray> Может ломать арбузные блоки");
+        melonBreaker.setMiningPower(1);
+        melonBreaker.setBlockDamage(1);
+        registerItem(melonBreaker);
+
+        // Melon
+        CommonCookieItem melon = new CommonCookieItem(Items.MELON_SLICE, ItemTag.MELON,
+                "<italic:false><gradient:#6AB848:#FF2323>Лом</gradient><gradient:#FF2323:#FF2323>тик ар</gradient><gradient:#FF2323:#12A503>буза</gradient>");
+        melon.hideItem();
+        melon.setAmount(99);
+        registerItem(melon);
+
+        // Enchanted melon
+        CommonCookieItem enchantedMelon = new CommonCookieItem(Items.MELON_SLICE, ItemTag.ENCHANTED_MELON,
+                "<italic:false><gradient:#B029F5:#591FE3>Зачар</gradient><gradient:#591FE3:#B029F5>ованный</gradient><gradient:#B029F5:#6AB848> </gradient><gradient:#6AB848:#FF2323>ломт</gradient><gradient:#FF2323:#FF2323>ик арб</gradient><gradient:#FF2323:#12A503>уза</gradient>");
+        enchantedMelon.hideItem();
+        enchantedMelon.setAmount(64);
+        enchantedMelon.setEnchantmentGlint();
+        registerItem(enchantedMelon);
+
+        // Melon Block
+        CommonCookieItem blockMelon = new CommonCookieItem(Items.MELON, ItemTag.MELON_BLOCK,
+                "<italic:false><gradient:#6AB848:#12A503>Арбуз</gradient>");
+        registerItem(blockMelon);
 
         logger.info("loaded items: " + itemsToLoad.size());
     }
