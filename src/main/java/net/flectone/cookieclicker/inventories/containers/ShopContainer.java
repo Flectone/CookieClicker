@@ -1,7 +1,6 @@
 package net.flectone.cookieclicker.inventories.containers;
 
 import net.flectone.cookieclicker.items.ItemsRegistry;
-import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
 import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.items.trade.TradeItem;
@@ -12,7 +11,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
 
 import java.util.ArrayList;
@@ -26,11 +24,6 @@ public class ShopContainer extends ClickerContainer {
     private int slot = 9;       // Текущий слот
     private int startSlot = 9;  // Слот, с которого начинаются предметы
     private int step = 1;       // Шаг
-
-    private static final ItemStack fillerItem = new CommonCookieItem(Items.WHITE_STAINED_GLASS_PANE, ItemTag.EMPTY,
-            "<gradient:#ffffff:#cccccc><italic:false>Здесь вы можете купить что-нибудь")
-            .withoutTooltip()
-            .toMinecraftStack();
 
     private ShopContainer(int windowType, String customData) {
         super(generateId(), windowType, customData);

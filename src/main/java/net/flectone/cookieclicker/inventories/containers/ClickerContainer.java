@@ -3,6 +3,8 @@ package net.flectone.cookieclicker.inventories.containers;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerOpenWindow;
 import lombok.Getter;
 import lombok.Setter;
+import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -17,6 +19,14 @@ public class ClickerContainer {
     public static final ClickerContainer EMPTY = new ClickerContainer(0, 0, "empty");
     public static final int ANVIL_TYPE = 8;
     public static final int CRAFTING_TABLE_TYPE = 12;
+
+    public static final ItemStack fillerItem = new CommonCookieItem(Items.WHITE_STAINED_GLASS_PANE, ItemTag.EMPTY,
+            "<gradient:#ffffff:#cccccc><italic:false>filler")
+            .withoutTooltip()
+            .toMinecraftStack();
+    public static final ItemStack closeItem = new CommonCookieItem(Items.RED_STAINED_GLASS_PANE, ItemTag.EMPTY, "close")
+            .withoutTooltip()
+            .toMinecraftStack();
 
     private final int windowId;
     private final int windowType;

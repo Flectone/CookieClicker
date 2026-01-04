@@ -4,13 +4,16 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCl
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.eventdata.events.ClickerInventoryClick;
 import net.flectone.cookieclicker.gameplay.cookiepart.StatisticDisplay;
 import net.flectone.cookieclicker.inventories.containers.ClickerContainer;
+import net.flectone.cookieclicker.inventories.containers.ItemViewContainer;
 import net.flectone.cookieclicker.inventories.containers.MenuContainer;
 import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.RecipesRegistry;
 import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.CommonCookieItem;
+import net.flectone.cookieclicker.items.itemstacks.base.data.Features;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.flectone.cookieclicker.items.recipe.CustomRecipe;
 import net.flectone.cookieclicker.utility.config.ItemsDescription;
@@ -24,6 +27,7 @@ import net.minecraft.server.dialog.*;
 import net.minecraft.server.dialog.body.DialogBody;
 import net.minecraft.server.dialog.body.ItemBody;
 import net.minecraft.server.dialog.body.PlainMessage;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -72,54 +76,36 @@ public class MainMenu {
 
         // Common items
         categorySelector.setItem(19, getCategoryButton(Items.COOKIE, "Обычные предметы"));
-        categorySelector.setAction(19, (player, click) -> openAllItemsByCategory(player, ToolType.NONE));
+        categorySelector.setAction(19, (player, click) -> openAllItems(player, ToolType.NONE));
 
         // Hoes
         categorySelector.setItem(20, getCategoryButton(Items.DIAMOND_HOE, "Мотыги"));
-        categorySelector.setAction(20, (player, click) -> openAllItemsByCategory(player, ToolType.HOE));
+        categorySelector.setAction(20, (player, click) -> openAllItems(player, ToolType.HOE));
 
         // Equipment (Armor)
         categorySelector.setItem(21, getCategoryButton(Items.NETHERITE_CHESTPLATE, "Экипировка"));
-        categorySelector.setAction(21, (player, click) -> openAllItemsByCategory(player, ToolType.EQUIPMENT, ToolType.BACKPACK));
+        categorySelector.setAction(21, (player, click) -> openAllItems(player, ToolType.EQUIPMENT, ToolType.BACKPACK));
 
         // Enchantments
         categorySelector.setItem(22, getCategoryButton(Items.ENCHANTED_BOOK, "Зачарования"));
-        categorySelector.setAction(22, (player, click) -> openAllItemsByCategory(player, ToolType.ENCHANTMENT));
+        categorySelector.setAction(22, (player, click) -> openAllItems(player, ToolType.ENCHANTMENT));
 
         // [Mining] Pickaxes
         categorySelector.setItem(23, getCategoryButton(Items.GOLDEN_PICKAXE, "Кирки (не используется)"));
-        categorySelector.setAction(23, (player, click) -> openAllItemsByCategory(player, ToolType.PICKAXE));
+        categorySelector.setAction(23, (player, click) -> openAllItems(player, ToolType.PICKAXE));
 
         // [Mining] Common items
         categorySelector.setItem(24, getCategoryButton(Items.AMETHYST_SHARD, "Шахтёрские предметы (не используется)"));
-        categorySelector.setAction(24, (player, click) -> openAllItemsByCategory(player, ToolType.MINING_COMMON));
+        categorySelector.setAction(24, (player, click) -> openAllItems(player, ToolType.MINING_COMMON));
 
         containerManager.openContainer(serverCookiePlayer, categorySelector);
     }
 
-    private void openAllItemsByCategory(ServerCookiePlayer serverCookiePlayer, ToolType... toolTypes) {
-        MenuContainer allItems = createMenuWindow(3, "creative", (player, click) -> openCategorySelector(player));
-        List<ToolType> validToolTypes = Arrays.asList(toolTypes);
+    private void openAllItems(ServerCookiePlayer serverCookiePlayer, ToolType... toolTypes) {
+        ItemViewContainer viewContainer = new ItemViewContainer("category_view");
+        Arrays.asList(toolTypes).forEach(toolType -> viewContainer.addCategory(toolType, loadedItems));
 
-        int slot = 9;
-        for (ItemTag tag : ItemTag.values()) {
-            if (!validToolTypes.contains(tag.getCategory())) continue;
-
-            ItemStack itemStack = loadedItems.get(tag);
-
-            allItems.setItem(slot, itemStack);
-            allItems.setAction(slot, (player, clickType) -> {
-                containerManager.cancelClick(serverCookiePlayer);
-                if (player.getPlayer().isCreative()) {
-                    giveItem(serverCookiePlayer, itemStack, clickType);
-                } else {
-                    openGuide(serverCookiePlayer, tag, itemStack);
-                }
-            });
-            slot++;
-        }
-
-        containerManager.openContainer(serverCookiePlayer, allItems);
+        containerManager.openContainer(serverCookiePlayer, viewContainer);
     }
 
     public void openAllRecipes(ServerCookiePlayer serverCookiePlayer) {
@@ -162,6 +148,26 @@ public class MainMenu {
         containerManager.openContainer(serverCookiePlayer, singleRecipe);
     }
 
+    public void processClick(ServerCookiePlayer serverCookiePlayer, ItemViewContainer viewContainer, ClickerInventoryClick event) {
+        int slot = event.getSlot();
+
+        if (slot < 8) return;
+
+        if (slot == 8) {
+            openCategorySelector(serverCookiePlayer);
+            return;
+        }
+
+        ItemStack itemStack = viewContainer.getItem(slot);
+        Player player = serverCookiePlayer.getPlayer();
+
+        if (player.isCreative()) {
+            giveItem(serverCookiePlayer, itemStack, event.getClickType());
+        } else {
+            openGuide(serverCookiePlayer, itemStack);
+        }
+    }
+
     private void giveItem(ServerCookiePlayer serverCookiePlayer, ItemStack itemStack,
                           WrapperPlayClientClickWindow.WindowClickType clickType) {
         boolean isShiftClick = clickType == WrapperPlayClientClickWindow.WindowClickType.QUICK_MOVE;
@@ -172,8 +178,8 @@ public class MainMenu {
 
     }
 
-    private void openGuide(ServerCookiePlayer serverCookiePlayer, ItemTag itemTag, ItemStack itemStack) {
-
+    private void openGuide(ServerCookiePlayer serverCookiePlayer, ItemStack itemStack) {
+        ItemTag itemTag = new Features(itemStack).getItemTag();
         List<DialogBody> lines = new ArrayList<>();
 
         // Добавление предмета перед описанием, чтобы было понятнее

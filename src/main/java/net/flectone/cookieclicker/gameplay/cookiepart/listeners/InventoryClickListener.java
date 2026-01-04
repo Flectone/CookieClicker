@@ -10,7 +10,9 @@ import net.flectone.cookieclicker.eventdata.CookieListener;
 import net.flectone.cookieclicker.eventdata.events.ClickerInventoryClick;
 import net.flectone.cookieclicker.gameplay.window.InventoryMoveLogic;
 import net.flectone.cookieclicker.inventories.ContainerManager;
+import net.flectone.cookieclicker.inventories.MainMenu;
 import net.flectone.cookieclicker.inventories.containers.ItemStorage;
+import net.flectone.cookieclicker.inventories.containers.ItemViewContainer;
 import net.flectone.cookieclicker.inventories.containers.MenuContainer;
 import net.flectone.cookieclicker.inventories.containers.ShopContainer;
 import net.flectone.cookieclicker.utility.PacketUtils;
@@ -24,17 +26,24 @@ public class InventoryClickListener implements CookieListener {
     private final InventoryMoveLogic inventoryMoveLogic;
     private final ContainerManager containerManager;
     private final PacketUtils packetUtils;
+    private final MainMenu mainMenu;
 
     @Inject
     public InventoryClickListener(InventoryMoveLogic inventoryMoveLogic, ContainerManager containerManager,
-                                  PacketUtils packetUtils) {
+                                  PacketUtils packetUtils, MainMenu mainMenu) {
         this.inventoryMoveLogic = inventoryMoveLogic;
         this.containerManager = containerManager;
         this.packetUtils = packetUtils;
+        this.mainMenu = mainMenu;
     }
 
     @CookieEventHandler
     public void onMenuClick(ClickerInventoryClick event) {
+        if (event.getOpenedContainer() instanceof ItemViewContainer viewContainer) {
+            containerManager.cancelClick(event.getCookiePlayer());
+            mainMenu.processClick(event.getCookiePlayer(), viewContainer, event);
+        }
+
         // Покупка предметов, если игрок открыл инвентарь магазина
         if (event.getOpenedContainer() instanceof ShopContainer shopContainer) {
             containerManager.cancelClick(event.getCookiePlayer());
