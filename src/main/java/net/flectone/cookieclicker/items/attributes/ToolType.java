@@ -9,6 +9,8 @@ public enum ToolType {
     NONE ("common", "используется"),
     HOE ("hoe", "в ведущей руке"),
     PICKAXE ("pickaxe", "в ведущей руке"),
+    AXE ("axe", "в ведущей руке"),
+    SWORD ("sword", "в ведущей руке"),
     EQUIPMENT ("equipment", "экипировано"),
     ENCHANTMENT ("book", "зачаровано на предмет"),
     BACKPACK ("backpack", "открыто"),
@@ -28,6 +30,8 @@ public enum ToolType {
             case "armor", "equipment" -> EQUIPMENT;
             case "book" -> ENCHANTMENT;
             case "pickaxe" -> PICKAXE;
+            case "axe" -> AXE;
+            case "sword" -> SWORD;
             case "backpack" -> BACKPACK;
             case "mining_common" -> MINING_COMMON;
             default -> NONE; // также basic, common и item
