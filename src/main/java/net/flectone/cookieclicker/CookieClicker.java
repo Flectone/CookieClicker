@@ -1,5 +1,7 @@
 package net.flectone.cookieclicker;
 
+import com.github.Anon8281.universalScheduler.UniversalScheduler;
+import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.google.inject.Guice;
@@ -49,6 +51,9 @@ public final class CookieClicker extends JavaPlugin {
 
         PacketEvents.getAPI().init();
 
+        // creating task scheduler
+        TaskScheduler scheduler = UniversalScheduler.getScheduler(this);
+
         // registered entities
         Path entitiesPath = registryPath.resolve("entities.yml");
         RegisteredEntitiesConfig entities = new RegisteredEntitiesConfig(entitiesPath);
@@ -70,7 +75,8 @@ public final class CookieClicker extends JavaPlugin {
         guides.reload();
         upgrades.reload();
 
-        injector = Guice.createInjector(new CookieClickerInject(this, getLogger(), entities, config, guides, upgrades));
+        injector = Guice.createInjector(new CookieClickerInject(this, getLogger(), entities, config, guides,
+                scheduler, upgrades));
 
         registerEvents();
         PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(PacketDispatcher.class), PacketListenerPriority.NORMAL);

@@ -12,6 +12,7 @@ repositories {
         name = "papermc-repo"
         url = "https://repo.papermc.io/repository/maven-public/"
     }
+    maven { url 'https://jitpack.io' }
     maven {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
@@ -29,6 +30,7 @@ dependencies {
     compileOnly "org.projectlombok:lombok:1.18.34"
     annotationProcessor "org.projectlombok:lombok:1.18.34"
 
+    implementation "com.github.Anon8281:UniversalScheduler:0.1.7"
     implementation "com.google.inject:guice:7.0.0"
     implementation "com.zaxxer:HikariCP:4.0.3"
     implementation "net.elytrium:serializer:1.1.1"
