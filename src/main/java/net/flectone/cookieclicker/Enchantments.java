@@ -2,10 +2,13 @@ package net.flectone.cookieclicker;
 
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
+import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
 import io.papermc.paper.registry.event.RegistryEvents;
 import io.papermc.paper.registry.keys.EnchantmentKeys;
+import io.papermc.paper.registry.keys.ItemTypeKeys;
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
+import io.papermc.paper.registry.set.RegistrySet;
 import net.flectone.cookieclicker.items.itemstacks.base.CookieItems;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -41,9 +44,10 @@ public class Enchantments implements PluginBootstrap {
                             .activeSlots(EquipmentSlotGroup.ANY)
             );
             event.registry().register(
-                    EnchantmentKeys.create(Key.key(CookieItems.ELEMENTAL_ENCHANTMENT)),
-                    b -> b.description(miniMessage.deserialize("<gradient:#C3C45A:#B2CD52>Elemental Sharpness</gradient>"))
-                            .supportedItems(event.getOrCreateTag(ItemTypeTagKeys.SWORDS))
+                    EnchantmentKeys.create(Key.key(CookieItems.BLOCK_DAMAGE_ENCHANTMENT)),
+                    b -> b.description(miniMessage.deserialize("<gradient:#C3C45A:#B2CD52>Block Damage</gradient>"))
+                            .supportedItems(RegistrySet.keySet(RegistryKey.ITEM, ItemTypeKeys.DIAMOND_AXE, ItemTypeKeys.STONE_PICKAXE, ItemTypeKeys.IRON_PICKAXE,
+                                    ItemTypeKeys.GOLDEN_PICKAXE, ItemTypeKeys.COPPER_PICKAXE, ItemTypeKeys.DIAMOND_PICKAXE, ItemTypeKeys.NETHERITE_PICKAXE))
                             .anvilCost(1)
                             .maxLevel(10)
                             .weight(10)

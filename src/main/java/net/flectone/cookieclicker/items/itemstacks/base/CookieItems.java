@@ -46,7 +46,7 @@ public interface CookieItems {
 
     String COOKIE_BOOST_ENCHANTMENT = PLUGIN_KEY + ":ccboost";
     String MINING_BOOST_ENCHANTMENT = PLUGIN_KEY + ":mining_boost";
-    String ELEMENTAL_ENCHANTMENT = PLUGIN_KEY + ":elemental_sharpness";
+    String BLOCK_DAMAGE_ENCHANTMENT = PLUGIN_KEY + ":block_damage";
 
 
 }

@@ -64,8 +64,8 @@ public class ItemsRegistry {
         registerItem(miningBoostBook);
 
         //Enchantment Elemental Sharpness
-        CookieEnchantmentBook elementalBook = new CookieEnchantmentBook(ItemTag.BOOK_ELEMENTAL_SHARPNESS);
-        elementalBook.setStoredEnchantment("Elemental Sharpness");
+        CookieEnchantmentBook elementalBook = new CookieEnchantmentBook(ItemTag.BOOK_BLOCK_DAMAGE);
+        elementalBook.setStoredEnchantment("Block Damage");
         registerItem(elementalBook);
 
         //Wood hoe

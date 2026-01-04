@@ -103,10 +103,12 @@ public class GeneratedCookieItem extends BaseCookieItem {
 
         for (Object2IntMap.Entry<Holder<Enchantment>> enchantment : enchantments.entrySet()) {
             switch (enchantment.getKey().getRegisteredName()) {
-                case COOKIE_BOOST_ENCHANTMENT -> features.setStatFromEnchant(
-                        StatType.FARMING_FORTUNE, 1 << (enchantment.getIntValue() - 1));
-                case MINING_BOOST_ENCHANTMENT -> features.setStatFromEnchant(
-                        StatType.MINING_FORTUNE, enchantment.getIntValue());
+                case COOKIE_BOOST_ENCHANTMENT ->
+                        features.setStatFromEnchant(StatType.FARMING_FORTUNE, 1 << (enchantment.getIntValue() - 1));
+                case MINING_BOOST_ENCHANTMENT ->
+                        features.setStatFromEnchant(StatType.MINING_FORTUNE, enchantment.getIntValue());
+                case BLOCK_DAMAGE_ENCHANTMENT ->
+                        features.setStatFromEnchant(StatType.BLOCK_DAMAGE, 1 << (enchantment.getIntValue() - 1));
             }
         }
     }
