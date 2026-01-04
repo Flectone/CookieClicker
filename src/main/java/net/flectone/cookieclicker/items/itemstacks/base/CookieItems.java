@@ -38,8 +38,11 @@ public interface CookieItems {
 
     String EQUIPMENT_TIER = "tier";
     String ADDITIONAL_SLOTS_KEY = "add_slots";
+    String MINING_POWER_KEY = "mine_power";
+    String BLOCK_DAMAGE_KEY = "block_dmg";
 
-    List<String> LOADED_STATS = List.of(FORTUNE_KEY, OLD_FORTUNE_KEY, MINING_FORTUNE_KEY, EQUIPMENT_TIER, ADDITIONAL_SLOTS_KEY);
+    List<String> LOADED_STATS = List.of(FORTUNE_KEY, OLD_FORTUNE_KEY, MINING_FORTUNE_KEY, EQUIPMENT_TIER, ADDITIONAL_SLOTS_KEY,
+            MINING_POWER_KEY, BLOCK_DAMAGE_KEY);
 
     String COOKIE_BOOST_ENCHANTMENT = PLUGIN_KEY + ":ccboost";
     String MINING_BOOST_ENCHANTMENT = PLUGIN_KEY + ":mining_boost";
