@@ -8,10 +8,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.flectone.cookieclicker.commands.subcommands.ConvertCommands;
-import net.flectone.cookieclicker.commands.subcommands.EntityRegisterCommands;
-import net.flectone.cookieclicker.commands.subcommands.ModifyCommands;
-import net.flectone.cookieclicker.commands.subcommands.UtilityCommands;
+import lombok.RequiredArgsConstructor;
+import net.flectone.cookieclicker.commands.subcommands.*;
 import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
 import net.minecraft.world.entity.player.Player;
@@ -19,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.Arrays;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @__(@Inject))
 public class CookieCommands {
 
     private final ItemsRegistry itemsRegistry;
@@ -26,28 +25,19 @@ public class CookieCommands {
     private final ModifyCommands modifyCommands;
     private final UtilityCommands utilityCommands;
     private final EntityRegisterCommands entityRegisterCommands;
+    private final BlockRegisterCommands blockRegisterCommands;
     private final ConvertCommands convertCommands;
-
-    @Inject
-    public CookieCommands(ItemsRegistry itemsRegistry,
-                          ModifyCommands modifyCommands,
-                          EntityRegisterCommands entityRegisterCommands,
-                          UtilityCommands utilityCommands,
-                          ConvertCommands convertCommands) {
-        this.itemsRegistry = itemsRegistry;
-        this.modifyCommands = modifyCommands;
-        this.utilityCommands = utilityCommands;
-        this.entityRegisterCommands = entityRegisterCommands;
-        this.convertCommands = convertCommands;
-    }
 
     public LiteralCommandNode<CommandSourceStack> createCookieClickerCommand() {
         LiteralArgumentBuilder<CommandSourceStack> cookieClicker = Commands.literal("cookieclicker")
                 .then(convertCommands.createCookieClickerConvert())
-                .then(entityRegisterCommands.createCookieEntityCommand())
                 .then(createGiveCommand())
                 .then(modifyCommands.createModifyCommand())
-                .then(utilityCommands.createReloadCommand());
+                .then(utilityCommands.createReloadCommand())
+                .then(Commands.literal("registry")
+                        .requires(sender -> sender.getSender().isOp())
+                        .then(entityRegisterCommands.createCookieEntityCommand())
+                        .then(blockRegisterCommands.createBlocksCommand()));
         return cookieClicker.build();
     }
 

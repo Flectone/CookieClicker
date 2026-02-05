@@ -24,10 +24,7 @@ import net.flectone.cookieclicker.gameplay.window.listeners.WindowListener;
 import net.flectone.cookieclicker.items.ItemsRegistry;
 import net.flectone.cookieclicker.items.RecipesRegistry;
 import net.flectone.cookieclicker.items.TradesRegistry;
-import net.flectone.cookieclicker.utility.config.CookieClickerConfig;
-import net.flectone.cookieclicker.utility.config.EquipmentUpgradeConfig;
-import net.flectone.cookieclicker.utility.config.ItemsDescription;
-import net.flectone.cookieclicker.utility.config.RegisteredEntitiesConfig;
+import net.flectone.cookieclicker.utility.config.*;
 import net.flectone.cookieclicker.utility.database.Database;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -58,6 +55,10 @@ public final class CookieClicker extends JavaPlugin {
         Path entitiesPath = registryPath.resolve("entities.yml");
         RegisteredEntitiesConfig entities = new RegisteredEntitiesConfig(entitiesPath);
 
+        // registered blocks
+        Path blocksPath = registryPath.resolve("blocks.yml");
+        RegisteredBlocks blocks = new RegisteredBlocks(blocksPath);
+
         // registered equipment upgrades
         Path upgradesPath = registryPath.resolve("upgrades.yml");
         EquipmentUpgradeConfig upgrades = new EquipmentUpgradeConfig(upgradesPath);
@@ -72,11 +73,12 @@ public final class CookieClicker extends JavaPlugin {
 
         config.reload();
         entities.reload();
+        blocks.reload();
         guides.reload();
         upgrades.reload();
 
-        injector = Guice.createInjector(new CookieClickerInject(this, getLogger(), entities, config, guides,
-                scheduler, upgrades));
+
+        injector = Guice.createInjector(new CookieClickerInject(this, getLogger(), scheduler, entities, config, guides, upgrades, blocks));
 
         registerEvents();
         PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(PacketDispatcher.class), PacketListenerPriority.NORMAL);
