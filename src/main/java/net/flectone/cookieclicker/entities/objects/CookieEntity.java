@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class CookieEntity {
+public class CookieEntity implements Spawnable {
     private final int entityId;
     private final UUID uuid;
     protected final EntityType entityType;
