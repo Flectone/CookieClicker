@@ -12,18 +12,65 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
 @Singleton
 public class StatsUtils {
-    private Features getFeatures(ItemStack itemStack) {
-        if (itemStack == null)
-            return Features.EMPTY;
 
-        return new Features(itemStack);
+    public int getFarmingFortune(Player player) {
+        int amount = getStatAmount(player.getMainHandItem(), StatType.FARMING_FORTUNE, CookieItems.COOKIE_BOOST_ENCHANTMENT);
+        amount += getStatFromArmor(player, StatType.FARMING_FORTUNE);
+
+        return amount;
+    }
+
+    public int getMiningFortune(Player player) {
+        int amount = getStatAmount(player.getMainHandItem(), StatType.MINING_FORTUNE, CookieItems.MINING_BOOST_ENCHANTMENT);
+        amount += getStatFromArmor(player, StatType.MINING_FORTUNE);
+
+        return amount;
+    }
+
+    public int getBlockDamage(ItemStack itemStack) {
+        return getStatAmount(itemStack, StatType.BLOCK_DAMAGE, CookieItems.BLOCK_DAMAGE_ENCHANTMENT);
+    }
+
+    public Integer extractStat(Player player, StatType statType) {
+        return switch (statType) {
+            case FARMING_FORTUNE -> getFarmingFortune(player);
+            case MINING_FORTUNE -> getMiningFortune(player);
+            case BLOCK_DAMAGE -> getBlockDamage(player.getMainHandItem());
+            default -> getStatAmount(player.getMainHandItem(), statType);
+        };
+    }
+
+    private int getStatFromArmor(Player player, StatType statType) {
+        int fortune = 0;
+
+        Inventory inventory = player.getInventory();
+
+        for (ItemStack itemStack : inventory) {
+            fortune += getStatAmount(itemStack, statType);
+        }
+        return fortune;
+    }
+
+    private int getStatAmount(ItemStack itemStack, StatType statType) {
+        return getFeatures(itemStack).getStat(statType);
+    }
+
+    private int getStatAmount(ItemStack itemStack, StatType statType, String enchantmentName) {
+        int amount = getFeatures(itemStack).getStat(statType);
+
+        for (Object2IntMap.Entry<Holder<Enchantment>> enchantment : itemStack.getEnchantments().entrySet()) {
+            if (enchantment.getKey().getRegisteredName().equals(enchantmentName))
+                amount += 1 << (enchantment.getIntValue() - 1);
+        }
+
+        return amount;
     }
 
     public ItemTag getItemTag(ItemStack itemStack) {
@@ -51,36 +98,11 @@ public class StatsUtils {
         return getFeatures(itemStack).getStat(StatType.EQUIPMENT_TIER);
     }
 
-    private Integer getBaseFarmingFortune(ItemStack itemStack) {
-        return getFeatures(itemStack).getStat(StatType.FARMING_FORTUNE);
-    }
+    private Features getFeatures(@NotNull ItemStack itemStack) {
+        if (itemStack.isEmpty())
+            return Features.EMPTY;
 
-    public Integer getFarmingFortune(ItemStack itemStack) {
-        int amount = getBaseFarmingFortune(itemStack);
-
-        for (Object2IntMap.Entry<Holder<Enchantment>> enchantment : itemStack.getEnchantments().entrySet()) {
-            if (enchantment.getKey().getRegisteredName().equals(CookieItems.COOKIE_BOOST_ENCHANTMENT))
-                amount += 1 << (enchantment.getIntValue() - 1);
-        }
-        return amount;
-    }
-
-    public Integer extractStat(Player player, StatType statType) {
-        int fortune = 1;
-
-        Inventory inventory = player.getInventory();
-        //броня, если есть
-        for (int i = 36; i < 40; i++) {
-            if (inventory.getItem(i).getItem() != Items.AIR)
-                fortune += getFarmingFortune(inventory.getItem(i));
-        }
-
-        ItemStack itemInHand = player.getMainHandItem();
-        fortune += getFarmingFortune(itemInHand);
-//        if (getFeatures(itemInHand).getCategory() == ToolType.HOE) {
-//            fortune += getFarmingFortune(itemInHand);
-//        }
-        return fortune;
+        return new Features(itemStack);
     }
 
     //оно там как-то вычисляет,
