@@ -119,6 +119,9 @@ public class CookieEventManager {
             // Player interact with block
             case WrapperPlayClientPlayerBlockPlacement blockPlacement ->
                     dispatchPlayerEvent(event, new ClickerInteractBlock(serverCookiePlayer, blockPlacement));
+            // Player mining block
+            case WrapperPlayClientPlayerDigging digging ->
+                    dispatchPlayerEvent(event, new ClickerPlayerBreaking(serverCookiePlayer, digging));
 
             default -> {
                 // некоторые пакеты могут не выполнять условия, из-за чего ивент не вызывается,

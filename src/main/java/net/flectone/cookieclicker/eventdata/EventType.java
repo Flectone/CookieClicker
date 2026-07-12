@@ -22,6 +22,7 @@ public enum EventType {
     PICKUP_ITEM (ClickerPickupItem.class),
     DROP_ITEM (ClickerDropItem.class),
     SWING_ARM (ClickerPlayerSwingArm.class),
+    PLAYER_MINING (ClickerPlayerBreaking.class),
     PREPARE_ANVIL (ClickerPrepareAnvil.class);
 
     private final Class<?> clazz;
