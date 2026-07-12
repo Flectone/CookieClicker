@@ -61,5 +61,6 @@ public class ItemPickupLogic {
         compactor.compact(inventory, ItemTag.COOKIE, loadedItems.get(ItemTag.ENCHANTED_COOKIE), 160 + lvl);
         compactor.compact(inventory, ItemTag.COCOA_BEANS, loadedItems.get(ItemTag.ENCHANTED_COCOA_BEANS), 320 + lvl);
         compactor.compact(inventory, ItemTag.WHEAT, loadedItems.get(ItemTag.ENCHANTED_WHEAT), 160 + lvl);
+        compactor.compact(inventory, ItemTag.MELON, loadedItems.get(ItemTag.ENCHANTED_MELON), 80 + lvl);
     }
 }

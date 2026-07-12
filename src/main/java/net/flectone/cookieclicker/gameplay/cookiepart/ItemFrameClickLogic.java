@@ -64,7 +64,7 @@ public class ItemFrameClickLogic {
         // проверка на уникальную мотыгу (легендарная или эпическая)
         checkUniqueHoe(serverCookiePlayer, location);
 
-        statisticDisplay.displayActionBar(serverCookiePlayer, maxAmount, droppedAmount);
+        statisticDisplay.displayFarmStatsActionBar(serverCookiePlayer, maxAmount, droppedAmount);
 
         itemSpawner.prepareSpawnItems(serverCookiePlayer, droppedAmount,
                 location);

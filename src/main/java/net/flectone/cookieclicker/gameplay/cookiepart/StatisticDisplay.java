@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerAc
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
+import net.flectone.cookieclicker.gameplay.blockbreaking.data.BlockType;
 import net.flectone.cookieclicker.items.attributes.StatType;
 import net.flectone.cookieclicker.utility.StatsUtils;
 import net.flectone.cookieclicker.utility.hoes.EpicHoeUtils;
@@ -27,7 +28,7 @@ public class StatisticDisplay {
         this.statsUtils = statsUtils;
     }
 
-    public void displayActionBar(ServerCookiePlayer serverCookiePlayer, Integer maxAmount, Integer droppedAmount) {
+    public void displayFarmStatsActionBar(ServerCookiePlayer serverCookiePlayer, Integer maxAmount, Integer droppedAmount) {
         // Показ статистики
         Component line = Component.text("| ").style(Style.style(TextDecoration.BOLD));
         // Первое число - общее количество удачи
@@ -53,6 +54,23 @@ public class StatisticDisplay {
                 .append(fortune)
                 .append(epicStat)
                 .append(miningStats);
+
+        serverCookiePlayer.sendPEpacket(new WrapperPlayServerActionBar(actionBar));
+    }
+
+    public void displayMiningStatsOnStart(ServerCookiePlayer serverCookiePlayer, BlockType type) {
+        Component line = Component.text(" | ").style(Style.style(TextDecoration.BOLD));
+
+        Component minedBlock = Component.text(type.toString());
+
+        Component requiredAndPlayerPower = Component.text(statsUtils.extractStat(serverCookiePlayer.getPlayer(), StatType.MINING_POWER))
+                .append(Component.text(" to required "))
+                .append(Component.text(type.getRequiredPower()));
+
+        Component actionBar = Component.empty()
+                .append(minedBlock)
+                .append(line)
+                .append(requiredAndPlayerPower);
 
         serverCookiePlayer.sendPEpacket(new WrapperPlayServerActionBar(actionBar));
     }

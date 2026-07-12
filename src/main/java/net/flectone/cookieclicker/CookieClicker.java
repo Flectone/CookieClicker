@@ -14,6 +14,7 @@ import net.flectone.cookieclicker.commands.subcommands.UtilityCommands;
 import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.eventdata.CookieEventManager;
 import net.flectone.cookieclicker.eventdata.listener.PacketDispatcher;
+import net.flectone.cookieclicker.gameplay.blockbreaking.listeners.BlockBreakListener;
 import net.flectone.cookieclicker.gameplay.cookiepart.InteractionController;
 import net.flectone.cookieclicker.gameplay.cookiepart.listeners.*;
 import net.flectone.cookieclicker.gameplay.crafting.anvil.listeners.AnvilListener;
@@ -126,6 +127,8 @@ public final class CookieClicker extends JavaPlugin {
         cookieEventManager.register(injector.getInstance(InventoryClickListener.class));
         cookieEventManager.register(injector.getInstance(PlayerInteractItemListener.class));
         cookieEventManager.register(injector.getInstance(PlayerInteractBlockListener.class));
+
+        cookieEventManager.register(injector.getInstance(BlockBreakListener.class));
 
         cookieEventManager.register(injector.getInstance(WindowListener.class));
         cookieEventManager.register(injector.getInstance(CraftingListener.class));
