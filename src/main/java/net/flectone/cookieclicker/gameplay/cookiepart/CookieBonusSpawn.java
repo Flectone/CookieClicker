@@ -41,7 +41,7 @@ public class CookieBonusSpawn {
 
     }
 
-    public void checkForBonusClick(ServerCookiePlayer serverCookiePlayer, Integer entityId) {
+    public void checkForBonusClickAndSpawn(ServerCookiePlayer serverCookiePlayer, Integer entityId) {
         if (bonusEntities.isEmpty() || !bonusEntities.contains(entityId))
             return;
 

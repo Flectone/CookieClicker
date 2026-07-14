@@ -59,7 +59,7 @@ public class ServerCookiePlayer extends CookiePlayer {
     private Player getPlayer(UUID uuid) {
         //короче, тут я беру всех игроков на сервере и с помощью UUID нахожу нужного
         Player player = null;
-        for (Player i : MinecraftServer.getServer().getPlayerList().players) {
+        for (Player i : MinecraftServer.getServer().getPlayerList().getPlayers()) {
             if (i.getUUID().equals(uuid))
                 player = i;
         }

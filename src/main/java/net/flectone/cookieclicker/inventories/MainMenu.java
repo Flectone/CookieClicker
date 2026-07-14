@@ -30,6 +30,7 @@ import net.minecraft.server.dialog.body.PlainMessage;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.TooltipDisplay;
 
@@ -183,7 +184,9 @@ public class MainMenu {
         List<DialogBody> lines = new ArrayList<>();
 
         // Добавление предмета перед описанием, чтобы было понятнее
-        lines.add(new ItemBody(itemStack, Optional.empty(),
+        ItemStackTemplate itemStackTemplate = new ItemStackTemplate(itemStack.getItem(), itemStack.getComponentsPatch());
+
+        lines.add(new ItemBody(itemStackTemplate, Optional.empty(),
                 true, true, 16, 16));
         Component titleComponent = itemStack.getComponents()
                                 .getOrDefault(DataComponents.CUSTOM_NAME, Component.literal("Описание предмета"));
@@ -250,7 +253,7 @@ public class MainMenu {
     }
 
     private ItemStack getFiller() {
-        CommonCookieItem filler = new CommonCookieItem(Items.WHITE_STAINED_GLASS_PANE, ItemTag.EMPTY,
+        CommonCookieItem filler = new CommonCookieItem(Items.STAINED_GLASS_PANE.white(), ItemTag.EMPTY,
                 "<gradient:#C30707:#D43030>???</gradient>");
 
         ItemStack itemStack = filler.toMinecraftStack();
@@ -261,7 +264,7 @@ public class MainMenu {
     }
 
     private ItemStack getReturnButton() {
-        CommonCookieItem close = new CommonCookieItem(Items.RED_STAINED_GLASS_PANE, ItemTag.EMPTY,
+        CommonCookieItem close = new CommonCookieItem(Items.STAINED_GLASS_PANE.red(), ItemTag.EMPTY,
                 "<gradient:#C30707:#D43030>Назад</gradient>");
 
         return close.toMinecraftStack();

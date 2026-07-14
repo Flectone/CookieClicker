@@ -2,8 +2,8 @@ package net.flectone.cookieclicker.items.itemstacks.tools;
 
 import net.flectone.cookieclicker.items.attributes.ToolType;
 import net.flectone.cookieclicker.items.itemstacks.base.data.ItemTag;
-import net.minecraft.advancements.criterion.BlockPredicate;
-import net.minecraft.advancements.criterion.DataComponentMatchers;
+import net.minecraft.advancements.predicates.BlockPredicate;
+import net.minecraft.advancements.predicates.DataComponentMatchers;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
@@ -50,7 +50,6 @@ public class CookieBlockBreaker extends ToolCookieItem {
                 blockHolders.add(blockHolder);
             }
         }));
-
         BlockPredicate blockPredicate = new BlockPredicate(
                 Optional.of(HolderSet.direct(blockHolders)),
                 Optional.empty(),

@@ -1,17 +1,19 @@
 package net.flectone.cookieclicker.inventories.containers;
 
 import lombok.Getter;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.ItemContainerContents;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 @Getter
 public class ItemStorage extends ClickerContainer {
+
     public static final String STORAGE_CONTAINER = "shulker";
     private ItemStack boundItem;
     private boolean playerInv = false;
@@ -19,9 +21,13 @@ public class ItemStorage extends ClickerContainer {
     public ItemStorage(ItemContainerContents containerContents, int type, ItemStack boundItem) {
         super(generateId(), type, STORAGE_CONTAINER);
         this.boundItem = boundItem;
-        NonNullList<ItemStack> items = containerContents.items;
+        List<Optional<ItemStackTemplate>> items = containerContents.items;
+
         for (int i = 0; i < items.size(); i++) {
-            containerItems.set(i, items.get(i));
+            Optional<ItemStackTemplate> itemStackTemplate = items.get(i);
+            if (itemStackTemplate.isEmpty()) return;
+            containerItems.set(i, itemStackTemplate.get().create());
+
         }
     }
 

@@ -107,8 +107,8 @@ public class InteractionController {
         return false;
     }
 
-    public void isBonusClick(int entityId, ServerCookiePlayer serverCookiePlayer) {
-        cookieBonusSpawn.checkForBonusClick(serverCookiePlayer, entityId);
+    public void handleEntityClick(int entityId, ServerCookiePlayer serverCookiePlayer) {
+        cookieBonusSpawn.checkForBonusClickAndSpawn(serverCookiePlayer, entityId);
     }
 
 }

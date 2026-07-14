@@ -11,6 +11,7 @@ public enum EventType {
 
     NONE (BasePlayerEvent.class),
     INTERACT_AT_ENTITY (ClickerInteractAtEntity.class),
+    ATTACK_ENTITY (ClickerAttackEntity.class),
     INTERACT_AT_BLOCK (ClickerInteractBlock.class),
     INTERACT_WITH_ITEM(ClickerInteract.class),
     OPEN_WINDOW (ClickerOpenWindow.class),

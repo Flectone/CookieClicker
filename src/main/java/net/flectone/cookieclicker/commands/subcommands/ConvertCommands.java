@@ -28,7 +28,7 @@ public class ConvertCommands {
                             Player nmsExecutor = getPlayerExecutor(ctx.getSource().getExecutor());
                             if (nmsExecutor == null)
                                 return 0;
-                            nmsExecutor.displayClientMessage(Component.literal("Предмет в вашей руке был переделан"), false);
+                            nmsExecutor.sendSystemMessage(Component.literal("Предмет в вашей руке был переделан"));
 
                             nmsExecutor.setItemInHand(InteractionHand.MAIN_HAND, convertItem(nmsExecutor.getMainHandItem(), nmsExecutor.getMainHandItem().getCount()));
 
@@ -43,7 +43,7 @@ public class ConvertCommands {
                             Inventory playerInventory = nmsExecutor.getInventory();
                             convertInventory(playerInventory);
 
-                            nmsExecutor.displayClientMessage(Component.literal("Предметы в инвентаре обновлены"), false);
+                            nmsExecutor.sendSystemMessage(Component.literal("Предметы в инвентаре обновлены"));
                             return Command.SINGLE_SUCCESS;
                         }));
         return convert.build();

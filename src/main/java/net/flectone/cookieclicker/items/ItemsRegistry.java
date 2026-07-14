@@ -316,13 +316,13 @@ public class ItemsRegistry {
         registerItem(pumpkin);
 
         //Backpack 18 slots
-        BackpackCookieItem bag18 = new BackpackCookieItem(Items.GREEN_BUNDLE, ItemTag.BAG_18, 18,
+        BackpackCookieItem bag18 = new BackpackCookieItem(Items.DYED_BUNDLE.green(), ItemTag.BAG_18, 18,
                 "<gradient:#32a208:#46d610><italic:false>Обычный мешок");
         bag18.hideItem();
         registerItem(bag18);
 
         //Backpack 45 slots
-        BackpackCookieItem bag45 = new BackpackCookieItem(Items.PURPLE_BUNDLE, ItemTag.BAG_45, 45,
+        BackpackCookieItem bag45 = new BackpackCookieItem(Items.DYED_BUNDLE.purple(), ItemTag.BAG_45, 45,
                 "<gradient:#8315b6:#c21fe7><italic:false>Редкий мешок");
         bag45.hideItem();
         registerItem(bag45);

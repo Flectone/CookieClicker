@@ -51,8 +51,8 @@ public class PlayerInteractItemListener implements CookieListener {
             return;
 
         ItemContainerContents containerContents = itemInHand.getComponents().getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
-        ItemStorage itemStorage = new ItemStorage(containerContents,
-                (new Features(itemInHand).getStat(StatType.ADDITIONAL_SLOT) / 9) - 1, itemInHand);
+        int containerType = (new Features(itemInHand).getStat(StatType.ADDITIONAL_SLOT) / 9) - 1;
+        ItemStorage itemStorage = new ItemStorage(containerContents, containerType, itemInHand);
 
         containerManager.openContainer(serverCookiePlayer, itemStorage);
         serverCookiePlayer.swingArm();

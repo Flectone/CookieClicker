@@ -1,14 +1,13 @@
 package net.flectone.cookieclicker.gameplay.blockbreaking.listeners;
 
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
-import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.cookieclicker.commands.subcommands.BlockRegisterCommands;
 import net.flectone.cookieclicker.entities.playerdata.ServerCookiePlayer;
 import net.flectone.cookieclicker.eventdata.CookieEventHandler;
 import net.flectone.cookieclicker.eventdata.CookieListener;
-import net.flectone.cookieclicker.eventdata.events.ClickerInteractAtEntity;
+import net.flectone.cookieclicker.eventdata.events.ClickerAttackEntity;
 import net.flectone.cookieclicker.eventdata.events.ClickerPlayerBreaking;
 import net.flectone.cookieclicker.gameplay.blockbreaking.BlockHandler;
 import net.flectone.cookieclicker.gameplay.blockbreaking.data.BlockType;
@@ -62,9 +61,9 @@ public class BlockBreakListener implements CookieListener {
     }
 
     @CookieEventHandler
-    public void onPlayerClick(ClickerInteractAtEntity event) {
-        if (event.getInteractAction() != WrapperPlayClientInteractEntity.InteractAction.ATTACK) return;
-
+    public void onPlayerClick(ClickerAttackEntity event) {
+        //if (event.getInteractAction() != WrapperPlayClientInteractEntity.InteractAction.ATTACK) return;
+        
         blockHandler.dealDamage(event.getCookiePlayer(), event.getInteractedEntityId());
     }
 

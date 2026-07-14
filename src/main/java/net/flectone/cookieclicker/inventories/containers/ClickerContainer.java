@@ -20,11 +20,11 @@ public class ClickerContainer {
     public static final int ANVIL_TYPE = 8;
     public static final int CRAFTING_TABLE_TYPE = 12;
 
-    public static final ItemStack fillerItem = new CommonCookieItem(Items.WHITE_STAINED_GLASS_PANE, ItemTag.EMPTY,
+    public static final ItemStack fillerItem = new CommonCookieItem(Items.STAINED_GLASS_PANE.white(), ItemTag.EMPTY,
             "<gradient:#ffffff:#cccccc><italic:false>filler")
             .withoutTooltip()
             .toMinecraftStack();
-    public static final ItemStack closeItem = new CommonCookieItem(Items.RED_STAINED_GLASS_PANE, ItemTag.EMPTY, "close")
+    public static final ItemStack closeItem = new CommonCookieItem(Items.STAINED_GLASS_PANE.red(), ItemTag.EMPTY, "close")
             .withoutTooltip()
             .toMinecraftStack();
 

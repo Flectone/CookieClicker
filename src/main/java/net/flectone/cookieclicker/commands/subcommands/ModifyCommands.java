@@ -66,11 +66,11 @@ public class ModifyCommands {
                                         inHandCookieStack.setStat(statType, ctx.getArgument("value", Integer.class));
 
                                         nmsExecutor.setItemInHand(InteractionHand.MAIN_HAND, inHandCookieStack.toMinecraftStack());
-                                        nmsExecutor.displayClientMessage(SUCCESSFUL_STAT_CHANGE.copy().append(statType.getName()), false);
+                                        nmsExecutor.sendSystemMessage(SUCCESSFUL_STAT_CHANGE.copy().append(statType.getName()));
                                         return Command.SINGLE_SUCCESS;
 
                                     } catch (IllegalArgumentException e) {
-                                        nmsExecutor.displayClientMessage(UNABLE_TO_FIND, false);
+                                        nmsExecutor.sendSystemMessage(UNABLE_TO_FIND);
                                         return 0;
                                     }
                                 })));
@@ -100,11 +100,11 @@ public class ModifyCommands {
                                 inHandCookieStack.setAbility(ability);
 
                                 nmsExecutor.setItemInHand(InteractionHand.MAIN_HAND, inHandCookieStack.toMinecraftStack());
-                                nmsExecutor.displayClientMessage(SUCCESSFUL_ABILITY_CHANGE, false);
+                                nmsExecutor.sendSystemMessage(SUCCESSFUL_ABILITY_CHANGE);
                                 return Command.SINGLE_SUCCESS;
 
                             } catch (IllegalArgumentException e) {
-                                nmsExecutor.displayClientMessage(UNABLE_TO_FIND, false);
+                                nmsExecutor.sendSystemMessage(UNABLE_TO_FIND);
                                 return 0;
                             }
                         }));
@@ -134,11 +134,11 @@ public class ModifyCommands {
                                 inHandCookieStack.setToolType(toolType);
 
                                 nmsExecutor.setItemInHand(InteractionHand.MAIN_HAND, inHandCookieStack.toMinecraftStack());
-                                nmsExecutor.displayClientMessage(SUCCESSFUL_TOOL_CHANGE, false);
+                                nmsExecutor.sendSystemMessage(SUCCESSFUL_TOOL_CHANGE);
                                 return Command.SINGLE_SUCCESS;
 
                             } catch (IllegalArgumentException e) {
-                                nmsExecutor.displayClientMessage(UNABLE_TO_FIND, false);
+                                nmsExecutor.sendSystemMessage(UNABLE_TO_FIND);
                                 return 0;
                             }
                         }));
@@ -165,7 +165,7 @@ public class ModifyCommands {
 
                             inHandCookieStack.setName(ctx.getArgument("name", String.class));
 
-                            nmsExecutor.displayClientMessage(SUCCESSFUL_RENAME, false);
+                            nmsExecutor.sendSystemMessage(SUCCESSFUL_RENAME);
                             nmsExecutor.setItemInHand(InteractionHand.MAIN_HAND, inHandCookieStack.toMinecraftStack());
 
                             return Command.SINGLE_SUCCESS;

@@ -81,6 +81,9 @@ public class CookieEventManager {
             // Interact at entity
             case WrapperPlayClientInteractEntity interact ->
                     dispatchPlayerEvent(event, new ClickerInteractAtEntity(serverCookiePlayer, interact));
+            // Attack entity
+            case WrapperPlayClientAttack attack ->
+                    dispatchPlayerEvent(event, new ClickerAttackEntity(serverCookiePlayer, attack));
             // Player eat
             case WrapperPlayServerEntityStatus status when status.getEntityId() == serverCookiePlayer.getId() && status.getStatus() == 9 ->
                     dispatchPlayerEvent(event, new ClickerPlayerEat(serverCookiePlayer, status));
@@ -161,6 +164,7 @@ public class CookieEventManager {
             case PacketType.Play.Client.PLAYER_DIGGING -> new WrapperPlayClientPlayerDigging(receiveEvent);
             case PacketType.Play.Client.PLAYER_BLOCK_PLACEMENT -> new WrapperPlayClientPlayerBlockPlacement(receiveEvent);
             case PacketType.Play.Client.ANIMATION -> new WrapperPlayClientAnimation(receiveEvent);
+            case PacketType.Play.Client.ATTACK -> new WrapperPlayClientAttack(receiveEvent);
             default -> null;
         };
     }
